@@ -107,14 +107,14 @@ CGI webinterface for Nagios.
 Interfejs CGI dla Nagiosa.
 
 %package devel
-Summary:	Include files that Netsaint-related applications may compile against
+Summary:	Include files that Nagios-related applications may compile against
 Summary(pl):	Pliki nag³ówkowe, wykorzystywane przez aplikacje nagiosa
 Summary(pt_BR):	Arquivos de cabeçalho necessários para desenvolvimento de aplicativos para o Nagios
 Group:		Development/Libraries
 # doesn't require base
 
 %description devel
-This package provides include files that Netsaint-related applications
+This package provides include files that Nagios-related applications
 may compile against.
 
 %description devel -l pl
@@ -177,7 +177,7 @@ if [ -n "`getgid nagios`" ]; then
 		exit 1
 	fi
 else
-	if [ -n "`getgid netsaint`" -a "`getgid netsaint`" = "72" ]; then
+	if [ -n "`getgid netsaint`" ] && [ "`getgid netsaint`" = "72" ]; then
 		/usr/sbin/groupmod -n nagios netsaint
 	else
 		/usr/sbin/groupadd -g 72 -f nagios
@@ -189,7 +189,7 @@ if [ -n "`id -u nagios 2>/dev/null`" ]; then
 		exit 1
 	fi
 else
-	if [ -n "`id -u netsaint 2>/dev/null`" -a "`id -u netsaint`" = "72" ]; then
+	if [ -n "`id -u netsaint 2>/dev/null`" ] && [ "`id -u netsaint`" = "72" ]; then
 		/usr/sbin/usermod -d /tmp -l nagios netsaint
 	else
 		/usr/sbin/useradd -u 72 -d %{_libdir}/nagios -s /bin/false -c "%{name} User" -g nagios nagios 1>&2
