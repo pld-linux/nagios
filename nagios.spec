@@ -11,7 +11,7 @@ Summary(pl):	Program do monitorowania serwerów/us³ug/sieci
 Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	1.2
-Release:	5
+Release:	6
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
@@ -25,7 +25,11 @@ Patch2:		%{name}-iconv-in-libc.patch
 URL:		http://www.nagios.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
-%{?with_gd:BuildRequires:	gd-devel, libjpeg-devel, libpng-devel}
+%if %{with gd}
+BuildRequires:	gd-devel
+BuildRequires:	libjpeg-devel
+BuildRequires:	libpng-devel
+%endif
 %{?with_mysql:BuildRequires:	mysql-devel}
 %{?with_pgsql:BuildRequires:	postgresql-devel}
 BuildRequires:	rpmbuild(macros) >= 1.159
