@@ -11,7 +11,7 @@ Summary(pl):	Program do monitorowania serwerów/us³ug/sieci
 Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	1.2
-Release:	2
+Release:	3
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
@@ -20,6 +20,7 @@ Source1:	%{name}-apache.conf
 Source2:	%{name}.init
 Patch0:		%{name}-pgsql.patch
 Patch1:		%{name}-resources.patch
+Patch2:		%{name}-iconv-in-libc.patch
 URL:		http://www.nagios.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -84,7 +85,7 @@ Summary:	CGI webinterface for Nagios
 Summary(pl):	Interfejs WWW/CGI dla Nagiosa
 Group:		Networking
 # for dirs... and accessing local logs(?)
-Requires:	%{name} = %{version}
+Requires:	%{name} = %{version}-%{release}
 Requires:	apache
 
 %description cgi
@@ -116,6 +117,7 @@ aplicativos para o Nagios.
 %setup -q
 %{?with_pgsql:%patch0 -p1}
 %patch1 -p0
+%patch2 -p1
 
 %build
 %{__aclocal}
