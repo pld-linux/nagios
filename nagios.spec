@@ -188,8 +188,8 @@ fi
 %doc Changelog README* UPGRADING contrib/database
 %attr(754,root,root) /etc/rc.d/init.d/%{name}
 %attr(751,root,nagios) %dir %{_sysconfdir}
-%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/[^c]*
-%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/c[^g]*
+%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/[!c]*
+%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/c[!g]*
 %dir %{_libdir}/%{name}
 %dir %{_libdir}/%{name}/plugins
 %attr(755,root,root) %{_sbindir}/%{name}
