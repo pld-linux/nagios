@@ -18,10 +18,10 @@ Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	2.0
 %define	_rc     b2
-Release:	0.%{_rc}.62
+Release:	0.%{_rc}.64
 License:	GPL v2
 Group:		Networking
-Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}%{_rc}.tar.gz
+Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}%{_rc}.tar.gz
 # Source0-md5:	72d21f961b28519529e8c96c35051fbc
 Source1:	%{name}-apache.conf
 Source2:	%{name}.init
@@ -325,8 +325,8 @@ chgrp nagios-data %{_sysconfdir}/*.cfg
 %doc Changelog README* UPGRADING INSTALLING LICENSE
 %doc sample-config/template-object/{bigger,minimal}.cfg
 %attr(750,root,nagios-data) %dir %{_sysconfdir}
-%attr(640,root,nagios-data) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/[!r]*.cfg
-%attr(640,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/resource.cfg
+%attr(640,root,nagios-data) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/[!r]*.cfg
+%attr(640,root,nagios) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/resource.cfg
 %exclude %{_sysconfdir}/cgi.cfg
 
 %attr(754,root,root) /etc/rc.d/init.d/%{name}
@@ -354,12 +354,12 @@ chgrp nagios-data %{_sysconfdir}/*.cfg
 
 %files cgi
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/apache-%{name}.conf
-%attr(640,root,http) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/cgi.cfg
-%attr(640,root,http) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/passwd
-%attr(640,root,http) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/group
-%dir %{_libdir}/%{name}/cgi
-%attr(755,root,root) %{_libdir}/%{name}/cgi/*.cgi
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/apache-%{name}.conf
+%attr(640,root,http) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/cgi.cfg
+%attr(640,root,http) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/passwd
+%attr(640,root,http) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/group
+%dir %{_sbindir}
+%attr(755,root,root) %{_sbindir}/*.cgi
 %{_datadir}
 
 %files devel
