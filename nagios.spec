@@ -18,7 +18,7 @@ Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	2.0
 %define	_rc     b2
-Release:	0.%{_rc}.66
+Release:	0.%{_rc}.68
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}%{_rc}.tar.gz
@@ -54,6 +54,7 @@ BuildRequires:	automake
 BuildRequires:	gd-devel
 BuildRequires:	libjpeg-devel
 BuildRequires:	libpng-devel
+BuildRequires:	sed >= 4.0
 %endif
 %{?with_mysql:BuildRequires:	mysql-devel}
 %{?with_pgsql:BuildRequires:	postgresql-devel}
@@ -168,6 +169,11 @@ aplicativos para o Nagios.
 %patch3 -p1
 %patch4 -p1
 
+sed -i -e '
+	s,.*/var/rw/nagios.cmd,%{_localstatedir}/rw/nagios.cmd,
+	s,.*/libexec/eventhandlers,%{_libdir}/%{name}/eventhandlers,
+' $(find contrib/eventhandlers -type f)
+
 %build
 %{__aclocal}
 %{__autoconf}
@@ -186,8 +192,8 @@ aplicativos para o Nagios.
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},%{_includedir}/%{name},%{_libdir}/%{name}/plugins} \
-	$RPM_BUILD_ROOT{%{_var}/log/%{name}/archives,%{_localstatedir},%{_sysconfdir}}
+install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},%{_includedir}/%{name},%{_libdir}/%{name}/{eventhandlers,plugins}} \
+	$RPM_BUILD_ROOT{%{_var}/log/%{name}/archives,%{_localstatedir},%{_sysconfdir},%{_examplesdir}/%{name}-%{version}}
 
 install include/locations.h	$RPM_BUILD_ROOT%{_includedir}/%{name}
 
@@ -208,7 +214,7 @@ install sample-config/{contact{s,groups},{misccommand,dependencie,escalation,hos
 echo 'nagios:' > $RPM_BUILD_ROOT%{_sysconfdir}/group
 
 # install event handlers
-cp -a contrib/eventhandlers $RPM_BUILD_ROOT%{_libdir}/%{name}/eventhandlers
+cp -a contrib/eventhandlers $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
 
 # Install logos
 install -d $RPM_BUILD_ROOT%{_datadir}/images/logos/{andrade,bernhard,cook}
@@ -379,8 +385,9 @@ fi
 %ghost %{_localstatedir}/*.dat
 %ghost %{_localstatedir}/%{name}.tmp
 
-%defattr(755,root,root,755)
-%{_libdir}/%{name}/eventhandlers
+%{_examplesdir}/%{name}-%{version}
+
+%dir %{_libdir}/%{name}/eventhandlers
 
 %files cgi
 %defattr(644,root,root,755)
