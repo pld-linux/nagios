@@ -3,7 +3,7 @@
 # _with_mysql - enable mysql support
 # _without_gd - without statusmap and trends, which require gd library
 
-%define	_beta	b5
+%define	_beta	b6
 
 Summary:	Host/service/network monitoring program
 Summary(pl):	Program do monitorowania serwerów/us³ug/sieci
