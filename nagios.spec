@@ -9,16 +9,18 @@
 #   - cgi.cfg contains sensitive information
 #   - /etc/nagios/*.cfg should be readable by nagios (and webserver if -cgi is used)
 #   - all files should be owned by root as there's no write permission needed
+
 Summary:	Host/service/network monitoring program
 Summary(pl):	Program do monitorowania serwerów/us³ug/sieci
 Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
-Version:	1.2
-Release:	7.4
+Version:	2.0
+%define	_rc     b1
+Release:	0.%{_rc}.1.3
 License:	GPL v2
 Group:		Networking
-Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
-# Source0-md5:	414d70e5269d5b8d7c21bf3ee129309f
+Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}%{?_rc}.tar.gz
+# Source0-md5:	994a89bd6d344f72a0520b72fb615857
 Source1:	%{name}-apache.conf
 Source2:	%{name}.init
 Source3:	http://dl.sourceforge.net/nagios/imagepak-base.tar.gz
@@ -102,7 +104,7 @@ Summary(pl):	Interfejs WWW/CGI dla Nagiosa
 Group:		Networking
 # for dirs... and accessing local logs(?)
 Requires:	%{name} = %{version}-%{release}
-Requires:	apache
+Requires:	webserver
 
 %description cgi
 CGI webinterface for Nagios.
@@ -130,7 +132,7 @@ Este pacote contém arquivos de cabeçalho usados no desenvolvimento de
 aplicativos para o Nagios.
 
 %prep
-%setup -q
+%setup -q -n %{name}-%{version}%{?_rc}
 %{?with_pgsql:%patch0 -p1}
 %patch1 -p0
 %patch2 -p1
@@ -154,11 +156,11 @@ aplicativos para o Nagios.
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{/etc/{rc.d/init.d,httpd},%{_includedir}/%{name},%{_libdir}/%{name}/plugins} \
-	$RPM_BUILD_ROOT{%{_var}/log/%{name},%{_localstatedir}}
+	$RPM_BUILD_ROOT{%{_var}/log/%{name},%{_localstatedir},%{_sysconfdir}/private}
 
-install common/locations.h	$RPM_BUILD_ROOT%{_includedir}/%{name}
+install include/locations.h	$RPM_BUILD_ROOT%{_includedir}/%{name}
 
-%{__make} install install-html install-config install-init install-commandmode fullinstall \
+%{__make} install install-html install-init install-commandmode fullinstall \
 	DESTDIR=$RPM_BUILD_ROOT \
 	INSTALL_OPTS="" \
 	INIT_OPTS="" \
@@ -167,13 +169,18 @@ install common/locations.h	$RPM_BUILD_ROOT%{_includedir}/%{name}
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/httpd/%{name}.conf
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 
-### Install logos
-tar -xvz -C $RPM_BUILD_ROOT%{_datadir}/images/logos -f %{SOURCE3}
+# install templated configuration files
+install sample-config/{nagios,cgi}.cfg $RPM_BUILD_ROOT%{_sysconfdir}
+install sample-config/resource.cfg $RPM_BUILD_ROOT%{_sysconfdir}/private
+install sample-config/template-object/{bigger,checkcommands,minimal,misccommands}.cfg $RPM_BUILD_ROOT%{_sysconfdir}
 
-# rename configs without sample extension
-for f in $RPM_BUILD_ROOT%{_sysconfdir}/*-sample; do
-	mv $f ${f%%-sample}
-done
+# install CGIs
+
+# install event handlers
+cp -a contrib/eventhandlers $RPM_BUILD_ROOT%{_libdir}/%{name}/eventhandlers
+
+# Install logos
+tar -xvz -C $RPM_BUILD_ROOT%{_datadir}/images/logos -f %{SOURCE3}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -254,7 +261,7 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc Changelog README* UPGRADING contrib/database
+%doc Changelog README* UPGRADING INSTALLING LICENSE 
 %attr(754,root,root) /etc/rc.d/init.d/%{name}
 %attr(751,root,nagios) %dir %{_sysconfdir}
 %attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/[!c]*
@@ -262,10 +269,14 @@ fi
 %dir %{_libdir}/%{name}
 %dir %{_libdir}/%{name}/plugins
 %attr(755,root,root) %{_bindir}/%{name}
+%attr(755,root,root) %{_bindir}/nagiostats
 %attr(771,nagios,http) %{_var}/log/%{name}
 %attr(775,nagios,nagios) %dir %{_localstatedir}
 %attr(775,nagios,nagios) %dir %{_localstatedir}/archives
 %attr(2775,nagios,http) %dir %{_localstatedir}/rw
+
+%defattr(755,root,root,755)
+%{_libdir}/%{name}/eventhandlers
 
 %files cgi
 %defattr(644,root,root,755)
