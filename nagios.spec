@@ -156,20 +156,20 @@ rm -rf $RPM_BUILD_ROOT
 
 %pre
 if [ -n "`getgid %{name}`" ]; then
-       if [ "`getgid %{name}`" != "72" ]; then
-               echo "Error: group %{name} doesn't have gid=72. Correct this before installing %{name}." 1>&2
-               exit 1
-       fi
+	if [ "`getgid %{name}`" != "72" ]; then
+		echo "Error: group %{name} doesn't have gid=72. Correct this before installing %{name}." 1>&2
+		exit 1
+	fi
 else
-       /usr/sbin/groupadd -g 72 -f %{name}
+	/usr/sbin/groupadd -g 72 -f %{name}
 fi
 if [ -n "`id -u %{name} 2>/dev/null`" ]; then
-       if [ "`id -u %{name}`" != "72" ]; then
-               echo "Error: user %{name} doesn't have uid=72. Correct this before installing %{name}." 1>&2
-               exit 1
-       fi
+	if [ "`id -u %{name}`" != "72" ]; then
+		echo "Error: user %{name} doesn't have uid=72. Correct this before installing %{name}." 1>&2
+		exit 1
+	fi
 else
-       /usr/sbin/useradd -u 72 -d %{_libdir}/%{name} -s /bin/false -c "%{name} User" -g %{name} %{name} 1>&2
+	/usr/sbin/useradd -u 72 -d %{_libdir}/%{name} -s /bin/false -c "%{name} User" -g %{name} %{name} 1>&2
 fi
 
 %post
@@ -188,8 +188,8 @@ fi
 
 %postun
 if [ "$1" = "0" ]; then
-       /usr/sbin/userdel %{name}
-       /usr/sbin/groupdel %{name}
+	/usr/sbin/userdel %{name}
+	/usr/sbin/groupdel %{name}
 fi
 
 %files
