@@ -22,10 +22,7 @@ URL:		http://www.nagios.org/
 %{?_with_mysql:BuildRequires:	mysql-devel}
 PreReq:		rc-scripts
 PreReq:		sh-utils
-Requires(pre):	/usr/bin/getgid
-Requires(pre):	/bin/id
-Requires(pre):	/usr/sbin/groupadd
-Requires(pre):	/usr/sbin/useradd
+Requires(pre):	user-nagios
 Requires(post,postun):	/sbin/chkconfig
 Conflicts:	iputils-ping < 1:ss020124
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -150,24 +147,6 @@ rm -f $RPM_BUILD_ROOT%{_sysconfdir}/%{name}command.cfg
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%pre
-if [ -n "`getgid %{name}`" ]; then
-	if [ "`getgid %{name}`" != "72" ]; then
-		echo "Error: group %{name} doesn't have gid=72. Correct this before installing %{name}." 1>&2
-		exit 1
-	fi
-else
-	/usr/sbin/groupadd -g 72 -f %{name}
-fi
-if [ -n "`id -u %{name} 2>/dev/null`" ]; then
-	if [ "`id -u %{name}`" != "72" ]; then
-		echo "Error: user %{name} doesn't have uid=72. Correct this before installing %{name}." 1>&2
-		exit 1
-	fi
-else
-	/usr/sbin/useradd -u 72 -d %{_libdir}/%{name} -s /bin/false -c "%{name} User" -g %{name} %{name} 1>&2
-fi
-
 %post
 /sbin/chkconfig --add %{name}
 if [ -f /var/lock/subsys/%{name} ]; then
@@ -180,12 +159,6 @@ if [ "$1" = "0" ] ; then
 		/etc/rc.d/init.d/%{name} stop 1>&2
 	fi
 	/sbin/chkconfig --del %{name}
-fi
-
-%postun
-if [ "$1" = "0" ]; then
-	/usr/sbin/userdel %{name}
-	/usr/sbin/groupdel %{name}
 fi
 
 %files
