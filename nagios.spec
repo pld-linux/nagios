@@ -27,6 +27,7 @@ BuildRequires:	automake
 %{?with_gd:BuildRequires:	gd-devel}
 %{?with_mysql:BuildRequires:	mysql-devel}
 %{?with_pgsql:BuildRequires:	postgresql-devel}
+BuildRequires:	rpmbuild(macros) >= 1.159
 PreReq:		rc-scripts
 PreReq:		sh-utils
 Requires(pre):	/usr/bin/getgid
