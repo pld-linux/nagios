@@ -58,13 +58,23 @@ case "$1" in
 	status nagios
 	exit $?
 	;;
-  restart|force-reload)
+  reload|force-reload)
+        if [ -f /var/lock/subsys/nagios ]; then
+                msg_reloading nagios
+                killproc nagios -HUP
+                RETVAL=$?
+        else
+                msg_not_running nagios >&2
+                exit 7
+        fi
+        ;;
+  restart)
 	$0 stop
 	$0 start
 	exit $?
 	;;
   *)
-	msg_usage "$0 {start|stop|restart|force-reload|status}"
+	msg_usage "$0 {start|stop|restart|reload|force-reload|status}"
 	exit 3
 esac
 
