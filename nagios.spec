@@ -46,6 +46,7 @@ BuildRequires:	libpng-devel
 BuildRequires:	rpmbuild(macros) >= 1.159
 PreReq:		rc-scripts
 PreReq:		sh-utils
+Requires:	mailx
 Requires(pre):	/usr/bin/getgid
 Requires(pre):	/bin/id
 Requires(pre):	/usr/sbin/groupadd
