@@ -535,6 +535,26 @@ diff -Nur ../c/hosts.cfg ./hosts.cfg
 +	command_name	process-service-perfdata
 +	command_line	/bin/printf "%b" "$LASTSERVICECHECK$\t$HOSTNAME$\t$SERVICEDESC$\t$SERVICESTATE$\t$SERVICEATTEMPT$\t$SERVICESTATETYPE$\t$SERVICEEXECUTIONTIME$\t$SERVICELATENCY$\t$SERVICEOUTPUT$\t$SERVICEPERFDATA$" >> /var/lib/nagios/service-perfdata.out
 +}
+--- ./sample-config/misccommands.cfg~	2005-03-06 23:47:31.000000000 +0200
++++ ./sample-config/misccommands.cfg	2005-03-06 23:32:10.370430529 +0200
+@@ -43,7 +43,7 @@
+ # 'notify-by-email' command definition
+ define command {
+ 	command_name	notify-by-email
+-	command_line	/bin/printf "%b" "***** Nagios  *****\n\nNotification Type: $NOTIFICATIONTYPE$\n\nService: $SERVICEDESC$\nHost: $HOSTALIAS$\nAddress: $HOSTADDRESS$\nState: $SERVICESTATE$\n\nDate/Time: $LONGDATETIME$\n\nAdditional Info:\n\n$SERVICEOUTPUT$" | /bin/mail -s "** $NOTIFICATIONTYPE$ alert - $HOSTALIAS$/$SERVICEDESC$ is $SERVICESTATE$ **" $CONTACTEMAIL$
++	command_line	/bin/printf "%b" "***** Nagios *****\n\nNotification Type: $NOTIFICATIONTYPE$\n\nService: $SERVICEDESC$\nHost: $HOSTALIAS$\nAddress: $HOSTADDRESS$\nState: $SERVICESTATE$\n\nDate/Time: $LONGDATETIME$\n\nAdditional Info:\n\n$SERVICEOUTPUT$" | /bin/mail -s "** $NOTIFICATIONTYPE$ alert - $HOSTALIAS$/$SERVICEDESC$ is $SERVICESTATE$ **" $CONTACTEMAIL$
+ }
+ 
+ # 'notify-by-epager' command definition
+@@ -55,7 +55,7 @@
+ # 'host-notify-by-email' command definition
+ define command {
+ 	command_name	host-notify-by-email
+-	command_line	/bin/printf "%b" "***** Nagios  *****\n\nNotification Type: $NOTIFICATIONTYPE$\nHost: $HOSTNAME$\nState: $HOSTSTATE$\nAddress: $HOSTADDRESS$\nInfo: $HOSTOUTPUT$\n\nDate/Time: $LONGDATETIME$\n" | /bin/mail -s "Host $HOSTSTATE$ alert for $HOSTNAME$!" $CONTACTEMAIL$
++	command_line	/bin/printf "%b" "***** Nagios *****\n\nNotification Type: $NOTIFICATIONTYPE$\nHost: $HOSTNAME$\nState: $HOSTSTATE$\nAddress: $HOSTADDRESS$\nInfo: $HOSTOUTPUT$\n\nDate/Time: $LONGDATETIME$\n" | /bin/mail -s "Host $HOSTSTATE$ alert for $HOSTNAME$!" $CONTACTEMAIL$
+ }
+ 
+ # 'host-notify-by-epager' command definition
 diff -Nur ../c/services.cfg ./services.cfg
 --- ../c/services.cfg	1970-01-01 03:00:00.000000000 +0300
 +++ ./sample-config/services.cfg	2005-03-06 22:14:50.597680223 +0200
