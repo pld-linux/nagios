@@ -1,8 +1,9 @@
 #
+# Conditional build:
 # _with_pgsql - enable pgsql support
 # _with_mysql - enable mysql support
 # _without_gd - without statusmap and trends, which require gd library
-
+#
 Summary:	Host/service/network monitoring program
 Summary(pl):	Program do monitorowania serwerów/us³ug/sieci
 Summary(pt_BR):	Programa para monitoração de máquinas e serviços
@@ -11,7 +12,7 @@ Version:	1.0
 Release:	1
 License:	GPL v2
 Group:		Networking
-Source0:	ftp://ftp.sourceforge.net/pub/sourceforge/%{name}/%{name}-%{version}.tar.gz
+Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 Source1:	%{name}-apache.conf
 Source2:	%{name}.init
 Patch0:		%{name}-pgsql.patch
