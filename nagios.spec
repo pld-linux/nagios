@@ -242,6 +242,7 @@ fi
 if [ "$1" = "0" ]; then
 	%userremove nagios
 	%groupremove nagios
+	%groupremove nagios-data
 fi
 
 %post cgi
