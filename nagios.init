@@ -33,11 +33,13 @@ case "$1" in
         if [ ! -f /var/lock/subsys/nagios ]; then
 		msg_starting nagios
                 # remove stale cmd pipe (or nagios won't start if it exists)
-                rm -f /var/log/nagios/rw/nagios.cmd
+                rm -f /var/lib/nagios/rw/nagios.cmd
 		daemon nagios -d /etc/nagios/nagios.cfg </dev/null
 	        RETVAL=$?
-    		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/nagios
-		chgrp http /var/lib/nagios/rw/nagios.cmd
+		if [ $RETVAL -eq 0 ]; then
+			touch /var/lock/subsys/nagios
+			chgrp http /var/lib/nagios/rw/nagios.cmd
+		fi
 	else
         	msg_already_running nagios
 	        exit 1
