@@ -5,13 +5,16 @@
 %bcond_without	gd	# without statusmap and trends, which require gd library
 #
 # TODO:
-# - remove *-sample from /etc - move it to %doc or place without "-sample" suffix
+#  - permissions in /etc. things to consider:
+#   - cgi.cfg contains sensitive information
+#   - /etc/nagios/*.cfg should be readable by nagios (and webserver if -cgi is used)
+#   - all files should be owned by root as there's no write permission needed
 Summary:	Host/service/network monitoring program
 Summary(pl):	Program do monitorowania serwerów/us³ug/sieci
 Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	1.2
-Release:	7
+Release:	7.4
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
@@ -167,6 +170,10 @@ install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 ### Install logos
 tar -xvz -C $RPM_BUILD_ROOT%{_datadir}/images/logos -f %{SOURCE3}
 
+# rename configs without sample extension
+for f in $RPM_BUILD_ROOT%{_sysconfdir}/*-sample; do
+	mv $f ${f%%-sample}
+done
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -263,7 +270,7 @@ fi
 %files cgi
 %defattr(644,root,root,755)
 %attr(640,root,http) %config(noreplace) %verify(not size mtime md5) /etc/httpd/%{name}.conf
-%attr(644,root,http) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/cgi.cfg-sample
+%attr(644,root,http) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/cgi.cfg
 %dir %{_libdir}/%{name}/cgi
 %attr(755,root,root) %{_libdir}/%{name}/cgi/*.cgi
 %{_datadir}
