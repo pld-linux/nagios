@@ -20,7 +20,7 @@ Version:	2.0
 Release:	0.%{_rc}.1
 License:	GPL v2
 Group:		Networking
-Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}%{?_rc}.tar.gz
+Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}%{_rc}.tar.gz
 # Source0-md5:	72d21f961b28519529e8c96c35051fbc
 Source1:	%{name}-apache.conf
 Source2:	%{name}.init
