@@ -18,7 +18,7 @@ Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	2.0
 %define	_rc     b2
-Release:	0.%{_rc}.64
+Release:	0.%{_rc}.65
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}%{_rc}.tar.gz
@@ -28,6 +28,20 @@ Source2:	%{name}.init
 Source3:	%{name}.sysconfig
 Source4:	http://dl.sourceforge.net/nagios/imagepak-base.tar.gz
 # Source4-md5:	35b75ece533dfdf4963a67ce4e77fc4a
+Source5:	http://dl.sourceforge.net/nagios/imagepak-andrade.tar.gz
+# Source5-md5:	6e3d35113812e19a2803281a3317fffb
+Source6:	http://dl.sourceforge.net/nagios/imagepak-bernhard.tar.gz
+# Source6-md5:	cd711110929fd2487234172a533e82c5
+Source7:	http://dl.sourceforge.net/nagios/imagepak-cook.tar.gz
+# Source7-md5:	248d682712c594fc4734c0158d2d2ee4
+Source8:	http://dl.sourceforge.net/nagios/imagepak-didier.tar.gz
+# Source8-md5:	83e98389e5b7fb39d2c0e3a96d5ca585
+Source9:	http://dl.sourceforge.net/nagios/imagepak-remus.tar.gz
+# Source9-md5:	76595744dae8153c921c4af6bf18383d
+Source10:	http://dl.sourceforge.net/nagios/imagepak-satrapa.tar.gz
+# Source10-md5:	3ed26d8b49379e0dc14f448d5c2a70c3
+Source11:	http://dl.sourceforge.net/nagios/imagepak-werschler.tar.gz
+# Source11-md5:	1a9cba019ccd27756977821aa735c40f
 Patch0:		%{name}-pgsql.patch
 Patch1:		%{name}-resources.patch
 Patch2:		%{name}-iconv-in-libc.patch
@@ -197,7 +211,15 @@ echo 'nagios:' > $RPM_BUILD_ROOT%{_sysconfdir}/group
 cp -a contrib/eventhandlers $RPM_BUILD_ROOT%{_libdir}/%{name}/eventhandlers
 
 # Install logos
-tar -xvz -C $RPM_BUILD_ROOT%{_datadir}/images/logos -f %{SOURCE4}
+install -d $RPM_BUILD_ROOT%{_datadir}/images/logos/{andrade,bernhard,cook}
+tar -xz -C $RPM_BUILD_ROOT%{_datadir}/images/logos -f %{SOURCE4}
+tar -xz -C $RPM_BUILD_ROOT%{_datadir}/images/logos/andrade --strip-path=1 -f %{SOURCE5}
+tar -xz -C $RPM_BUILD_ROOT%{_datadir}/images/logos/bernhard --strip-path=1 -f %{SOURCE6}
+tar -xz -C $RPM_BUILD_ROOT%{_datadir}/images/logos/cook -f %{SOURCE7}
+tar -xz -C $RPM_BUILD_ROOT%{_datadir}/images/logos -f %{SOURCE8}
+tar -xz -C $RPM_BUILD_ROOT%{_datadir}/images/logos -f %{SOURCE9}
+tar -xz -C $RPM_BUILD_ROOT%{_datadir}/images/logos -f %{SOURCE10}
+tar -xz -C $RPM_BUILD_ROOT%{_datadir}/images/logos -f %{SOURCE11}
 
 # Object data/cache files
 for i in {objects.cache,{comments,downtime,retention,status}.dat,nagios.tmp}; do
