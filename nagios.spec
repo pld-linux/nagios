@@ -65,6 +65,9 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_datadir	%{_prefix}/share/%{name}
 %define		_localstatedir	/var/lib/%{name}
 
+%define		_apache1dir	/etc/apache
+%define		_apache2dir	/etc/httpd
+
 %description
 Nagios is a program that will monitor hosts and services on your
 network. It has the ability to email or page you when a problem arises
@@ -169,7 +172,7 @@ install include/locations.h	$RPM_BUILD_ROOT%{_includedir}/%{name}
 	INIT_OPTS="" \
 	COMMAND_OPTS=""
 
-install %{SOURCE1} $RPM_BUILD_ROOT/etc/httpd/%{name}.conf
+install %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/%{name}-apache.conf
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 
 # install templated configuration files
@@ -246,30 +249,36 @@ if [ "$1" = "0" ]; then
 fi
 
 %post cgi
-if [ -f /etc/httpd/httpd.conf ] && ! grep -q "^Include.*%{name}.conf" /etc/httpd/httpd.conf; then
-	echo "Include /etc/httpd/%{name}.conf" >> /etc/httpd/httpd.conf
-	if [ -f /var/lock/subsys/httpd ]; then
-		/usr/sbin/apachectl restart 1>&2
+# apache1
+if [ -d %{_apache1dir}/conf.d ]; then
+	ln -sf %{_sysconfdir}/apache-%{name}.conf %{_apache1dir}/conf.d/99_%{name}.conf
+	if [ -f /var/lock/subsys/apache ]; then
+		/etc/rc.d/init.d/apache restart 1>&2
 	fi
-elif [ -d /etc/httpd/httpd.conf ]; then
-	ln -sf /etc/httpd/%{name}.conf /etc/httpd/httpd.conf/99_%{name}.conf
+fi
+# apache2
+if [ -d %{_apache2dir}/httpd.conf ]; then
+	ln -sf %{_sysconfdir}/apache-%{name}.conf %{_apache2dir}/httpd.conf/99_%{name}.conf
 	if [ -f /var/lock/subsys/httpd ]; then
-		/usr/sbin/apachectl restart 1>&2
+		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
 fi
 
 %preun cgi
 if [ "$1" = "0" ]; then
-	umask 027
-	if [ -d /etc/httpd/httpd.conf ]; then
-		rm -f /etc/httpd/httpd.conf/99_%{name}.conf
-	else
-		grep -v "^Include.*%{name}.conf" /etc/httpd/httpd.conf > \
-			/etc/httpd/httpd.conf.tmp
-		mv -f /etc/httpd/httpd.conf.tmp /etc/httpd/httpd.conf
+	# apache1
+	if [ -d %{_apache1dir}/conf.d ]; then
+		rm -f %{_apache1dir}/conf.d/99_%{name}.conf
+		if [ -f /var/lock/subsys/apache ]; then
+			/etc/rc.d/init.d/apache restart 1>&2
+		fi
 	fi
-	if [ -f /var/lock/subsys/httpd ]; then
-		/usr/sbin/apachectl restart 1>&2
+	# apache2
+	if [ -d %{_apache2dir}/httpd.conf ]; then
+		rm -f %{_apache2dir}/httpd.conf/99_%{name}.conf
+		if [ -f /var/lock/subsys/httpd ]; then
+			/etc/rc.d/init.d/httpd restart 1>&2
+		fi
 	fi
 fi
 
@@ -294,7 +303,7 @@ fi
 
 %files cgi
 %defattr(644,root,root,755)
-%attr(640,root,http) %config(noreplace) %verify(not size mtime md5) /etc/httpd/%{name}.conf
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}-apache.conf
 %attr(644,root,http) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/cgi.cfg
 %dir %{_libdir}/%{name}/cgi
 %attr(755,root,root) %{_libdir}/%{name}/cgi/*.cgi
