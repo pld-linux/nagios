@@ -1,0 +1,72 @@
+#!/bin/sh
+#
+# nagios	Host/service/network monitoring daemon
+#
+# chkconfig:	345 50 50
+# description:	Host/service/network monitoring daemon which uses snort as NIDS
+#
+
+# Source function library
+. /etc/rc.d/init.d/functions
+
+# Get network config
+. /etc/sysconfig/network
+
+# Get service config
+[ -f /etc/sysconfig/nagios ] && . /etc/sysconfig/nagios
+
+# Check that networking is up.
+if is_yes "${NETWORKING}"; then
+        if [ ! -f /var/lock/subsys/network ]; then
+                # nls "ERROR: Networking is down. %s can't be run." <service>
+                msg_network_down nagios
+                exit 1
+        fi
+else
+        exit 0
+fi
+
+# See how we were called.
+case "$1" in
+  start)
+	# Check if the service is already running?
+        if [ ! -f /var/lock/subsys/nagios ]; then
+		msg_starting nagios
+                # remove stale cmd pipe (or nagios won't start if it exists)
+                rm -f /var/log/nagios/rw/nagios.cmd
+		daemon nagios -d /etc/nagios/nagios.cfg </dev/null
+	        RETVAL=$?
+    		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/nagios
+		chgrp http /var/lib/nagios/rw/nagios.cmd
+	else
+        	msg_already_running nagios
+	        exit 1
+	fi
+	;;
+  stop)
+        # Stop daemons.
+	if [ -f /var/lock/subsys/nagios ]; then
+                msg_stopping nagios
+                killproc nagios -TERM
+                rm -f /var/lock/subsys/nagios > /dev/null 2>&1
+        else
+		msg_not_running nagios
+	        exit 1
+	fi
+	;;
+  status)
+	status nagios
+	RETVAL=$?
+	;;
+  restart|reload)
+	$0 stop
+	$0 start
+	;;
+  *)
+	msg_usage "$0 {start|stop|restart|status}"
+	exit 1
+	;;
+esac
+
+exit $RETVAL
+
