@@ -17,42 +17,42 @@
 
 # Check that networking is up.
 if is_yes "${NETWORKING}"; then
-        if [ ! -f /var/lock/subsys/network ]; then
-                msg_network_down nagios
-                exit 1
-        fi
+	if [ ! -f /var/lock/subsys/network ]; then
+		msg_network_down nagios
+		exit 1
+	fi
 else
-        exit 0
+	exit 0
 fi
 
 # See how we were called.
 case "$1" in
   start)
 	# Check if the service is already running?
-        if [ ! -f /var/lock/subsys/nagios ]; then
+	if [ ! -f /var/lock/subsys/nagios ]; then
 		msg_starting nagios
-                # remove stale cmd pipe (or nagios won't start if it exists)
-                rm -f /var/lib/nagios/rw/nagios.cmd
+		# remove stale cmd pipe (or nagios won't start if it exists)
+		rm -f /var/lib/nagios/rw/nagios.cmd
 		daemon /usr/sbin/nagios -d /etc/nagios/nagios.cfg </dev/null
-	        RETVAL=$?
+		RETVAL=$?
 		if [ $RETVAL -eq 0 ]; then
 			touch /var/lock/subsys/nagios
 			chgrp http /var/lib/nagios/rw/nagios.cmd
 		fi
 	else
-        	msg_already_running nagios
-	        exit 1
+		msg_already_running nagios
+		exit 1
 	fi
 	;;
   stop)
-        # Stop daemons.
+	# Stop daemons.
 	if [ -f /var/lock/subsys/nagios ]; then
-                msg_stopping nagios
-                killproc nagios -TERM
-                rm -f /var/lock/subsys/nagios > /dev/null 2>&1
-        else
+		msg_stopping nagios
+		killproc nagios -TERM
+		rm -f /var/lock/subsys/nagios > /dev/null 2>&1
+	else
 		msg_not_running nagios
-	        exit 1
+		exit 1
 	fi
 	;;
   status)
@@ -64,10 +64,9 @@ case "$1" in
 	$0 start
 	;;
   *)
-	msg_usage "$0 {start|stop|restart|status}"
+	msg_usage "$0 {start|stop|restart|reload|status}"
 	exit 1
 	;;
 esac
 
 exit $RETVAL
-
