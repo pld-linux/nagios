@@ -18,7 +18,7 @@ Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	2.0
 %define	_rc     b2
-Release:	0.%{_rc}.8
+Release:	0.%{_rc}.38
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}%{_rc}.tar.gz
@@ -27,6 +27,7 @@ Source1:	%{name}-apache.conf
 Source2:	%{name}.init
 Source3:	http://dl.sourceforge.net/nagios/imagepak-base.tar.gz
 # Source3-md5:	35b75ece533dfdf4963a67ce4e77fc4a
+Source4:	%{name}.sysconfig
 Patch0:		%{name}-pgsql.patch
 Patch1:		%{name}-resources.patch
 Patch2:		%{name}-iconv-in-libc.patch
@@ -110,7 +111,9 @@ Summary(pl):	Interfejs WWW/CGI dla Nagiosa
 Group:		Networking
 # for dirs... and accessing local logs(?)
 Requires:	%{name} = %{version}-%{release}
-Requires:	webserver
+Requires:	webserver = apache
+Requires:	apache(mod_alias)
+Requires:	apache(mod_cgi)
 
 %description cgi
 CGI webinterface for Nagios.
@@ -161,7 +164,7 @@ aplicativos para o Nagios.
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{/etc/{rc.d/init.d,httpd},%{_includedir}/%{name},%{_libdir}/%{name}/plugins} \
+install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},%{_includedir}/%{name},%{_libdir}/%{name}/plugins} \
 	$RPM_BUILD_ROOT{%{_var}/log/%{name},%{_localstatedir},%{_sysconfdir}/private}
 
 install include/locations.h	$RPM_BUILD_ROOT%{_includedir}/%{name}
@@ -172,12 +175,21 @@ install include/locations.h	$RPM_BUILD_ROOT%{_includedir}/%{name}
 	INIT_OPTS="" \
 	COMMAND_OPTS=""
 
-install %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/apache.conf
+install %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/apache-%{name}.conf
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
+install %{SOURCE4} $RPM_BUILD_ROOT/etc/sysconfig/%{name}
 
 # install templated configuration files
 install sample-config/{nagios,cgi,resource}.cfg $RPM_BUILD_ROOT%{_sysconfdir}
-install sample-config/template-object/{bigger,checkcommands,minimal,misccommands}.cfg $RPM_BUILD_ROOT%{_sysconfdir}
+install sample-config/template-object/{checkcommands,misccommands}.cfg $RPM_BUILD_ROOT%{_sysconfdir}
+> $RPM_BUILD_ROOT%{_sysconfdir}/contactgroups.cfg 
+> $RPM_BUILD_ROOT%{_sysconfdir}/contacts.cfg 
+> $RPM_BUILD_ROOT%{_sysconfdir}/dependencies.cfg
+> $RPM_BUILD_ROOT%{_sysconfdir}/escalations.cfg
+> $RPM_BUILD_ROOT%{_sysconfdir}/hostgroups.cfg
+> $RPM_BUILD_ROOT%{_sysconfdir}/hosts.cfg
+> $RPM_BUILD_ROOT%{_sysconfdir}/services.cfg
+> $RPM_BUILD_ROOT%{_sysconfdir}/timeperiods.cfg
 
 # install CGIs
 
@@ -186,6 +198,12 @@ cp -a contrib/eventhandlers $RPM_BUILD_ROOT%{_libdir}/%{name}/eventhandlers
 
 # Install logos
 tar -xvz -C $RPM_BUILD_ROOT%{_datadir}/images/logos -f %{SOURCE3}
+
+# Object data/cache files
+for i in {objects.cache,{comments,downtime,retention,status}.dat}; do
+	> $RPM_BUILD_ROOT%{_localstatedir}/$i
+done
+> $RPM_BUILD_ROOT%{_localstatedir}/rw/nagios.cmd
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -222,7 +240,7 @@ else
 	if [ -n "`id -u netsaint 2>/dev/null`" ] && [ "`id -u netsaint`" = "72" ]; then
 		/usr/sbin/usermod -d %{_libdir}/nagios -l nagios netsaint
 	else
-		/usr/sbin/useradd -u 72 -d %{_libdir}/nagios -s /bin/false -c "%{name} User" -g nagios nagios 1>&2
+		/usr/sbin/useradd -u 72 -d %{_libdir}/nagios -s /bin/false -c "%{name} User" -g nagios,nagios-data nagios 1>&2
 	fi
 fi
 
@@ -231,6 +249,12 @@ fi
 if [ -f /var/lock/subsys/%{name} ]; then
 	/etc/rc.d/init.d/%{name} restart 1>&2
 fi
+
+for i in %{_localstatedir}/{objects.cache,{comments,downtime,retention,status}.dat}; do
+	[ ! -f $i ] && touch $i
+	chown root:nagios-data $i
+	chmod 660 $i
+done
 
 %preun
 if [ "$1" = "0" ] ; then
@@ -281,17 +305,30 @@ if [ "$1" = "0" ]; then
 	fi
 fi
 
-%triggerpostun -- nagios < 2.0-0.b2.1
+%triggerpostun -- nagios < 2.0-0.b2.27
 chgrp nagios-data %{_sysconfdir}/*.cfg
+%addusertogroup nagios nagios-data
+
+%addusertogroup http nagios-data
+# apache1
+if [ -f /var/lock/subsys/apache ]; then
+	/etc/rc.d/init.d/apache restart 1>&2
+fi
+# apache2
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd restart 1>&2
+fi
 
 %files
 %defattr(644,root,root,755)
 %doc Changelog README* UPGRADING INSTALLING LICENSE
-%attr(751,root,nagios-data) %dir %{_sysconfdir}
+%doc sample-config/template-object/{bigger,minimal}.cfg
+%attr(750,root,nagios-data) %dir %{_sysconfdir}
 %attr(640,root,nagios-data) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/*.cfg
 %exclude %{_sysconfdir}/cgi.cfg
 
 %attr(754,root,root) /etc/rc.d/init.d/%{name}
+%config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/%{name}
 
 %dir %{_libdir}/%{name}
 %dir %{_libdir}/%{name}/plugins
@@ -301,16 +338,19 @@ chgrp nagios-data %{_sysconfdir}/*.cfg
 
 %attr(771,root,http) %{_var}/log/%{name}
 
-%attr(775,root,nagios-data) %dir %{_localstatedir}
-%attr(775,root,nagios-data) %dir %{_localstatedir}/archives
-%attr(2775,root,nagios-data) %dir %{_localstatedir}/rw
+%attr(750,root,nagios-data) %dir %{_localstatedir}
+%attr(770,root,nagios-data) %dir %{_localstatedir}/archives
+%attr(2770,root,nagios-data) %dir %{_localstatedir}/rw
+%ghost %{_localstatedir}/rw/nagios.cmd
+%ghost %{_localstatedir}/objects.cache
+%ghost %{_localstatedir}/*.dat
 
 %defattr(755,root,root,755)
 %{_libdir}/%{name}/eventhandlers
 
 %files cgi
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/apache.conf
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/apache-%{name}.conf
 %attr(640,root,nagios-data) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/cgi.cfg
 %dir %{_libdir}/%{name}/cgi
 %attr(755,root,root) %{_libdir}/%{name}/cgi/*.cgi
