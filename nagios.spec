@@ -1,9 +1,11 @@
 #
 # Conditional build:
-# _with_pgsql - enable pgsql support
-# _with_mysql - enable mysql support
-# _without_gd - without statusmap and trends, which require gd library
+%bcond_with	pgsql	# enable pgsql support
+%bcond_with	mysql	# enable mysql support
+%bcond_without	gd	# without statusmap and trends, which require gd library
 #
+# TODO:
+# - remove *-sample from /etc - move it to %doc or place without "-sample" suffix
 Summary:	Host/service/network monitoring program
 Summary(pl):	Program do monitorowania serwerów/us³ug/sieci
 Summary(pt_BR):	Programa para monitoração de máquinas e serviços
@@ -20,9 +22,9 @@ Patch0:		%{name}-pgsql.patch
 URL:		http://www.nagios.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
-%{!?_without_gd:BuildRequires:	gd-devel}
-%{?_with_mysql:BuildRequires:	mysql-devel}
-%{?_with_pgsql:BuildRequires:	postgresql-devel}
+%{?with_gd:BuildRequires:	gd-devel}
+%{?with_mysql:BuildRequires:	mysql-devel}
+%{?with_pgsql:BuildRequires:	postgresql-devel}
 PreReq:		rc-scripts
 PreReq:		sh-utils
 Requires(pre):	/usr/bin/getgid
@@ -34,7 +36,11 @@ Conflicts:	iputils-ping < 1:ss020124
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 Obsoletes:	netsaint
 
-%define _sysconfdir	/etc/%{name}
+%define		_sysconfdir	/etc/%{name}
+%define		_bindir		%{_prefix}/sbin
+%define		_sbindir	%{_libdir}/%{name}/cgi
+%define		_datadir	%{_prefix}/share/%{name}
+%define		_localstatedir	/var/lib/%{name}
 
 %description
 Nagios is a program that will monitor hosts and services on your
@@ -76,6 +82,8 @@ executando checagens nos diversos serviços que forem especificados.
 Summary:	CGI webinterface for Nagios
 Summary(pl):	Interfejs WWW/CGI dla Nagiosa
 Group:		Networking
+# for dirs... and accessing local logs(?)
+Requires:	%{name} = %{version}
 Requires:	apache
 
 %description cgi
@@ -89,6 +97,7 @@ Summary:	Include files that Netsaint-related applications may compile against
 Summary(pl):	Pliki nag³ówkowe, wykorzystywane przez aplikacje nagiosa
 Summary(pt_BR):	Arquivos de cabeçalho necessários para desenvolvimento de aplicativos para o Nagios
 Group:		Development/Libraries
+# doesn't require base
 
 %description devel
 This package provides include files that Netsaint-related applications
@@ -104,10 +113,9 @@ aplicativos para o Nagios.
 
 %prep
 %setup -q
-%{?_with_pgsql:%patch -p1}
+%{?with_pgsql:%patch -p1}
 
 %build
-rm -f missing
 %{__aclocal}
 %{__autoconf}
 %configure \
@@ -117,19 +125,16 @@ rm -f missing
 	--with-command-grp=nobody \
 	--with-lockfile=/var/run/%{name}.pid \
 	--with-ping_command='/bin/ping -n %%s -c %%d' \
-	%{?_with_mysql:--with-mysql-xdata --with-mysql-status --with-mysql-comments --with-mysql-extinfo --with-mysql-retention --with-mysql-downtime --with-mysql-lib=%{_libdir} --with-mysql-inc=%{_includedir}/mysql} \
-	%{?_with_pgsql:--with-pgsql-xdata --with-pgsql-status --with-pgsql-comments --with-pgsql-extinfo --with-pgsql-retention --with-pgsql-downtime--with-pgsql-lib=%{_libdir} --with-pgsql-inc=%{_includedir}/postgresql} \
-	%{?_without_gd:--disable-statusmap --disable-trends} \
-	--bindir=%{_sbindir} \
-	--sbindir=%{_libdir}/%{name}/cgi \
-	--datadir=%{_datadir}/%{name} \
-	--localstatedir=/var/lib/%{name}
+	%{?with_mysql:--with-mysql-xdata --with-mysql-status --with-mysql-comments --with-mysql-extinfo --with-mysql-retention --with-mysql-downtime --with-mysql-lib=%{_libdir} --with-mysql-inc=%{_includedir}/mysql} \
+	%{?with_pgsql:--with-pgsql-xdata --with-pgsql-status --with-pgsql-comments --with-pgsql-extinfo --with-pgsql-retention --with-pgsql-downtime--with-pgsql-lib=%{_libdir} --with-pgsql-inc=%{_includedir}/postgresql} \
+	%{!?with_gd:--disable-statusmap --disable-trends}
 
 %{__make} all
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{/etc/{rc.d/init.d,httpd},%{_includedir}/%{name},%{_libdir}/%{name}/plugins,%{_var}/log/%{name}}
+install -d $RPM_BUILD_ROOT{/etc/{rc.d/init.d,httpd},%{_includedir}/%{name},%{_libdir}/%{name}/plugins} \
+	$RPM_BUILD_ROOT{%{_var}/log/%{name},%{_localstatedir}}
 
 install common/locations.h	$RPM_BUILD_ROOT%{_includedir}/%{name}
 
@@ -192,8 +197,11 @@ fi
 %attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/c[!g]*
 %dir %{_libdir}/%{name}
 %dir %{_libdir}/%{name}/plugins
-%attr(755,root,root) %{_sbindir}/%{name}
+%attr(755,root,root) %{_bindir}/%{name}
 %attr(771,nagios,http) %{_var}/log/%{name}
+%attr(775,nagios,nagios) %dir %{_localstatedir}
+%attr(775,nagios,nagios) %dir %{_localstatedir}/archives
+%attr(2775,nagios,http) %dir %{_localstatedir}/rw
 
 %files cgi
 %defattr(644,root,root,755)
@@ -201,7 +209,7 @@ fi
 %attr(644,root,http) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/cgi.cfg-sample
 %dir %{_libdir}/%{name}/cgi
 %attr(755,root,root) %{_libdir}/%{name}/cgi/*.cgi
-%{_datadir}/%{name}
+%{_datadir}
 
 %files devel
 %defattr(644,root,root,755)
