@@ -18,7 +18,7 @@ Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	2.0
 %define	_rc     b2
-Release:	0.%{_rc}.1
+Release:	0.%{_rc}.8
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}%{_rc}.tar.gz
@@ -172,12 +172,11 @@ install include/locations.h	$RPM_BUILD_ROOT%{_includedir}/%{name}
 	INIT_OPTS="" \
 	COMMAND_OPTS=""
 
-install %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/%{name}-apache.conf
+install %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/apache.conf
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 
 # install templated configuration files
-install sample-config/{nagios,cgi}.cfg $RPM_BUILD_ROOT%{_sysconfdir}
-install sample-config/resource.cfg $RPM_BUILD_ROOT%{_sysconfdir}/private
+install sample-config/{nagios,cgi,resource}.cfg $RPM_BUILD_ROOT%{_sysconfdir}
 install sample-config/template-object/{bigger,checkcommands,minimal,misccommands}.cfg $RPM_BUILD_ROOT%{_sysconfdir}
 
 # install CGIs
@@ -282,29 +281,37 @@ if [ "$1" = "0" ]; then
 	fi
 fi
 
+%triggerpostun -- nagios < 2.0-0.b2.1
+chgrp nagios-data %{_sysconfdir}/*.cfg
+
 %files
 %defattr(644,root,root,755)
-%doc Changelog README* UPGRADING INSTALLING LICENSE 
+%doc Changelog README* UPGRADING INSTALLING LICENSE
+%attr(751,root,nagios-data) %dir %{_sysconfdir}
+%attr(640,root,nagios-data) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/*.cfg
+%exclude %{_sysconfdir}/cgi.cfg
+
 %attr(754,root,root) /etc/rc.d/init.d/%{name}
-%attr(751,root,nagios) %dir %{_sysconfdir}
-%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/[!c]*
-%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/c[!g]*
+
 %dir %{_libdir}/%{name}
 %dir %{_libdir}/%{name}/plugins
+
 %attr(755,root,root) %{_bindir}/%{name}
 %attr(755,root,root) %{_bindir}/nagiostats
-%attr(771,nagios,http) %{_var}/log/%{name}
-%attr(775,nagios,nagios) %dir %{_localstatedir}
-%attr(775,nagios,nagios) %dir %{_localstatedir}/archives
-%attr(2775,nagios,http) %dir %{_localstatedir}/rw
+
+%attr(771,root,http) %{_var}/log/%{name}
+
+%attr(775,root,nagios-data) %dir %{_localstatedir}
+%attr(775,root,nagios-data) %dir %{_localstatedir}/archives
+%attr(2775,root,nagios-data) %dir %{_localstatedir}/rw
 
 %defattr(755,root,root,755)
 %{_libdir}/%{name}/eventhandlers
 
 %files cgi
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}-apache.conf
-%attr(644,root,http) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/cgi.cfg
+%attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/apache.conf
+%attr(640,root,nagios-data) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/cgi.cfg
 %dir %{_libdir}/%{name}/cgi
 %attr(755,root,root) %{_libdir}/%{name}/cgi/*.cgi
 %{_datadir}
