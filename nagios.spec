@@ -18,7 +18,7 @@ Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	2.0
 %define	_rc     b2
-Release:	0.%{_rc}.65
+Release:	0.%{_rc}.66
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}%{_rc}.tar.gz
@@ -262,7 +262,7 @@ else
 	if [ -n "`id -u netsaint 2>/dev/null`" ] && [ "`id -u netsaint`" = "72" ]; then
 		/usr/sbin/usermod -d %{_libdir}/nagios -l nagios netsaint
 	else
-		/usr/sbin/useradd -u 72 -d %{_libdir}/nagios -s /bin/false -c "%{name} User" -g nagios -G nagios-data,icmp nagios 1>&2
+		/usr/sbin/useradd -u 72 -d %{_libdir}/nagios -s /bin/false -c "%{name} User" -g nagios -G nagios-data nagios 1>&2
 	fi
 fi
 
@@ -340,7 +340,15 @@ fi
 %triggerpostun -- nagios < 2.0-0.b2.53
 chgrp nagios-data %{_sysconfdir}/*.cfg
 %addusertogroup nagios nagios-data
-%addusertogroup nagios icmp
+if [ -f /var/lock/subsys/%{name} ]; then
+	/etc/rc.d/init.d/%{name} restart 1>&2
+fi
+
+%triggerpostun -- nagios < 2.0-0.b2.66
+/usr/sbin/usermod -G nagios-data nagios
+if [ -f /var/lock/subsys/%{name} ]; then
+	/etc/rc.d/init.d/%{name} restart 1>&2
+fi
 
 %files
 %defattr(644,root,root,755)
