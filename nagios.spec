@@ -218,7 +218,7 @@ if [ -n "`id -u nagios 2>/dev/null`" ]; then
 	fi
 else
 	if [ -n "`id -u netsaint 2>/dev/null`" ] && [ "`id -u netsaint`" = "72" ]; then
-		/usr/sbin/usermod -d /tmp -l nagios netsaint
+		/usr/sbin/usermod -d %{_libdir}/nagios -l nagios netsaint
 	else
 		/usr/sbin/useradd -u 72 -d %{_libdir}/nagios -s /bin/false -c "%{name} User" -g nagios nagios 1>&2
 	fi
