@@ -18,13 +18,14 @@ Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 # Source0-md5:	414d70e5269d5b8d7c21bf3ee129309f
 Source1:	%{name}-apache.conf
 Source2:	%{name}.init
+Source3:	http://dl.sf.net/nagios/imagepak-base.tar.gz
 Patch0:		%{name}-pgsql.patch
 Patch1:		%{name}-resources.patch
 Patch2:		%{name}-iconv-in-libc.patch
 URL:		http://www.nagios.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
-%{?with_gd:BuildRequires:	gd-devel}
+%{?with_gd:BuildRequires:	gd-devel, libjpeg-devel, libpng-devel}
 %{?with_mysql:BuildRequires:	mysql-devel}
 %{?with_pgsql:BuildRequires:	postgresql-devel}
 BuildRequires:	rpmbuild(macros) >= 1.159
@@ -157,6 +158,10 @@ install common/locations.h	$RPM_BUILD_ROOT%{_includedir}/%{name}
 
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/httpd/%{name}.conf
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
+
+### Install logos
+tar -xvz -C $RPM_BUILD_ROOT%{_datadir}/images/logos -f %{SOURCE3}
+
 
 %clean
 rm -rf $RPM_BUILD_ROOT
