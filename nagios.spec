@@ -1,10 +1,9 @@
 #
-# _with_pgsql - enable pgsql (instead of mysql) support
-# _without_sql - without pgsql nor mysql support
+# _with_pgsql - enable pgsql
+# _with_mysql - enable mysql
 # _without_gd - without statusmap and trends, which require gd library
-%{!?_without_sql:%{!?_with_pgsql:%define _with_mysql 1}}
 
-%define	_beta	b4
+%define	_beta	b5
 
 Summary:	Host/service/network monitoring program
 Summary(pl):	Program do monitorowania serwerów/us³ug/sieci
@@ -12,7 +11,7 @@ Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	1.0
 Release:	0.%{_beta}.1
-License:	GPL
+License:	GPL v2
 Group:		Networking
 Source0:	http://west.dl.sourceforge.net/sourceforge/%{name}/%{name}-%{version}%{_beta}.tar.gz
 Source1:	%{name}-apache.conf
@@ -36,10 +35,10 @@ Obsoletes:	netsaint
 %description
 Nagios is a program that will monitor hosts and services on your
 network. It has the ability to email or page you when a problem arises
-and when a problem is resolved. Nagios is written in C and is
-designed to run under Linux (and some other *NIX variants) as a
-background process, intermittently running checks on various services
-that you specify.
+and when a problem is resolved. Nagios is written in C and is designed
+to run under Linux (and some other *NIX variants) as a background
+process, intermittently running checks on various services that you
+specify.
 
 The actual service checks are performed by separate "plugin" programs
 which return the status of the checks to Nagios. The plugins are
@@ -56,19 +55,18 @@ jako proces pracuj±cy w tle i bezustannie wykonuj±cy pewne operacje
 sprawdzaj±ce.
 
 W³a¶ciwe sprawdzanie jest wykonywane przez osobne programy
-("wtyczki"), które zwracaj± informacje o statusie do Nagiosa.
-Wtyczki s± dostêpne na stronie w pakietach nagios-plugins.
+("wtyczki"), które zwracaj± informacje o statusie do Nagiosa. Wtyczki
+s± dostêpne na stronie w pakietach nagios-plugins.
 
 Nagios jest nastêpc± NetSainta.
 
 %description -l pt_BR
 O Nagios é um programa que monitora máquinas e serviços na sua rede.
 Ele pode enviar um email ou um aviso de pager para o administrador
-quando surgir um problema e quando ele for resolvido. Nagios é
-escrito em C e foi desenvolvido para rodar em plataformas Linux (e
-algumas variações de *NIX) como um processo em segundo plano,
-periodicamente executando checagens nos diversos serviços que forem
-especificados.
+quando surgir um problema e quando ele for resolvido. Nagios é escrito
+em C e foi desenvolvido para rodar em plataformas Linux (e algumas
+variações de *NIX) como um processo em segundo plano, periodicamente
+executando checagens nos diversos serviços que forem especificados.
 
 %package cgi
 Summary:	CGI webinterface for Nagios
@@ -125,7 +123,7 @@ aplicativos para o Nagios.
 	--sbindir=%{_libdir}/%{name}/cgi \
 	--libexecdir=%{_libdir}/%{name}/plugins \
 	--datadir=%{_datadir}/%{name} \
-	--sysconfdir=/etc/nagios \
+--sysconfdir=%{_sysconfdir}/nagios \
 	--localstatedir=/var/lib/%{name}
 
 %{__make} all
@@ -196,18 +194,18 @@ fi
 %doc Changelog README* UPGRADING contrib/database
 %attr(754,root,root) %{_sysconfdir}/rc.d/init.d/%{name}
 %attr(751,root,nagios) %dir %{_sysconfdir}/%{name}
-%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) /etc/%{name}/nagios.cfg-sample
-%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) /etc/%{name}/checkcommands.cfg-sample
-%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) /etc/%{name}/contactgroups.cfg-sample
-%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) /etc/%{name}/contacts.cfg-sample
-%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) /etc/%{name}/dependencies.cfg-sample
-%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) /etc/%{name}/escalations.cfg-sample
-%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) /etc/%{name}/hostgroups.cfg-sample
-%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) /etc/%{name}/hosts.cfg-sample
-%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) /etc/%{name}/misccommands.cfg-sample
-%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) /etc/%{name}/resource.cfg-sample
-%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) /etc/%{name}/services.cfg-sample
-%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) /etc/%{name}/timeperiods.cfg-sample
+%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/nagios.cfg-sample
+%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/checkcommands.cfg-sample
+%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/contactgroups.cfg-sample
+%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/contacts.cfg-sample
+%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/dependencies.cfg-sample
+%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/escalations.cfg-sample
+%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/hostgroups.cfg-sample
+%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/hosts.cfg-sample
+%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/misccommands.cfg-sample
+%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/resource.cfg-sample
+%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/services.cfg-sample
+%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/timeperiods.cfg-sample
 %dir %{_libdir}/%{name}
 %dir %{_libdir}/%{name}/plugins
 %attr(755,root,root) %{_sbindir}/%{name}
@@ -216,7 +214,7 @@ fi
 %files cgi
 %defattr(644,root,root,755)
 %attr(640,root,http) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd/%{name}.conf
-%attr(644,root,http) %config(noreplace) %verify(not size mtime md5) /etc/%{name}/cgi.cfg-sample
+%attr(644,root,http) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/cgi.cfg-sample
 %dir %{_libdir}/%{name}/cgi
 %attr(755,root,root) %{_libdir}/%{name}/cgi/*.cgi
 %{_datadir}/%{name}
