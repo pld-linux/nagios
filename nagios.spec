@@ -18,7 +18,7 @@ Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	2.0
 %define	_rc     b2
-Release:	0.%{_rc}.38
+Release:	0.%{_rc}.39
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}%{_rc}.tar.gz
@@ -165,7 +165,7 @@ aplicativos para o Nagios.
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},%{_includedir}/%{name},%{_libdir}/%{name}/plugins} \
-	$RPM_BUILD_ROOT{%{_var}/log/%{name},%{_localstatedir},%{_sysconfdir}/private}
+	$RPM_BUILD_ROOT{%{_var}/log/%{name}/archives,%{_localstatedir},%{_sysconfdir}}
 
 install include/locations.h	$RPM_BUILD_ROOT%{_includedir}/%{name}
 
@@ -336,10 +336,10 @@ fi
 %attr(755,root,root) %{_bindir}/%{name}
 %attr(755,root,root) %{_bindir}/nagiostats
 
-%attr(771,root,http) %{_var}/log/%{name}
+%attr(770,root,nagios-data) %{_var}/log/%{name}
+%attr(770,root,nagios-data) %dir %{_var}/log/%{name}/archives
 
 %attr(750,root,nagios-data) %dir %{_localstatedir}
-%attr(770,root,nagios-data) %dir %{_localstatedir}/archives
 %attr(2770,root,nagios-data) %dir %{_localstatedir}/rw
 %ghost %{_localstatedir}/rw/nagios.cmd
 %ghost %{_localstatedir}/objects.cache
