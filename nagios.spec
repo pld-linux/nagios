@@ -142,7 +142,7 @@ install common/locations.h	$RPM_BUILD_ROOT%{_includedir}/%{name}
 	COMMAND_OPTS=""
 
 install %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/httpd/%{name}.conf
-install %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/rc.d/init.d/%{name}
+install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 
 rm -f $RPM_BUILD_ROOT%{_sysconfdir}/%{name}command.cfg
 
@@ -190,7 +190,7 @@ fi
 %files
 %defattr(644,root,root,755)
 %doc Changelog README* UPGRADING contrib/database
-%attr(754,root,root) %{_sysconfdir}/rc.d/init.d/%{name}
+%attr(754,root,root) /etc/rc.d/init.d/%{name}
 %attr(751,root,nagios) %dir %{_sysconfdir}/%{name}
 %attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/nagios.cfg-sample
 %attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/checkcommands.cfg-sample
