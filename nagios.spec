@@ -4,17 +4,17 @@
 # _without_gd - without statusmap and trends, which require gd library
 %{!?_without_sql:%{!?_with_pgsql:%define _with_mysql 1}}
 
-%define	_beta	b2
+%define	_beta	b4
 
 Summary:	Host/service/network monitoring program
 Summary(pl):	Program do monitorowania serwerów/us³ug/sieci
 Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	1.0
-Release:	%{_beta}.0.1
+Release:	0.%{_beta}
 License:	GPL
 Group:		Networking
-Source0:	http://www.nagios.org/download/%{name}-%{version}%{_beta}.tar.gz
+Source0:	http://west.dl.sourceforge.net/sourceforge/%{name}/%{name}-%{version}%{_beta}.tar.gz
 Source1:	%{name}-apache.conf
 Source2:	%{name}.init
 Patch0:		%{name}-pgsql.patch
@@ -22,7 +22,6 @@ URL:		http://www.nagios.org/
 %{!?_without_gd:BuildRequires:	gd-devel}
 %{?_with_pgsql:BuildRequires:	postgresql-devel}
 %{?_with_mysql:BuildRequires:	mysql-devel}
-Requires:	apache
 Prereq:		rc-scripts
 Prereq:		/sbin/chkconfig
 Prereq:		%{_sbindir}/useradd
@@ -44,6 +43,8 @@ The actual service checks are performed by separate "plugin" programs
 which return the status of the checks to Nagios. The plugins are
 available in nagios-plugins packages.
 
+Nagios is successor to NetSaint.
+
 %description -l pl
 Nagios to program, który monitoruje serwery oraz us³ugi w naszej
 sieci. Posiada on mo¿liwo¶æ wysy³ania informacji o wyst±pieniu oraz
@@ -55,6 +56,8 @@ sprawdzaj±ce.
 W³a¶ciwe sprawdzanie jest wykonywane przez osobne programy
 ("wtyczki"), które zwracaj± informacje o statusie do Nagiosa.
 Wtyczki s± dostêpne na stronie w pakietach nagios-plugins.
+
+Nagios jest nastêpc± NetSainta.
 
 %description -l pt_BR
 O Nagios é um programa que monitora máquinas e serviços na sua rede.
@@ -69,6 +72,7 @@ especificados.
 Summary:	CGI webinterface for Nagios
 Summary(pl):	Interfejs WWW/CGI dla Nagiosa
 Group:		Networking
+Requires:	apache
 
 %description cgi
 CGI webinterface for Nagios
