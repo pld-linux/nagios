@@ -18,7 +18,6 @@
 # Check that networking is up.
 if is_yes "${NETWORKING}"; then
         if [ ! -f /var/lock/subsys/network ]; then
-                # nls "ERROR: Networking is down. %s can't be run." <service>
                 msg_network_down nagios
                 exit 1
         fi
@@ -34,7 +33,7 @@ case "$1" in
 		msg_starting nagios
                 # remove stale cmd pipe (or nagios won't start if it exists)
                 rm -f /var/lib/nagios/rw/nagios.cmd
-		daemon nagios -d /etc/nagios/nagios.cfg </dev/null
+		daemon /usr/sbin/nagios -d /etc/nagios/nagios.cfg </dev/null
 	        RETVAL=$?
 		if [ $RETVAL -eq 0 ]; then
 			touch /var/lock/subsys/nagios
