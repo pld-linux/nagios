@@ -38,7 +38,7 @@ checkconfig() {
 RETVAL=0
 # See how we were called.
 case "$1" in
-  start)
+start)
 	# Check if the service is already running?
 	if [ ! -f /var/lock/subsys/nagios ]; then
 		msg_starting nagios
@@ -59,7 +59,7 @@ case "$1" in
 		msg_already_running nagios
 	fi
 	;;
-  stop)
+stop)
 	# Stop daemons.
 	if [ -f /var/lock/subsys/nagios ]; then
 		msg_stopping nagios
@@ -69,34 +69,34 @@ case "$1" in
 		msg_not_running nagios
 	fi
 	;;
-  status)
+status)
 	status nagios
 	exit $?
 	;;
-  checkconfig|check)
+checkconfig|check)
 	/usr/sbin/nagios -v /etc/nagios/nagios.cfg
 	exit $?
 	;;
-  reload|force-reload)
-        if [ -f /var/lock/subsys/nagios ]; then
-                msg_reloading nagios
-				checkconfig || exit
+reload|force-reload)
+	if [ -f /var/lock/subsys/nagios ]; then
+		msg_reloading nagios
+		checkconfig || exit
 
-                killproc nagios -HUP
-                RETVAL=$?
-        else
-                msg_not_running nagios >&2
-                exit 7
-        fi
-        ;;
-  restart)
+		killproc nagios -HUP
+		RETVAL=$?
+	else
+		msg_not_running nagios >&2
+		exit 7
+	fi
+	;;
+restart)
 	msg_reloading nagios
 	checkconfig || exit && started
 	$0 stop
 	$0 start
 	exit $?
 	;;
-  *)
+*)
 	msg_usage "$0 {start|stop|restart|reload|force-reload|status|checkconfig}"
 	exit 3
 esac
