@@ -45,6 +45,17 @@
  
  
  
+--- ./sample-config/nagios.cfg.in~	2005-03-07 00:11:32.000000000 +0200
++++ ./sample-config/nagios.cfg.in	2005-03-07 00:54:32.343939867 +0200
+@@ -126,7 +126,7 @@
+ # you will have to enable this.  Setting this value to 0 disables command
+ # checking (the default), other values enable it.
+ 
+-check_external_commands=0
++check_external_commands=1
+ 
+ 
+ 
 diff -Nur ../c/checkcommands.cfg ./checkcommands.cfg
 --- ../c/checkcommands.cfg	1970-01-01 03:00:00.000000000 +0300
 +++ ./sample-config/checkcommands.cfg	2005-03-06 22:14:50.581683465 +0200
