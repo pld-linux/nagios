@@ -19,6 +19,7 @@ Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 Source1:	%{name}-apache.conf
 Source2:	%{name}.init
 Patch0:		%{name}-pgsql.patch
+Patch1:		%{name}-resources.patch
 URL:		http://www.nagios.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -113,7 +114,8 @@ aplicativos para o Nagios.
 
 %prep
 %setup -q
-%{?with_pgsql:%patch -p1}
+%{?with_pgsql:%patch0 -p1}
+%patch1 -p0
 
 %build
 %{__aclocal}
