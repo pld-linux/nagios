@@ -11,7 +11,7 @@ Summary(pl):	Program do monitorowania serwerów/us³ug/sieci
 Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	1.2
-Release:	4
+Release:	5
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
@@ -33,13 +33,17 @@ PreReq:		sh-utils
 Requires(pre):	/usr/bin/getgid
 Requires(pre):	/bin/id
 Requires(pre):	/usr/sbin/groupadd
+Requires(pre):	/usr/sbin/groupmod
 Requires(pre):	/usr/sbin/useradd
+Requires(pre):	/usr/sbin/usermod
 Requires(post,postun):	/sbin/chkconfig
-Provides:	user(%{name})
-Provides:	group(%{name})
+Requires(postun):	/usr/sbin/groupdel
+Requires(postun):	/usr/sbin/userdel
+Provides:	user(nagios)
+Provides:	group(nagios)
 Conflicts:	iputils-ping < 1:ss020124
-BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 Obsoletes:	netsaint
+BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_sysconfdir	/etc/%{name}
 %define		_bindir		%{_prefix}/sbin
@@ -158,21 +162,29 @@ install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 rm -rf $RPM_BUILD_ROOT
 
 %pre
-if [ -n "`getgid %{name}`" ]; then
-	if [ "`getgid %{name}`" != "72" ]; then
-		echo "Error: group %{name} doesn't have gid=72. Correct this before installing %{name}." 1>&2
+if [ -n "`getgid nagios`" ]; then
+	if [ "`getgid nagios`" != "72" ]; then
+		echo "Error: group nagios doesn't have gid=72. Correct this before installing %{name}." 1>&2
 		exit 1
 	fi
 else
-	/usr/sbin/groupadd -g 72 -f %{name}
+	if [ -n "`getgid netsaint`" -a "`getgid netsaint`" = "72" ]; then
+		/usr/sbin/groupmod -n nagios netsaint
+	else
+		/usr/sbin/groupadd -g 72 -f nagios
+	fi
 fi
-if [ -n "`id -u %{name} 2>/dev/null`" ]; then
-	if [ "`id -u %{name}`" != "72" ]; then
-		echo "Error: user %{name} doesn't have uid=72. Correct this before installing %{name}." 1>&2
+if [ -n "`id -u nagios 2>/dev/null`" ]; then
+	if [ "`id -u nagios`" != "72" ]; then
+		echo "Error: user nagios doesn't have uid=72. Correct this before installing %{name}." 1>&2
 		exit 1
 	fi
 else
-	/usr/sbin/useradd -u 72 -d %{_libdir}/%{name} -s /bin/false -c "%{name} User" -g %{name} %{name} 1>&2
+	if [ -n "`id -u netsaint 2>/dev/null`" -a "`id -u netsaint`" = "72" ]; then
+		/usr/sbin/usermod -d /tmp -l nagios netsaint
+	else
+		/usr/sbin/useradd -u 72 -d %{_libdir}/nagios -s /bin/false -c "%{name} User" -g nagios nagios 1>&2
+	fi
 fi
 
 %post
@@ -191,8 +203,8 @@ fi
 
 %postun
 if [ "$1" = "0" ]; then
-	%userremove %{name}
-	%groupremove %{name}
+	%userremove nagios
+	%groupremove nagios
 fi
 
 %files
