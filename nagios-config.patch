@@ -1,0 +1,679 @@
+--- ./sample-config/nagios.cfg.in~	2005-01-11 06:53:08.000000000 +0200
++++ ./sample-config/nagios.cfg.in	2005-03-06 22:05:49.010432849 +0200
+@@ -16,7 +16,7 @@
+ # for historical purposes.  This should be the first option specified 
+ # in the config file!!!
+ 
+-log_file=@localstatedir@/nagios.log
++log_file=/var/log/nagios/nagios.log
+ 
+ 
+ 
+@@ -238,7 +238,7 @@
+ # This is the directory where archived (rotated) log files should be 
+ # placed (assuming you've chosen to do log rotation).
+ 
+-log_archive_path=@localstatedir@/archives
++log_archive_path=/var/log/nagios/archives
+ 
+ 
+ 
+@@ -850,7 +850,7 @@
+ #	strict-iso8601	(YYYY-MM-DDTHH:MM:SS)
+ #
+ 
+-date_format=us
++date_format=iso8601
+ 
+ 
+ 
+@@ -869,8 +869,7 @@
+ # object types.
+ 
+ illegal_object_name_chars=`~!$%^&*|'"<>?,()=
+-
+-
++#'
+ 
+ # ILLEGAL MACRO OUTPUT CHARACTERS
+ # This option allows you to specify illegal characters that are
+@@ -888,6 +887,7 @@
+ #	$SERVICEACKCOMMENT$
+ 
+ illegal_macro_output_chars=`~$&|'"<>
++#'
+ 
+ 
+ 
+diff -Nur ../c/checkcommands.cfg ./checkcommands.cfg
+--- ../c/checkcommands.cfg	1970-01-01 03:00:00.000000000 +0300
++++ ./sample-config/checkcommands.cfg	2005-03-06 22:14:50.581683465 +0200
+@@ -0,0 +1,224 @@
++################################################################################
++# object config file for Nagios 
++#
++################################################################################
++
++
++################################################################################
++# COMMAND DEFINITIONS
++#
++# SYNTAX:
++#
++#	define command {
++#		template	<templatename>
++#		name	<objectname>
++#		command_name  <commandname>
++#		command_line  <commandline>
++#	}
++#
++# WHERE:
++#
++# <templatename> = object name of another command definition that should be
++#                  used as a template for this definition (optional)
++# <objectname>   = object name of command definition, referenced by other
++#                  command definitions that use it as a template (optional)
++# <commandname>  = name of the command, as recognized/used by Nagios
++# <commandline>  = command line
++#
++################################################################################
++
++
++
++
++################################################################################
++#
++# SERVICE CHECK COMMANDS
++#
++################################################################################
++
++
++# 'check_tcp' command definition
++define command {
++	command_name	check_tcp
++	command_line	$USER1$/check_tcp -H $HOSTADDRESS$ -p $ARG1$
++}
++
++# 'check_udp' command definition
++define command {
++	command_name	check_udp
++	command_line	$USER1$/check_udp -H $HOSTADDRESS$ -p $ARG1$
++}
++
++# 'check_ftp' command definition
++define command {
++	command_name	check_ftp
++	command_line	$USER1$/check_ftp -H $HOSTADDRESS$
++}
++
++# 'check_pop' command definition
++define command {
++	command_name	check_pop
++	command_line	$USER1$/check_pop -H $HOSTADDRESS$
++}
++
++# 'check_smtp' command definition
++define command {
++	command_name	check_smtp
++	command_line	$USER1$/check_smtp -H $HOSTADDRESS$
++}
++
++# 'check_nntp' command definition
++define command {
++	command_name	check_nntp
++	command_line	$USER1$/check_nntp -H $HOSTADDRESS$
++}
++
++# 'check_http' command definition
++define command {
++	command_name	check_http
++	command_line	$USER1$/check_http -H $HOSTADDRESS$
++}
++
++# 'check_http' with port support
++define command {
++	command_name	check_http_port
++	command_line	$USER1$/check_http -H $HOSTADDRESS$ -p $ARG1$
++}
++
++# check http service with URI
++define command {
++	command_name	check_http_uri
++	command_line	$USER1$/check_http -I $HOSTADDRESS$ -H $ARG1$ -u $ARG2$
++}
++
++# check http service with URI and expect regex
++define command {
++	command_name	check_http_regex
++	command_line	$USER1$/check_http -I $HOSTADDRESS$ -H $ARG1$ -u $ARG2$ -r $ARG3$
++}
++
++# 'check_telnet' command definition
++define command {
++	command_name	check_telnet
++	command_line	$USER1$/check_tcp -H $HOSTADDRESS$ -p 23
++}
++
++# 'check_ping' command definition
++define command {
++	command_name	check_ping
++	command_line	$USER1$/check_ping -H $HOSTADDRESS$ -w $ARG1$ -c $ARG2$ -p 5
++}
++
++# 'check_dns' command definition
++define command {
++	command_name	check_dns
++	command_line	$USER1$/check_dns -H www.yahoo.com -s $HOSTADDRESS$
++}
++
++# 'check_hpjd' command definition
++define command {
++	command_name	check_hpjd
++	command_line	$USER1$/check_hpjd -H $HOSTADDRESS$ -C public
++}
++
++# 'check_local_disk' command definition
++define command {
++	command_name	check_local_disk
++	command_line	$USER1$/check_disk -w $ARG1$ -c $ARG2$ -p $ARG3$
++}
++
++# 'check_local_users' command definition
++define command {
++	command_name	check_local_users
++	command_line	$USER1$/check_users -w $ARG1$ -c $ARG2$
++}
++
++# 'check_local_procs' command definition
++define command {
++	command_name	check_local_procs
++	command_line	$USER1$/check_procs -w $ARG1$ -c $ARG2$ -s $ARG3$
++}
++
++# 'check_local_load' command definition
++define command {
++	command_name	check_local_load
++	command_line	$USER1$/check_load -w $ARG1$ -c $ARG2$
++}
++
++# 'check_ssh' command definition
++define command {
++	command_name	check_ssh
++	command_line 	$USER1$/check_ssh $HOSTADDRESS$
++}
++
++# 'check_mysql' command definition
++# uses $USER3$ and $USER4$ from resources.cfg for authentication
++define command {
++	command_name	check_mysql
++	command_line	$USER1$/check_mysql -H $ARG1$ -u $USER3$ -p $USER4$ -P$ARG2$
++}
++
++# check if DNSBL is returning success on test record 127.0.0.2
++define command {
++	command_name	check_dnsbl
++	command_line	$USER1$/check_dns -s $HOSTNAME$ -H 2.0.0.127.$ARG1$ -a 127.0.0.2
++}
++
++# check secure imap
++define command {
++	command_name	check_imaps
++	command_line	$USER1$/check_simap -H $HOSTADDRESS$
++}
++
++# check for ircd
++define command {
++	command_name	check_ircd
++	command_line	$USER1$/check_ircd -H $HOSTADDRESS$ -w $ARG1$ -c $ARG2$
++}
++
++# check for SNMP
++# $USER5$ is used for SNMP v1 community string
++define command {
++	command_name	check_snmp
++	command_line	$USER1$/check_snmp -H $HOSTADDRESS$ -C $USER5$ -o system.sysName.0 -P 1
++}
++
++# check any SNMP OID
++# $ARG1$ OID
++# $ARG2$ Critical Level
++# $ARG3$ warning Level
++define command {
++	command_name	check_snmp_oid
++	command_line	$USER1$/check_snmp -H $HOSTADDRESS$ -C sw -P 1 -o $ARG1$ -w $ARG2$ -c $ARG3$
++}
++
++# check for disk with nagios-snmp-plugins
++# $USER5$ is used for SNMP v1 community string
++define command {
++	command_name	check_snmp_disk
++	command_line	$USER1$/check_snmp_disk -H $HOSTADDRESS$ -C $USER5$
++}
++
++# check for spamassassin spamd
++define command {
++	command_name	check_spamd
++	command_line	$USER1$/check_tcp -H $HOSTNAME$ -p 783 -s 'PING SPAMC/1.0' -e 'PONG'
++}
++
++################################################################################
++#
++# HOST CHECK COMMANDS
++#
++################################################################################
++
++
++# This command checks to see if a host is "alive" by pinging it
++# The check must result in a 100% packet loss or 5 second (5000ms) round trip 
++# average time to produce a critical error.
++# Note: Only one ICMP echo packet is sent (determined by the '-p 1' argument)
++
++# 'check-host-alive' command definition
++define command {
++	command_name	check-host-alive
++	command_line	$USER1$/check_ping -H $HOSTADDRESS$ -w 3000.0,80% -c 5000.0,100% -p 1
++}
+diff -Nur ../c/contactgroups.cfg ./contactgroups.cfg
+--- ../c/contactgroups.cfg	1970-01-01 03:00:00.000000000 +0300
++++ ./sample-config/contactgroups.cfg	2005-03-06 22:14:50.593681034 +0200
+@@ -0,0 +1,18 @@
++################################################################################
++# object config file for Nagios 
++#
++################################################################################
++
++################################################################################
++# CONTACT GROUP DEFINITIONS
++#
++################################################################################
++
++# 'linux-admins' contact group definition
++define contactgroup {
++	contactgroup_name	linux-admins
++	alias			Linux Administrators
++	members			nagios
++}
++
++# vim:ts=8:sw=8
+diff -Nur ../c/contacts.cfg ./contacts.cfg
+--- ../c/contacts.cfg	1970-01-01 03:00:00.000000000 +0300
++++ ./sample-config/contacts.cfg	2005-03-06 22:14:50.593681034 +0200
+@@ -0,0 +1,29 @@
++################################################################################
++# object config file for Nagios 
++#
++################################################################################
++
++################################################################################
++# CONTACT DEFINITIONS
++#
++################################################################################
++
++# 'nagios' contact definition
++define contact {
++	contact_name			nagios
++	alias				Nagios Admin
++
++	service_notification_period	24x7
++	host_notification_period	24x7
++
++	service_notification_options	w,u,c,r
++	host_notification_options	d,u,r
++
++	service_notification_commands	notify-by-email,notify-by-epager
++	host_notification_commands	host-notify-by-email,host-notify-by-epager
++
++	email				root@localhost
++	pager				root@localhost
++}
++
++# vim:ts=8:sw=8
+diff -Nur ../c/dependencies.cfg ./dependencies.cfg
+--- ../c/dependencies.cfg	1970-01-01 03:00:00.000000000 +0300
++++ ./sample-config/dependencies.cfg	2005-03-06 22:14:50.594680831 +0200
+@@ -0,0 +1,16 @@
++################################################################################
++# object config file for Nagios 
++#
++################################################################################
++
++################################################################################
++# SERVICE DEPENDENCY DEFINITIONS
++#
++################################################################################
++
++################################################################################
++# HOST DEPENDENCY DEFINITIONS
++#
++################################################################################
++
++# vim:ts=8:sw=8
+diff -Nur ../c/escalations.cfg ./escalations.cfg
+--- ../c/escalations.cfg	1970-01-01 03:00:00.000000000 +0300
++++ ./sample-config/escalations.cfg	2005-03-06 22:14:50.595680628 +0200
+@@ -0,0 +1,19 @@
++################################################################################
++# object config file for Nagios 
++#
++################################################################################
++
++################################################################################
++# SERVICE ESCALATION DEFINITIONS
++#
++################################################################################
++   
++################################################################################
++# HOSTGROUP ESCALATION DEFINITIONS
++#
++################################################################################
++
++################################################################################
++# HOST ESCALATION DEFINITIONS
++#   
++################################################################################
+diff -Nur ../c/hostgroups.cfg ./hostgroups.cfg
+--- ../c/hostgroups.cfg	1970-01-01 03:00:00.000000000 +0300
++++ ./sample-config/hostgroups.cfg	2005-03-06 22:14:50.595680628 +0200
+@@ -0,0 +1,18 @@
++################################################################################
++# object config file for Nagios 
++#
++################################################################################
++
++################################################################################
++# HOST GROUP DEFINITIONS
++#
++################################################################################
++
++# 'linux-boxes' host group definition
++define hostgroup {
++	hostgroup_name	linux-boxes
++	alias		Linux Servers
++	members		linux
++}
++
++# vim:ts=8:sw=8
+diff -Nur ../c/hosts.cfg ./hosts.cfg
+--- ../c/hosts.cfg	1970-01-01 03:00:00.000000000 +0300
++++ ./sample-config/hosts.cfg	2005-03-06 22:14:50.596680426 +0200
+@@ -0,0 +1,46 @@
++################################################################################
++# object config file for Nagios 
++#
++################################################################################
++
++################################################################################
++# HOST DEFINITIONS
++#
++################################################################################
++
++# Generic host definition template
++define host {
++	name				generic-host	; The name of this host template
++							; - referenced in other host definitions,
++							;   used for template recursion/resolution
++	notifications_enabled		1		; Host notifications are enabled
++	event_handler_enabled		1		; Host event handler is enabled
++	flap_detection_enabled		1		; Flap detection is enabled
++	process_perf_data		1		; Process performance data
++	retain_status_information	1		; Retain status information across program restarts
++	retain_nonstatus_information	1		; Retain non-status information across program restarts
++
++	register			0		; DONT REGISTER THIS DEFINITION 
++							; - ITS NOT A REAL HOST, JUST A TEMPLATE!
++}
++
++# 'linux' host definition
++define host {
++	use			generic-host		; Name of host template to use
++
++	host_name		linux
++	alias			Linux Server
++	address			127.0.0.1
++
++	check_command		check-host-alive
++	max_check_attempts	10
++
++	notification_interval	480
++	notification_period	24x7
++	notification_options	d,u,r
++
++	contact_groups		linux-admins
++}
++
++
++# vim:ts=8:sw=8
+diff -Nur ../c/misccommands.cfg ./misccommands.cfg
+--- ../c/misccommands.cfg	1970-01-01 03:00:00.000000000 +0300
++++ ./sample-config/misccommands.cfg	2005-03-06 22:14:50.597680223 +0200
+@@ -0,0 +1,97 @@
++################################################################################
++# Object config file for Nagios 
++#
++################################################################################
++
++
++################################################################################
++# COMMAND DEFINITIONS
++#
++# SYNTAX:
++#
++#	define command {
++#		template      <templatename>
++#		name          <objectname>
++#		command_name  <commandname>
++#		command_line  <commandline>
++#	}
++#
++# WHERE:
++#
++# <templatename> = object name of another command definition that should be
++#                  used as a template for this definition (optional)
++# <objectname>   = object name of command definition, referenced by other
++#                  command definitions that use it as a template (optional)
++# <commandname>  = name of the command, as recognized/used by Nagios
++# <commandline>  = command line
++#
++################################################################################
++
++
++
++
++################################################################################
++#
++# NOTIFICATION COMMANDS
++#
++# These are some example notification commands.  They may or may not work on
++# your system without modification.
++#
++################################################################################
++
++
++# 'notify-by-email' command definition
++define command {
++	command_name	notify-by-email
++	command_line	/usr/bin/printf "%b" "***** Nagios  *****\n\nNotification Type: $NOTIFICATIONTYPE$\n\nService: $SERVICEDESC$\nHost: $HOSTALIAS$\nAddress: $HOSTADDRESS$\nState: $SERVICESTATE$\n\nDate/Time: $LONGDATETIME$\n\nAdditional Info:\n\n$SERVICEOUTPUT$" | /bin/mail -s "** $NOTIFICATIONTYPE$ alert - $HOSTALIAS$/$SERVICEDESC$ is $SERVICESTATE$ **" $CONTACTEMAIL$
++}
++
++
++# 'notify-by-epager' command definition
++define command {
++	command_name	notify-by-epager
++	command_line	/usr/bin/printf "%b" "Service: $SERVICEDESC$\nHost: $HOSTNAME$\nAddress: $HOSTADDRESS$\nState: $SERVICESTATE$\nInfo: $SERVICEOUTPUT$\nDate: $LONGDATETIME$" | /bin/mail -s "$NOTIFICATIONTYPE$: $HOSTALIAS$/$SERVICEDESC$ is $SERVICESTATE$" $CONTACTPAGER$
++}
++
++
++# 'host-notify-by-email' command definition
++define command {
++	command_name	host-notify-by-email
++	command_line	/usr/bin/printf "%b" "***** Nagios  *****\n\nNotification Type: $NOTIFICATIONTYPE$\nHost: $HOSTNAME$\nState: $HOSTSTATE$\nAddress: $HOSTADDRESS$\nInfo: $HOSTOUTPUT$\n\nDate/Time: $LONGDATETIME$\n" | /bin/mail -s "Host $HOSTSTATE$ alert for $HOSTNAME$!" $CONTACTEMAIL$
++}
++
++
++# 'host-notify-by-epager' command definition
++define command {
++	command_name	host-notify-by-epager
++	command_line	/usr/bin/printf "%b" "Host '$HOSTALIAS$' is $HOSTSTATE$\nInfo: $HOSTOUTPUT$\nTime: $LONGDATETIME$" | /bin/mail -s "$NOTIFICATIONTYPE$ alert - Host $HOSTNAME$ is $HOSTSTATE$" $CONTACTPAGER$
++}
++
++
++################################################################################
++#
++# PERFORMANCE DATA COMMANDS
++#
++# These are sample performance data commands that can be used to send performance
++# data output to two text files (one for hosts, another for services).  If you
++# plan on simply writing performance data out to a file, consider compiling
++# Nagios with native file support for performance data.  This is done by
++# supplying the --with-file-perfdata option to the configure script.
++#
++################################################################################
++
++
++# 'process-host-perfdata' command definition
++define command {
++	command_name	process-host-perfdata
++	command_line	/usr/bin/printf "%b" "$LASTHOSTCHECK$\t$HOSTNAME$\t$HOSTSTATE$\t$HOSTATTEMPT$\t$HOSTSTATETYPE$\t$HOSTEXECUTIONTIME$\t$HOSTOUTPUT$\t$HOSTPERFDATA$" >> /var/lib/nagios/host-perfdata.out
++}
++
++
++# 'process-service-perfdata' command definition
++define command {
++	command_name	process-service-perfdata
++	command_line	/usr/bin/printf "%b" "$LASTSERVICECHECK$\t$HOSTNAME$\t$SERVICEDESC$\t$SERVICESTATE$\t$SERVICEATTEMPT$\t$SERVICESTATETYPE$\t$SERVICEEXECUTIONTIME$\t$SERVICELATENCY$\t$SERVICEOUTPUT$\t$SERVICEPERFDATA$" >> /var/lib/nagios/service-perfdata.out
++}
++
++
+diff -Nur ../c/services.cfg ./services.cfg
+--- ../c/services.cfg	1970-01-01 03:00:00.000000000 +0300
++++ ./sample-config/services.cfg	2005-03-06 22:14:50.597680223 +0200
+@@ -0,0 +1,53 @@
++################################################################################
++# object config file for Nagios 
++#
++################################################################################
++
++################################################################################
++# SERVICE DEFINITIONS
++#
++################################################################################
++
++# Generic service definition template
++define service {
++	name				generic-service	; The 'name' of this service template,
++							; referenced in other service definitions
++	active_checks_enabled		1		; Active service checks are enabled
++	passive_checks_enabled		1		; Passive service checks are enabled/accepted
++	parallelize_check		1		; Active service checks should be parallelized (disabling this can lead to major performance problems)
++	obsess_over_service		1		; We should obsess over this service (if necessary)
++	check_freshness			0		; Default is to NOT check service 'freshness'
++	notifications_enabled		1		; Service notifications are enabled
++	event_handler_enabled		1		; Service event handler is enabled
++	flap_detection_enabled		1		; Flap detection is enabled
++	process_perf_data		1		; Process performance data
++	retain_status_information	1		; Retain status information across program restarts
++	retain_nonstatus_information	1		; Retain non-status information across program restarts
++
++	register			0		; DONT REGISTER THIS DEFINITION
++							; - ITS NOT A REAL SERVICE, JUST A TEMPLATE!
++}
++
++define service {
++	use				generic-service		; Name of service template to use
++
++	host_name			linux
++	service_description		SSH
++
++	is_volatile			0
++	check_period			24x7
++
++	max_check_attempts		3
++	normal_check_interval		2
++	retry_check_interval		1
++
++	contact_groups			linux-admins
++
++	notification_interval		240
++	notification_period		24x7
++	notification_options		w,u,c,r
++
++	check_command			check_ssh
++}
++
++# vim:ts=8:sw=8
+diff -Nur ../c/timeperiods.cfg ./timeperiods.cfg
+--- ../c/timeperiods.cfg	1970-01-01 03:00:00.000000000 +0300
++++ ./sample-config/timeperiods.cfg	2005-03-06 22:14:50.598680021 +0200
+@@ -0,0 +1,72 @@
++################################################################################
++# object config file for Nagios 
++#
++################################################################################
++
++################################################################################
++# TIMEPERIOD DEFINITIONS
++#
++################################################################################
++
++# '24x7' timeperiod definition
++define timeperiod {
++	timeperiod_name	24x7
++	alias		24 Hours A Day, 7 Days A Week
++
++	monday		00:00-24:00
++	tuesday		00:00-24:00
++	wednesday	00:00-24:00
++	thursday	00:00-24:00
++	friday		00:00-24:00
++	saturday	00:00-24:00
++	sunday		00:00-24:00
++}
++
++# 'workhours' timeperiod definition
++define timeperiod {
++	timeperiod_name	workhours
++	alias		"Normal" Working Hours
++
++	monday		09:00-17:00
++	tuesday		09:00-17:00
++	wednesday	09:00-17:00
++	thursday	09:00-17:00
++	friday		09:00-17:00
++}
++
++
++# 'nonworkhours' timeperiod definition
++define timeperiod {
++	timeperiod_name	nonworkhours
++	alias		Non-Work Hours
++
++	monday		00:00-09:00,17:00-24:00
++	tuesday		00:00-09:00,17:00-24:00
++	wednesday	00:00-09:00,17:00-24:00
++	thursday	00:00-09:00,17:00-24:00
++	friday		00:00-09:00,17:00-24:00
++	saturday	00:00-24:00
++	sunday		00:00-24:00
++}
++
++define timeperiod {
++	timeperiod_name	daytime
++	alias		Working Hours and Afternoon
++
++	monday		09:00-23:50
++	tuesday		09:00-23:50
++	wednesday	09:00-23:50
++	thursday	09:00-23:50
++	friday		09:00-23:50
++	saturday	09:00-23:50
++	sunday		09:00-23:50
++}
++
++
++# 'none' timeperiod definition
++define timeperiod {
++	timeperiod_name	none
++	alias		No Time Is A Good Time
++}
++
++# vim:ts=8:sw=8
