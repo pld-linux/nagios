@@ -10,6 +10,7 @@
 #   - /etc/nagios/*.cfg should be readable by nagios (and webserver if -cgi is used)
 #   - all files should be owned by root as there's no write permission needed
 #  - create group "nagios-data" for sharing access with httpd user (/etc/nagios/*.cfg)
+%define	data_gid 147
 
 Summary:	Host/service/network monitoring program
 Summary(pl):	Program do monitorowania serwerów/us³ug/sieci
@@ -53,6 +54,7 @@ Requires(postun):	/usr/sbin/groupdel
 Requires(postun):	/usr/sbin/userdel
 Provides:	user(nagios)
 Provides:	group(nagios)
+Provides:	group(nagios-data)
 Conflicts:	iputils-ping < 1:ss020124
 Obsoletes:	netsaint
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -199,6 +201,16 @@ else
 		/usr/sbin/groupadd -g 72 -f nagios
 	fi
 fi
+
+if [ -n "`getgid nagios-data`" ]; then
+	if [ "`getgid nagios-data`" != "%{data_gid}" ]; then
+		echo "Error: group nagios-data doesn't have gid=%{data_gid}. Correct this before installing %{name}." 1>&2
+		exit 1
+	fi
+else
+		/usr/sbin/groupadd -g %{data_gid} -f nagios-data
+fi
+
 if [ -n "`id -u nagios 2>/dev/null`" ]; then
 	if [ "`id -u nagios`" != "72" ]; then
 		echo "Error: user nagios doesn't have uid=72. Correct this before installing %{name}." 1>&2
