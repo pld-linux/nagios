@@ -18,7 +18,7 @@ Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	2.0
 %define	_rc     b2
-Release:	0.%{_rc}.56
+Release:	0.%{_rc}.62
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}%{_rc}.tar.gz
@@ -43,10 +43,11 @@ BuildRequires:	libpng-devel
 %endif
 %{?with_mysql:BuildRequires:	mysql-devel}
 %{?with_pgsql:BuildRequires:	postgresql-devel}
-BuildRequires:	rpmbuild(macros) >= 1.159
+BuildRequires:	rpmbuild(macros) >= 1.177
 PreReq:		rc-scripts
 PreReq:		sh-utils
 Requires:	mailx
+Requires:	nagios-plugins
 Requires(pre):	/usr/bin/getgid
 Requires(pre):	/bin/id
 Requires(pre):	/usr/sbin/groupadd
@@ -190,7 +191,7 @@ install %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/%{name}
 install sample-config/{nagios,cgi,resource}.cfg $RPM_BUILD_ROOT%{_sysconfdir}
 install sample-config/{contact{s,groups},{misccommand,dependencie,escalation,hostgroup,host,service,timeperiod,checkcommand}s}.cfg $RPM_BUILD_ROOT%{_sysconfdir}
 > $RPM_BUILD_ROOT%{_sysconfdir}/passwd
-> $RPM_BUILD_ROOT%{_sysconfdir}/group
+echo 'nagios:' > $RPM_BUILD_ROOT%{_sysconfdir}/group
 
 # install event handlers
 cp -a contrib/eventhandlers $RPM_BUILD_ROOT%{_libdir}/%{name}/eventhandlers
@@ -199,7 +200,7 @@ cp -a contrib/eventhandlers $RPM_BUILD_ROOT%{_libdir}/%{name}/eventhandlers
 tar -xvz -C $RPM_BUILD_ROOT%{_datadir}/images/logos -f %{SOURCE4}
 
 # Object data/cache files
-for i in {objects.cache,{comments,downtime,retention,status}.dat}; do
+for i in {objects.cache,{comments,downtime,retention,status}.dat,nagios.tmp}; do
 	> $RPM_BUILD_ROOT%{_localstatedir}/$i
 done
 > $RPM_BUILD_ROOT%{_localstatedir}/rw/nagios.cmd
@@ -271,6 +272,8 @@ if [ "$1" = "0" ]; then
 fi
 
 %post cgi
+%addusertogroup http nagios-data
+
 # apache1
 if [ -d %{_apache1dir}/conf.d ]; then
 	ln -sf %{_sysconfdir}/apache-%{name}.conf %{_apache1dir}/conf.d/99_%{name}.conf
@@ -284,6 +287,14 @@ if [ -d %{_apache2dir}/httpd.conf ]; then
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
+fi
+
+if [ "$1" = 1 ]; then
+%banner %{name} -e <<EOF
+NOTE:
+You need to add user to %{_sysconfdir}/passwd and %{_sysconfdir}/group to acccess nagios via web.
+
+EOF
 fi
 
 %preun cgi
@@ -308,17 +319,6 @@ fi
 chgrp nagios-data %{_sysconfdir}/*.cfg
 %addusertogroup nagios nagios-data
 %addusertogroup nagios icmp
-
-%addusertogroup http nagios-data
-
-# apache1
-if [ -f /var/lock/subsys/apache ]; then
-	/etc/rc.d/init.d/apache restart 1>&2
-fi
-# apache2
-if [ -f /var/lock/subsys/httpd ]; then
-	/etc/rc.d/init.d/httpd restart 1>&2
-fi
 
 %files
 %defattr(644,root,root,755)
@@ -347,6 +347,7 @@ fi
 %ghost %{_localstatedir}/rw/nagios.cmd
 %ghost %{_localstatedir}/objects.cache
 %ghost %{_localstatedir}/*.dat
+%ghost %{_localstatedir}/%{name}.tmp
 
 %defattr(755,root,root,755)
 %{_libdir}/%{name}/eventhandlers
