@@ -1,6 +1,6 @@
 #
-# _with_pgsql - enable pgsql
-# _with_mysql - enable mysql
+# _with_pgsql - enable pgsql support
+# _with_mysql - enable mysql support
 # _without_gd - without statusmap and trends, which require gd library
 
 %define	_beta	b5
@@ -123,7 +123,7 @@ aplicativos para o Nagios.
 	--sbindir=%{_libdir}/%{name}/cgi \
 	--libexecdir=%{_libdir}/%{name}/plugins \
 	--datadir=%{_datadir}/%{name} \
---sysconfdir=%{_sysconfdir}/nagios \
+	--sysconfdir=%{_sysconfdir}/nagios \
 	--localstatedir=/var/lib/%{name}
 
 %{__make} all
