@@ -9,7 +9,7 @@ Summary(pl):	Program do monitorowania serwerów/us³ug/sieci
 Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	1.1
-Release:	0.1
+Release:	0.9
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
@@ -23,14 +23,16 @@ URL:		http://www.nagios.org/
 %{?_with_mysql:BuildRequires:	mysql-devel}
 PreReq:		rc-scripts
 PreReq:		sh-utils
-Requires(pre): /usr/bin/getgid
-Requires(pre): /bin/id
-Requires(pre): /usr/sbin/groupadd
-Requires(pre): /usr/sbin/useradd
+Requires(pre):	/usr/bin/getgid
+Requires(pre):	/bin/id
+Requires(pre):	/usr/sbin/groupadd
+Requires(pre):	/usr/sbin/useradd
 Requires(post,postun):	/sbin/chkconfig
 Conflicts:	iputils-ping < 1:ss020124
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 Obsoletes:	netsaint
+
+%define _sysconfdir	/etc/%{name}
 
 %description
 Nagios is a program that will monitor hosts and services on your
@@ -99,41 +101,33 @@ Este pacote contém arquivos de cabeçalho usados no desenvolvimento de
 aplicativos para o Nagios.
 
 %prep
-%setup -q -n %{name}-%{version}
-%patch -p1
+%setup -q
+%{?_with_pgsql:%patch -p1}
 
 %build
-%configure2_13 \
+rm -f missing
+%{__aclocal}
+%{__autoconf}
+%configure \
 	--with-nagios-user=%{name} \
 	--with-nagios-grp=%{name} \
 	--with-command-user=nobody \
 	--with-command-grp=nobody \
-	--with-init-dir=/etc/rc.d/init.d \
 	--with-lockfile=/var/run/%{name}.pid \
-	--with-gd-lib=%{_libdir} \
-	--with-gd-inc=%{_includedir} \
-	--with-cgiurl=/nagios/cgi-bin \
-	--with-htmurl=/nagios \
 	--with-ping_command='/bin/ping -n %%s -c %%d' \
 	%{?_with_mysql:--with-mysql-xdata --with-mysql-status --with-mysql-comments --with-mysql-extinfo --with-mysql-retention --with-mysql-downtime --with-mysql-lib=%{_libdir} --with-mysql-inc=%{_includedir}/mysql} \
 	%{?_with_pgsql:--with-pgsql-xdata --with-pgsql-status --with-pgsql-comments --with-pgsql-extinfo --with-pgsql-retention --with-pgsql-downtime--with-pgsql-lib=%{_libdir} --with-pgsql-inc=%{_includedir}/postgresql} \
 	%{?_without_gd:--disable-statusmap --disable-trends} \
-	--exec-prefix=%{_sbindir} \
 	--bindir=%{_sbindir} \
 	--sbindir=%{_libdir}/%{name}/cgi \
-	--libexecdir=%{_libdir}/%{name}/plugins \
 	--datadir=%{_datadir}/%{name} \
-	--sysconfdir=%{_sysconfdir}/nagios \
 	--localstatedir=/var/lib/%{name}
 
 %{__make} all
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT%{_sysconfdir}/{rc.d/init.d,httpd}
-install -d $RPM_BUILD_ROOT%{_includedir}/%{name}
-install -d $RPM_BUILD_ROOT%{_libdir}/%{name}/plugins
-install -d $RPM_BUILD_ROOT%{_var}/log/%{name}
+install -d $RPM_BUILD_ROOT{/etc/{rc.d/init.d,httpd},%{_includedir}/%{name},%{_libdir}/%{name}/plugins,%{_var}/log/%{name}}
 
 install common/locations.h	$RPM_BUILD_ROOT%{_includedir}/%{name}
 
@@ -143,10 +137,8 @@ install common/locations.h	$RPM_BUILD_ROOT%{_includedir}/%{name}
 	INIT_OPTS="" \
 	COMMAND_OPTS=""
 
-install %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/httpd/%{name}.conf
+install %{SOURCE1} $RPM_BUILD_ROOT/etc/httpd/%{name}.conf
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
-
-rm -f $RPM_BUILD_ROOT%{_sysconfdir}/%{name}command.cfg
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -193,19 +185,9 @@ fi
 %defattr(644,root,root,755)
 %doc Changelog README* UPGRADING contrib/database
 %attr(754,root,root) /etc/rc.d/init.d/%{name}
-%attr(751,root,nagios) %dir %{_sysconfdir}/%{name}
-%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/nagios.cfg-sample
-%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/checkcommands.cfg-sample
-%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/contactgroups.cfg-sample
-%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/contacts.cfg-sample
-%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/dependencies.cfg-sample
-%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/escalations.cfg-sample
-%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/hostgroups.cfg-sample
-%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/hosts.cfg-sample
-%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/misccommands.cfg-sample
-%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/resource.cfg-sample
-%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/services.cfg-sample
-%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/timeperiods.cfg-sample
+%attr(751,root,nagios) %dir %{_sysconfdir}
+%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/[^c]*
+%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/c[^g]*
 %dir %{_libdir}/%{name}
 %dir %{_libdir}/%{name}/plugins
 %attr(755,root,root) %{_sbindir}/%{name}
@@ -213,8 +195,8 @@ fi
 
 %files cgi
 %defattr(644,root,root,755)
-%attr(640,root,http) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd/%{name}.conf
-%attr(644,root,http) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/cgi.cfg-sample
+%attr(640,root,http) %config(noreplace) %verify(not size mtime md5) /etc/httpd/%{name}.conf
+%attr(644,root,http) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/cgi.cfg-sample
 %dir %{_libdir}/%{name}/cgi
 %attr(755,root,root) %{_libdir}/%{name}/cgi/*.cgi
 %{_datadir}/%{name}
