@@ -18,7 +18,8 @@ Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
 # Source0-md5:	414d70e5269d5b8d7c21bf3ee129309f
 Source1:	%{name}-apache.conf
 Source2:	%{name}.init
-Source3:	http://dl.sf.net/nagios/imagepak-base.tar.gz
+Source3:	http://dl.sourceforge.net/nagios/imagepak-base.tar.gz
+# Source3-md5:	35b75ece533dfdf4963a67ce4e77fc4a
 Patch0:		%{name}-pgsql.patch
 Patch1:		%{name}-resources.patch
 Patch2:		%{name}-iconv-in-libc.patch
