@@ -34,6 +34,8 @@ Requires(pre):	/bin/id
 Requires(pre):	/usr/sbin/groupadd
 Requires(pre):	/usr/sbin/useradd
 Requires(post,postun):	/sbin/chkconfig
+Provides:	user(%{name})
+Provides:	group(%{name})
 Conflicts:	iputils-ping < 1:ss020124
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 Obsoletes:	netsaint
@@ -188,8 +190,8 @@ fi
 
 %postun
 if [ "$1" = "0" ]; then
-	/usr/sbin/userdel %{name}
-	/usr/sbin/groupdel %{name}
+	%userremove %{name}
+	%groupremove %{name}
 fi
 
 %files
