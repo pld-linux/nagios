@@ -30,7 +30,6 @@ Patch0:		%{name}-pgsql.patch
 Patch1:		%{name}-resources.patch
 Patch2:		%{name}-iconv-in-libc.patch
 Patch3:		%{name}-config.patch
-Patch4:		%{name}-cgi.patch
 URL:		http://www.nagios.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -152,7 +151,6 @@ aplicativos para o Nagios.
 %patch1 -p0
 %patch2 -p1
 %patch3 -p1
-%patch4 -p1
 
 sed -i -e '
 	s,.*/var/rw/nagios.cmd,%{_localstatedir}/rw/nagios.cmd,
