@@ -13,6 +13,7 @@ Release:	1
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
+# Source0-md5:	9f95388c59b34c06745870fd2012388e
 Source1:	%{name}-apache.conf
 Source2:	%{name}.init
 Patch0:		%{name}-pgsql.patch
