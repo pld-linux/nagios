@@ -16,7 +16,7 @@
  
  # Sets $USER2$ to be the path to event handlers
 -#$USER2$=@libexecdir@/eventhandlers
-+$USER2$=@libexecdir@/eventhandlers
++$USER2$=@libexecdir@/nagios/eventhandlers
  
 -# Store some usernames and passwords (hidden from the CGIs)
 -#$USER3$=someuser
