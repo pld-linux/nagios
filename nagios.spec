@@ -18,19 +18,21 @@ Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	2.0
 %define	_rc     b2
-Release:	0.%{_rc}.39
+Release:	0.%{_rc}.51
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}%{_rc}.tar.gz
 # Source0-md5:	72d21f961b28519529e8c96c35051fbc
 Source1:	%{name}-apache.conf
 Source2:	%{name}.init
-Source3:	http://dl.sourceforge.net/nagios/imagepak-base.tar.gz
-# Source3-md5:	35b75ece533dfdf4963a67ce4e77fc4a
-Source4:	%{name}.sysconfig
+Source3:	%{name}.sysconfig
+Source4:	http://dl.sourceforge.net/nagios/imagepak-base.tar.gz
+# Source4-md5:	35b75ece533dfdf4963a67ce4e77fc4a
 Patch0:		%{name}-pgsql.patch
 Patch1:		%{name}-resources.patch
 Patch2:		%{name}-iconv-in-libc.patch
+Patch3:		%{name}-config.patch
+Patch4:		%{name}-cgi.patch
 URL:		http://www.nagios.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -114,6 +116,8 @@ Requires:	%{name} = %{version}-%{release}
 Requires:	webserver = apache
 Requires:	apache(mod_alias)
 Requires:	apache(mod_cgi)
+Requires:	apache(mod_auth)
+Requires:	group(http)
 
 %description cgi
 CGI webinterface for Nagios.
@@ -145,6 +149,8 @@ aplicativos para o Nagios.
 %{?with_pgsql:%patch0 -p1}
 %patch1 -p0
 %patch2 -p1
+%patch3 -p1
+%patch4 -p1
 
 %build
 %{__aclocal}
@@ -152,9 +158,9 @@ aplicativos para o Nagios.
 %configure \
 	--with-nagios-user=%{name} \
 	--with-nagios-grp=%{name} \
-	--with-command-user=nobody \
-	--with-command-grp=nobody \
-	--with-lockfile=/var/run/%{name}.pid \
+	--with-command-user=%{name} \
+	--with-command-grp=%{name} \
+	--with-lockfile=%{_localstatedir}/%{name}.pid \
 	--with-ping_command='/bin/ping -n %%s -c %%d' \
 	%{?with_mysql:--with-mysql-xdata --with-mysql-status --with-mysql-comments --with-mysql-extinfo --with-mysql-retention --with-mysql-downtime --with-mysql-lib=%{_libdir} --with-mysql-inc=%{_includedir}/mysql} \
 	%{?with_pgsql:--with-pgsql-xdata --with-pgsql-status --with-pgsql-comments --with-pgsql-extinfo --with-pgsql-retention --with-pgsql-downtime--with-pgsql-lib=%{_libdir} --with-pgsql-inc=%{_includedir}/postgresql} \
@@ -177,27 +183,19 @@ install include/locations.h	$RPM_BUILD_ROOT%{_includedir}/%{name}
 
 install %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/apache-%{name}.conf
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
-install %{SOURCE4} $RPM_BUILD_ROOT/etc/sysconfig/%{name}
+install %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/%{name}
 
 # install templated configuration files
 install sample-config/{nagios,cgi,resource}.cfg $RPM_BUILD_ROOT%{_sysconfdir}
-install sample-config/template-object/{checkcommands,misccommands}.cfg $RPM_BUILD_ROOT%{_sysconfdir}
-> $RPM_BUILD_ROOT%{_sysconfdir}/contactgroups.cfg 
-> $RPM_BUILD_ROOT%{_sysconfdir}/contacts.cfg 
-> $RPM_BUILD_ROOT%{_sysconfdir}/dependencies.cfg
-> $RPM_BUILD_ROOT%{_sysconfdir}/escalations.cfg
-> $RPM_BUILD_ROOT%{_sysconfdir}/hostgroups.cfg
-> $RPM_BUILD_ROOT%{_sysconfdir}/hosts.cfg
-> $RPM_BUILD_ROOT%{_sysconfdir}/services.cfg
-> $RPM_BUILD_ROOT%{_sysconfdir}/timeperiods.cfg
-
-# install CGIs
+install sample-config/{contact{s,groups},{misccommand,dependencie,escalation,hostgroup,host,service,timeperiod,checkcommand}s}.cfg $RPM_BUILD_ROOT%{_sysconfdir}
+> $RPM_BUILD_ROOT%{_sysconfdir}/passwd
+> $RPM_BUILD_ROOT%{_sysconfdir}/group
 
 # install event handlers
 cp -a contrib/eventhandlers $RPM_BUILD_ROOT%{_libdir}/%{name}/eventhandlers
 
 # Install logos
-tar -xvz -C $RPM_BUILD_ROOT%{_datadir}/images/logos -f %{SOURCE3}
+tar -xvz -C $RPM_BUILD_ROOT%{_datadir}/images/logos -f %{SOURCE4}
 
 # Object data/cache files
 for i in {objects.cache,{comments,downtime,retention,status}.dat}; do
@@ -252,8 +250,8 @@ fi
 
 for i in %{_localstatedir}/{objects.cache,{comments,downtime,retention,status}.dat}; do
 	[ ! -f $i ] && touch $i
-	chown root:nagios-data $i
-	chmod 660 $i
+	chown root:nagios $i
+	chmod 664 $i
 done
 
 %preun
@@ -324,7 +322,8 @@ fi
 %doc Changelog README* UPGRADING INSTALLING LICENSE
 %doc sample-config/template-object/{bigger,minimal}.cfg
 %attr(750,root,nagios-data) %dir %{_sysconfdir}
-%attr(640,root,nagios-data) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/*.cfg
+%attr(640,root,nagios-data) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/[!r]*.cfg
+%attr(640,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/resource.cfg
 %exclude %{_sysconfdir}/cgi.cfg
 
 %attr(754,root,root) /etc/rc.d/init.d/%{name}
@@ -339,8 +338,9 @@ fi
 %attr(770,root,nagios-data) %{_var}/log/%{name}
 %attr(770,root,nagios-data) %dir %{_var}/log/%{name}/archives
 
-%attr(750,root,nagios-data) %dir %{_localstatedir}
+%attr(770,root,nagios-data) %dir %{_localstatedir}
 %attr(2770,root,nagios-data) %dir %{_localstatedir}/rw
+# NOTE: the permissions are set in post script
 %ghost %{_localstatedir}/rw/nagios.cmd
 %ghost %{_localstatedir}/objects.cache
 %ghost %{_localstatedir}/*.dat
@@ -351,7 +351,9 @@ fi
 %files cgi
 %defattr(644,root,root,755)
 %attr(640,root,root) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/apache-%{name}.conf
-%attr(640,root,nagios-data) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/cgi.cfg
+%attr(640,root,http) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/cgi.cfg
+%attr(640,root,http) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/passwd
+%attr(640,root,http) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/group
 %dir %{_libdir}/%{name}/cgi
 %attr(755,root,root) %{_libdir}/%{name}/cgi/*.cgi
 %{_datadir}
