@@ -18,9 +18,11 @@ Source1:	%{name}-apache.conf
 Source2:	%{name}.init
 Patch0:		%{name}-pgsql.patch
 URL:		http://www.nagios.org/
+BuildRequires:	autoconf
+BuildRequires:	automake
 %{!?_without_gd:BuildRequires:	gd-devel}
-%{?_with_pgsql:BuildRequires:	postgresql-devel}
 %{?_with_mysql:BuildRequires:	mysql-devel}
+%{?_with_pgsql:BuildRequires:	postgresql-devel}
 PreReq:		rc-scripts
 PreReq:		sh-utils
 Requires(pre):	/usr/bin/getgid
