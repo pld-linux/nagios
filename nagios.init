@@ -29,7 +29,8 @@ checkconfig() {
 	res=`/usr/sbin/nagios -v /etc/nagios/nagios.cfg`
 	rc=$?
 	if [ $rc -gt 0 ]; then
-		echo "$res"
+		fail
+		nls 'The configuration is broken. See details with %s "checkconfig"' $0
 	fi
 	return $rc
 }
@@ -40,9 +41,9 @@ case "$1" in
   start)
 	# Check if the service is already running?
 	if [ ! -f /var/lock/subsys/nagios ]; then
-		checkconfig || exit $?
-
 		msg_starting nagios
+		checkconfig || exit
+
 		# remove stale cmd pipe (or nagios won't start if it exists)
 		rm -f /var/lib/nagios/rw/nagios.cmd
 		daemon /usr/sbin/nagios -d /etc/nagios/nagios.cfg </dev/null
@@ -72,14 +73,15 @@ case "$1" in
 	status nagios
 	exit $?
 	;;
-  check)
+  checkconfig|check)
 	/usr/sbin/nagios -v /etc/nagios/nagios.cfg
 	exit $?
 	;;
   reload|force-reload)
-		checkconfig || exit $?
         if [ -f /var/lock/subsys/nagios ]; then
                 msg_reloading nagios
+				checkconfig || exit
+
                 killproc nagios -HUP
                 RETVAL=$?
         else
@@ -88,13 +90,14 @@ case "$1" in
         fi
         ;;
   restart)
-	checkconfig || exit $?
+	msg_reloading nagios
+	checkconfig || exit && started
 	$0 stop
 	$0 start
 	exit $?
 	;;
   *)
-	msg_usage "$0 {start|stop|restart|reload|force-reload|status|check}"
+	msg_usage "$0 {start|stop|restart|reload|force-reload|status|checkconfig}"
 	exit 3
 esac
 
