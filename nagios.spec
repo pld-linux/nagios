@@ -11,7 +11,7 @@ Summary(pl):	Program do monitorowania serwerów/us³ug/sieci
 Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	1.0
-Release:	0.%{_beta}
+Release:	0.%{_beta}.1
 License:	GPL
 Group:		Networking
 Source0:	http://west.dl.sourceforge.net/sourceforge/%{name}/%{name}-%{version}%{_beta}.tar.gz
@@ -22,12 +22,14 @@ URL:		http://www.nagios.org/
 %{!?_without_gd:BuildRequires:	gd-devel}
 %{?_with_pgsql:BuildRequires:	postgresql-devel}
 %{?_with_mysql:BuildRequires:	mysql-devel}
-Prereq:		rc-scripts
-Prereq:		/sbin/chkconfig
-Prereq:		%{_sbindir}/useradd
-Prereq:		%{_bindir}/getgid
-Prereq:		/bin/id
-Prereq:		sh-utils
+PreReq:		rc-scripts
+PreReq:		sh-utils
+Requires(pre):	/usr/bin/getgid
+Requires(pre):	/bin/id
+Requires(pre):	/usr/sbin/groupadd
+Requires(pre):	/usr/sbin/useradd
+Requires(post,postun):	/sbin/chkconfig
+Conflicts:	iputils-ping < 1:ss020124
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 Obsoletes:	netsaint
 
@@ -75,7 +77,10 @@ Group:		Networking
 Requires:	apache
 
 %description cgi
-CGI webinterface for Nagios
+CGI webinterface for Nagios.
+
+%description cgi -l pl
+Interfejs CGI dla Nagiosa.
 
 %package devel
 Summary:	Include files that Netsaint-related applications may compile against
@@ -111,7 +116,7 @@ aplicativos para o Nagios.
 	--with-gd-inc=%{_includedir} \
 	--with-cgiurl=/nagios/cgi-bin \
 	--with-htmurl=/nagios \
-	--with-ping_command='/usr/sbin/ping -n %%s -c %%d' \
+	--with-ping_command='/bin/ping -n %%s -c %%d' \
 	%{?_with_mysql:--with-mysql-xdata --with-mysql-status --with-mysql-comments --with-mysql-extinfo --with-mysql-retention --with-mysql-downtime --with-mysql-lib=%{_libdir} --with-mysql-inc=%{_includedir}/mysql} \
 	%{?_with_pgsql:--with-pgsql-xdata --with-pgsql-status --with-pgsql-comments --with-pgsql-extinfo --with-pgsql-retention --with-pgsql-downtime--with-pgsql-lib=%{_libdir} --with-pgsql-inc=%{_includedir}/postgresql} \
 	%{?_without_gd:--disable-statusmap --disable-trends} \
@@ -150,40 +155,40 @@ rm -rf $RPM_BUILD_ROOT
 
 %pre
 if [ -n "`getgid %{name}`" ]; then
-        if [ "`getgid %{name}`" != "72" ]; then
-                echo "Warning: group %{name} haven't gid=72. Correct this before installing %{name}" 1>&2
-                exit 1
-        fi
+	if [ "`getgid %{name}`" != "72" ]; then
+		echo "Error: group %{name} doesn't have gid=72. Correct this before installing %{name}." 1>&2
+		exit 1
+	fi
 else
-        %{_sbindir}/groupadd -g 72 -f %{name}
+	/usr/sbin/groupadd -g 72 -f %{name}
 fi
 if [ -n "`id -u %{name} 2>/dev/null`" ]; then
-        if [ "`id -u %{name}`" != "72" ]; then
-                echo "Warning: user %{name} haven't uid=72. Correct this before installing %{name}" 1>&2
-                exit 1
-        fi
+	if [ "`id -u %{name}`" != "72" ]; then
+		echo "Error: user %{name} doesn't have uid=72. Correct this before installing %{name}." 1>&2
+		exit 1
+	fi
 else
-        %{_sbindir}/useradd -u 72 -d %{_libdir}/%{name} -s /bin/false -c "%{name} User" -g %{name} %{name} 1>&2
+	/usr/sbin/useradd -u 72 -d %{_libdir}/%{name} -s /bin/false -c "%{name} User" -g %{name} %{name} 1>&2
 fi
 
 %post
 /sbin/chkconfig --add %{name}
-if [ -f %{_var}/lock/subsys/%{name} ]; then
-        %{_sysconfdir}/rc.d/init.d/%{name} restart 1>&2
+if [ -f /var/lock/subsys/%{name} ]; then
+	/etc/rc.d/init.d/%{name} restart 1>&2
 fi
 
 %preun
 if [ "$1" = "0" ] ; then
-	if [ -f %{_var}/lock/subsys/%{name} ]; then
-		%{_sysconfdir}/rc.d/init.d/%{name} stop 1>&2
+	if [ -f /var/lock/subsys/%{name} ]; then
+		/etc/rc.d/init.d/%{name} stop 1>&2
 	fi
 	/sbin/chkconfig --del %{name}
 fi
 
 %postun
 if [ "$1" = "0" ]; then
-        %{_sbindir}/userdel %{name}
-        %{_sbindir}/groupdel %{name}
+	/usr/sbin/userdel %{name}
+	/usr/sbin/groupdel %{name}
 fi
 
 %files
