@@ -9,6 +9,7 @@
 #   - cgi.cfg contains sensitive information
 #   - /etc/nagios/*.cfg should be readable by nagios (and webserver if -cgi is used)
 #   - all files should be owned by root as there's no write permission needed
+#  - create group "nagios-data" for sharing access with httpd user (/etc/nagios/*.cfg)
 
 Summary:	Host/service/network monitoring program
 Summary(pl):	Program do monitorowania serwerów/us³ug/sieci
