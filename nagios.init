@@ -2,7 +2,7 @@
 #
 # nagios	Host/service/network monitoring daemon
 #
-# chkconfig:	345 50 50
+# chkconfig:	345 85 24
 # description:	Host/service/network monitoring daemon which uses snort as NIDS
 #
 
