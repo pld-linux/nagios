@@ -3,17 +3,15 @@
 # _with_mysql - enable mysql support
 # _without_gd - without statusmap and trends, which require gd library
 
-%define	_beta	b6
-
 Summary:	Host/service/network monitoring program
 Summary(pl):	Program do monitorowania serwerów/us³ug/sieci
 Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	1.0
-Release:	0.%{_beta}.1
+Release:	1
 License:	GPL v2
 Group:		Networking
-Source0:	http://west.dl.sourceforge.net/sourceforge/%{name}/%{name}-%{version}%{_beta}.tar.gz
+Source0:	ftp://ftp.sourceforge.net/pub/sourceforge/%{name}/%{name}-%{version}.tar.gz
 Source1:	%{name}-apache.conf
 Source2:	%{name}.init
 Patch0:		%{name}-pgsql.patch
@@ -99,7 +97,7 @@ Este pacote contém arquivos de cabeçalho usados no desenvolvimento de
 aplicativos para o Nagios.
 
 %prep
-%setup -q -n %{name}-%{version}%{_beta}
+%setup -q -n %{name}-%{version}
 %patch -p1
 
 %build
