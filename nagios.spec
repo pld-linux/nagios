@@ -1,7 +1,7 @@
 #
 # Conditional build:
 %bcond_with	pgsql	# enable pgsql support
-%bcond_with	mysql	# enable mysql support
+%bcond_with	mysql	# enable MySQL support
 %bcond_without	gd	# without statusmap and trends, which require gd library
 #
 # TODO:
