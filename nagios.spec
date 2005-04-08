@@ -46,6 +46,7 @@ Requires(pre):	/usr/sbin/usermod
 Requires(post,postun):	/sbin/chkconfig
 Requires(postun):	/usr/sbin/groupdel
 Requires(postun):	/usr/sbin/userdel
+Provides:	nagios-core
 Provides:	user(nagios)
 Provides:	group(nagios)
 Conflicts:	iputils-ping < 1:ss020124
