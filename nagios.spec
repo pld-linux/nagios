@@ -200,6 +200,7 @@ install %{SOURCE4} $RPM_BUILD_ROOT%{_datadir}
 # install templated configuration files
 install sample-config/{nagios,cgi,resource}.cfg $RPM_BUILD_ROOT%{_sysconfdir}
 install sample-config/{contact{s,groups},{misccommand,dependencie,escalation,hostgroup,host,service,timeperiod,checkcommand}s}.cfg $RPM_BUILD_ROOT%{_sysconfdir}
+install sample-config/hostextinfo.cfg $RPM_BUILD_ROOT%{_sysconfdir}
 > $RPM_BUILD_ROOT%{_sysconfdir}/passwd
 echo 'nagios:' > $RPM_BUILD_ROOT%{_sysconfdir}/group
 
