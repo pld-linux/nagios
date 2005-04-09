@@ -158,6 +158,7 @@ sed -i -e '
 ' $(find contrib/eventhandlers -type f)
 
 %build
+cp -f /usr/share/automake/config.sub .
 %{__aclocal}
 %{__autoconf}
 %configure \
