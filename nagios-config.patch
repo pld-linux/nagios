@@ -804,3 +804,47 @@ diff -Nur ../c/timeperiods.cfg ./timeperiods.cfg
 +}
 +
 +# vim:ts=8:sw=8
+--- /dev/null	2005-01-08 06:33:45.000000000 +0200
++++ ./sample-config/hostextinfo.cfg	2005-04-10 00:30:31.012176820 +0300
+@@ -0,0 +1,41 @@
++################################################################################
++# object config file for Nagios
++#
++################################################################################
++
++################################################################################
++# EXTENDED HOST INFORMATION
++#
++# Extended host information entries are basically used to make the output from
++# the status, statusmap, statuswrl, and extinfo CGIs look pretty. They have no
++# effect on monitoring and are completely optional.
++#
++# SYNTAX:
++# define hostextinfo {
++#	host_name	host_name	
++#	notes	note_string	
++#	notes_url	url	
++#	action_url	url	
++#	icon_image	image_file	
++#	icon_image_alt	alt_string	
++#	vrml_image	image_file	
++#	statusmap_image	image_file	
++#	2d_coords	x_coord,y_coord	
++#	3d_coords	x_coord,y_coord,z_coord	
++# }
++#
++# http://nagios.sourceforge.net/docs/2_0/xodtemplate.html#hostextinfo
++################################################################################
++
++define hostextinfo {
++	host_name		linux
++	notes			This is the PLD Linux server
++	icon_image      base/pld.png
++	icon_image_alt  PLD Ac
++	vrml_image      base/pld.png
++	statusmap_image base/pld.gd2
++	2d_coords		100,250
++	3d_coords		100.0,50.0,75.0
++}
++
++# vim:ts=8:sw=8
