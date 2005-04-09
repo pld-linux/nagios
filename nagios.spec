@@ -18,7 +18,7 @@ Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	2.0
 %define	_rc     b2
-Release:	0.%{_rc}.74
+Release:	0.%{_rc}.75
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}%{_rc}.tar.gz
@@ -55,6 +55,7 @@ Requires(pre):	/usr/sbin/usermod
 Requires(post,postun):	/sbin/chkconfig
 Requires(postun):	/usr/sbin/groupdel
 Requires(postun):	/usr/sbin/userdel
+Provides:	nagios-core
 Provides:	user(nagios)
 Provides:	group(nagios)
 Provides:	group(nagios-data)
