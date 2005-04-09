@@ -23,7 +23,7 @@
 -#$USER4$=somepassword
 +# Store MySQL usernames/password (hidden from the CGIs)
 +$USER3$=mysql
-+#$USER4$=password
++$USER4$=
  
 +# This is used for SNMP v1 community string in checkcommands.cfg
 +$USER5$=public
