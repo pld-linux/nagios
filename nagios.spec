@@ -18,7 +18,7 @@ Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	2.0
 %define	_rc     b2
-Release:	0.%{_rc}.75
+Release:	0.%{_rc}.84
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}%{_rc}.tar.gz
@@ -26,10 +26,13 @@ Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}%{_rc}.tar.gz
 Source1:	%{name}-apache.conf
 Source2:	%{name}.init
 Source3:	%{name}.sysconfig
+Source4:	http://www.nagios.org/images/favicon.ico
+# Source4-md5:	1c4201c7da53d6c7e48251d3a9680449
 Patch0:		%{name}-pgsql.patch
 Patch1:		%{name}-resources.patch
 Patch2:		%{name}-iconv-in-libc.patch
 Patch3:		%{name}-config.patch
+Patch4:		%{name}-favicon.patch
 URL:		http://www.nagios.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -152,6 +155,7 @@ aplicativos para o Nagios.
 %patch1 -p0
 %patch2 -p1
 %patch3 -p1
+%patch4 -p1
 
 sed -i -e '
 	s,".*/var/rw/nagios.cmd,"%{_localstatedir}/rw/nagios.cmd,
@@ -191,6 +195,7 @@ install include/locations.h	$RPM_BUILD_ROOT%{_includedir}/%{name}
 install %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/apache-%{name}.conf
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 install %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/%{name}
+install %{SOURCE4} $RPM_BUILD_ROOT%{_datadir}
 
 # install templated configuration files
 install sample-config/{nagios,cgi,resource}.cfg $RPM_BUILD_ROOT%{_sysconfdir}
