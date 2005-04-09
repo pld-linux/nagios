@@ -154,8 +154,8 @@ aplicativos para o Nagios.
 %patch3 -p1
 
 sed -i -e '
-	s,.*/var/rw/nagios.cmd,%{_localstatedir}/rw/nagios.cmd,
-	s,.*/libexec/eventhandlers,%{_libdir}/%{name}/eventhandlers,
+	s,".*/var/rw/nagios.cmd,"%{_localstatedir}/rw/nagios.cmd,
+	s,".*/libexec/eventhandlers,"%{_libdir}/%{name}/eventhandlers,
 ' $(find contrib/eventhandlers -type f)
 
 %build
