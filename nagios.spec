@@ -14,7 +14,7 @@ Summary(pl):	Program do monitorowania serwerów/us³ug/sieci
 Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	1.2
-Release:	7.5
+Release:	7.6
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
@@ -102,7 +102,7 @@ Group:		Networking
 # for dirs... and accessing local logs(?)
 Requires:	%{name} = %{version}-%{release}
 Requires:	%{name}-imagepaks
-Requires:	apache
+Requires:	apache-mod_auth
 
 %description cgi
 CGI webinterface for Nagios.
