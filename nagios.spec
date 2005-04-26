@@ -14,7 +14,7 @@ Summary(pl):	Program do monitorowania serwerów/us³ug/sieci
 Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	1.2
-Release:	7.6
+Release:	8
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
@@ -185,7 +185,7 @@ else
 	if [ -n "`getgid netsaint`" ] && [ "`getgid netsaint`" = "72" ]; then
 		/usr/sbin/groupmod -n nagios netsaint
 	else
-		/usr/sbin/groupadd -g 72 -f nagios
+		/usr/sbin/groupadd -g 72 nagios
 	fi
 fi
 if [ -n "`id -u nagios 2>/dev/null`" ]; then
