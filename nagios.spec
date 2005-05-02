@@ -10,7 +10,6 @@
 #   - /etc/nagios/*.cfg should be readable by nagios (and webserver if -cgi is used)
 #   - all files should be owned by root as there's no write permission needed
 #  - create group "nagios-data" for sharing access with httpd user (/etc/nagios/*.cfg)
-%define	data_gid 147
 
 Summary:	Host/service/network monitoring program
 Summary(pl):	Program do monitorowania serwerów/us³ug/sieci
@@ -222,7 +221,7 @@ if [ -n "`getgid netsaint`" ] && [ "`getgid netsaint`" = "72" ]; then
 	/usr/sbin/groupmod -n nagios netsaint
 fi
 %groupadd -g 72 nagios
-%groupadd -g %{data_gid} -f nagios-data
+%groupadd -g 147 -f nagios-data
 
 # move to trigger?
 if [ -n "`id -u netsaint 2>/dev/null`" ] && [ "`id -u netsaint`" = "72" ]; then
