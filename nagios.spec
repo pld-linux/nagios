@@ -297,15 +297,9 @@ if [ "$1" = "0" ]; then
 	fi
 fi
 
-%triggerpostun -- nagios < 2.0-0.b2.53
+%triggerpostun -- nagios < 2.0-0.b2.66
 chgrp nagios-data %{_sysconfdir}/*.cfg
 %addusertogroup nagios nagios-data
-if [ -f /var/lock/subsys/%{name} ]; then
-	/etc/rc.d/init.d/%{name} restart 1>&2
-fi
-
-%triggerpostun -- nagios < 2.0-0.b2.66
-/usr/sbin/usermod -G nagios-data nagios
 if [ -f /var/lock/subsys/%{name} ]; then
 	/etc/rc.d/init.d/%{name} restart 1>&2
 fi
