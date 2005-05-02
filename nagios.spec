@@ -44,7 +44,7 @@ BuildRequires:	sed >= 4.0
 %endif
 %{?with_mysql:BuildRequires:	mysql-devel}
 %{?with_pgsql:BuildRequires:	postgresql-devel}
-BuildRequires:	rpmbuild(macros) >= 1.177
+BuildRequires:	rpmbuild(macros) >= 1.202
 PreReq:		rc-scripts
 PreReq:		sh-utils
 Requires:	mailx
@@ -217,40 +217,18 @@ done
 rm -rf $RPM_BUILD_ROOT
 
 %pre
-if [ -n "`getgid nagios`" ]; then
-	if [ "`getgid nagios`" != "72" ]; then
-		echo "Error: group nagios doesn't have gid=72. Correct this before installing %{name}." 1>&2
-		exit 1
-	fi
-else
-	if [ -n "`getgid netsaint`" ] && [ "`getgid netsaint`" = "72" ]; then
-		/usr/sbin/groupmod -n nagios netsaint
-	else
-		/usr/sbin/groupadd -g 72 -f nagios
-	fi
+# move to trigger?
+if [ -n "`getgid netsaint`" ] && [ "`getgid netsaint`" = "72" ]; then
+	/usr/sbin/groupmod -n nagios netsaint
 fi
+%groupadd -g 72 nagios
+%groupadd -g %{data_gid} -f nagios-data
 
-if [ -n "`getgid nagios-data`" ]; then
-	if [ "`getgid nagios-data`" != "%{data_gid}" ]; then
-		echo "Error: group nagios-data doesn't have gid=%{data_gid}. Correct this before installing %{name}." 1>&2
-		exit 1
-	fi
-else
-		/usr/sbin/groupadd -g %{data_gid} -f nagios-data
+# move to trigger?
+if [ -n "`id -u netsaint 2>/dev/null`" ] && [ "`id -u netsaint`" = "72" ]; then
+	/usr/sbin/usermod -d /tmp -l nagios netsaint
 fi
-
-if [ -n "`id -u nagios 2>/dev/null`" ]; then
-	if [ "`id -u nagios`" != "72" ]; then
-		echo "Error: user nagios doesn't have uid=72. Correct this before installing %{name}." 1>&2
-		exit 1
-	fi
-else
-	if [ -n "`id -u netsaint 2>/dev/null`" ] && [ "`id -u netsaint`" = "72" ]; then
-		/usr/sbin/usermod -d %{_libdir}/nagios -l nagios netsaint
-	else
-		/usr/sbin/useradd -u 72 -d %{_libdir}/nagios -s /bin/false -c "%{name} User" -g nagios -G nagios-data nagios 1>&2
-	fi
-fi
+%useradd -u 72 -d %{_libdir}/nagios -s /bin/false -c "%{name} User" -g nagios nagios
 
 %post
 /sbin/chkconfig --add %{name}
