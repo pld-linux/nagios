@@ -17,7 +17,7 @@ Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	2.0
 %define	_rc     b3
-Release:	0.%{_rc}.2
+Release:	0.%{_rc}.4
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}%{_rc}.tar.gz
@@ -216,18 +216,15 @@ done
 rm -rf $RPM_BUILD_ROOT
 
 %pre
-# move to trigger?
-if [ -n "`getgid netsaint`" ] && [ "`getgid netsaint`" = "72" ]; then
+if [ "`getgid netsaint`" = "72" ]; then
 	/usr/sbin/groupmod -n nagios netsaint
 fi
 %groupadd -g 72 nagios
 %groupadd -g 147 -f nagios-data
-
-# move to trigger?
 if [ -n "`id -u netsaint 2>/dev/null`" ] && [ "`id -u netsaint`" = "72" ]; then
-	/usr/sbin/usermod -d /tmp -l nagios netsaint
+	/usr/sbin/usermod -d %{_libdir}/nagios -l nagios -c "Nagios User" -G nagios-data netsaint
 fi
-%useradd -u 72 -d %{_libdir}/nagios -s /bin/false -c "%{name} User" -g nagios nagios
+%useradd -u 72 -d %{_libdir}/nagios -s /bin/false -c "Nagios User" -g nagios -G nagios-data nagios
 
 %post
 /sbin/chkconfig --add %{name}
