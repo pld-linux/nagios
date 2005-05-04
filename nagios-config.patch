@@ -848,3 +848,729 @@ diff -Nur ../c/timeperiods.cfg ./timeperiods.cfg
 +}
 +
 +# vim:ts=8:sw=8
+diff -u ./cgi.cfg /etc/nagios/cgi.cfg
+--- ./sample-config/cgi.cfg.in	2005-05-02 22:27:51.000000000 +0300
++++ ./sample-config/cgi.cfg.in	2005-05-04 14:10:46.080873851 +0300
+@@ -67,9 +67,9 @@
+ 
+ 
+ # AUTHENTICATION USAGE
+-# This option controls whether or not the CGIs will use any 
++# This option controls whether or not the CGIs will use any
+ # authentication when displaying host and service information, as
+-# well as committing commands to Nagios for processing.  
++# well as committing commands to Nagios for processing.
+ #
+ # Read the HTML documentation to learn how the authorization works!
+ #
+@@ -100,7 +100,7 @@
+ # access to the CGIs has been authenticated in some manner!  If you
+ # define this variable, anyone who has not authenticated to the web
+ # server will inherit all rights you assign to this user!
+- 
++
+ #default_user_name=guest
+ 
+ 
+@@ -159,9 +159,9 @@
+ # GLOBAL HOST/SERVICE COMMAND ACCESS
+ # These two options are comma-delimited lists of all usernames that
+ # can issue host or service related commands via the command
+-# CGI (cmd.cgi) for all hosts and services that are being monitored. 
+-# By default, users can only issue commands for hosts or services 
+-# that they are contacts for (unless you you choose to not use 
++# CGI (cmd.cgi) for all hosts and services that are being monitored.
++# By default, users can only issue commands for hosts or services
++# that they are contacts for (unless you you choose to not use
+ # authorization).  You may use an asterisk (*) to authorize any
+ # user who has authenticated to the web server.
+ 
+@@ -172,7 +172,7 @@
+ 
+ 
+ # STATUSMAP BACKGROUND IMAGE
+-# This option allows you to specify an image to be used as a 
++# This option allows you to specify an image to be used as a
+ # background in the statusmap CGI.  It is assumed that the image
+ # resides in the HTML images path (i.e. /usr/share/nagios/images).
+ # This path is automatically determined by appending "/images"
+@@ -217,7 +217,7 @@
+ 
+ 
+ # STATUSWRL INCLUDE
+-# This option allows you to include your own objects in the 
++# This option allows you to include your own objects in the
+ # generated VRML world.  It is assumed that the file
+ # resides in the HTML path (i.e. /usr/share/nagios).
+ 
+@@ -243,7 +243,7 @@
+ 
+ # REFRESH RATE
+ # This option allows you to specify the refresh rate in seconds
+-# of various CGIs (status, statusmap, extinfo, and outages).  
++# of various CGIs (status, statusmap, extinfo, and outages).
+ 
+ refresh_rate=90
+ 
+diff -u ./checkcommands.cfg /etc/nagios/checkcommands.cfg
+--- ./sample-config/checkcommands.cfg	2005-05-02 22:26:58.000000000 +0300
++++ ./sample-config/checkcommands.cfg	2005-05-04 14:10:55.458261109 +0300
+@@ -11,9 +11,9 @@
+ #
+ #	define command {
+ #		template	<templatename>
+-#		name	<objectname>
+-#		command_name  <commandname>
+-#		command_line  <commandline>
++#		name		<objectname>
++#		command_name	<commandname>
++#		command_line	<commandline>
+ #	}
+ #
+ # WHERE:
+@@ -103,7 +103,7 @@
+ 	command_line	$USER1$/check_tcp -H $HOSTADDRESS$ -p 23
+ }
+ 
+-# 'check_ping' command definition
++# Generic command to check a device by pinging it
+ define command {
+ 	command_name	check_ping
+ 	command_line	$USER1$/check_ping -H $HOSTADDRESS$ -w $ARG1$ -c $ARG2$ -p 5
+@@ -121,25 +121,26 @@
+ 	command_line	$USER1$/check_hpjd -H $HOSTADDRESS$ -C public
+ }
+ 
+-# 'check_local_disk' command definition
++# Command used to check disk space usage on local partitions
+ define command {
+ 	command_name	check_local_disk
+ 	command_line	$USER1$/check_disk -w $ARG1$ -c $ARG2$ -p $ARG3$
+ }
+ 
+-# 'check_local_users' command definition
++# Command used to check the number of currently logged in users on the
++# local machine
+ define command {
+ 	command_name	check_local_users
+ 	command_line	$USER1$/check_users -w $ARG1$ -c $ARG2$
+ }
+ 
+-# 'check_local_procs' command definition
++# Command to check the number of running processing on the local machine
+ define command {
+ 	command_name	check_local_procs
+ 	command_line	$USER1$/check_procs -w $ARG1$ -c $ARG2$ -s $ARG3$
+ }
+ 
+-# 'check_local_load' command definition
++# Command to check the load on the local machine
+ define command {
+ 	command_name	check_local_load
+ 	command_line	$USER1$/check_load -w $ARG1$ -c $ARG2$
+@@ -217,8 +218,10 @@
+ # average time to produce a critical error.
+ # Note: Only one ICMP echo packet is sent (determined by the '-p 1' argument)
+ 
+-# 'check-host-alive' command definition
++# Command to check to see if a host is "alive" (up) by pinging it
+ define command {
+ 	command_name	check-host-alive
+-	command_line	$USER1$/check_ping -H $HOSTADDRESS$ -w 3000.0,80% -c 5000.0,100% -p 1
++        command_line    $USER1$/check_ping -H $HOSTADDRESS$ -w 99,99% -c 100,100% -p 1
+ }
++
++# vim:ts=8:sw=8
+diff -u ./contactgroups.cfg /etc/nagios/contactgroups.cfg
+--- ./sample-config/contactgroups.cfg	2005-05-02 22:26:58.000000000 +0300
++++ ./sample-config/contactgroups.cfg	2005-05-03 14:59:21.031526797 +0300
+@@ -8,11 +8,12 @@
+ #
+ ################################################################################
+ 
+-# 'linux-admins' contact group definition
++# We only have one contact in this simple configuration file, so there is
++# no need to create more than one contact group.
+ define contactgroup {
+-	contactgroup_name	linux-admins
+-	alias			Linux Administrators
+-	members			nagios
++        contactgroup_name       admins
++        alias                   Nagios Administrators
++	members			nagios-admin
+ }
+ 
+ # vim:ts=8:sw=8
+diff -u ./contacts.cfg /etc/nagios/contacts.cfg
+--- ./sample-config/contacts.cfg	2005-05-02 22:26:58.000000000 +0300
++++ ./sample-config/contacts.cfg	2005-05-03 14:58:55.931843490 +0300
+@@ -8,19 +8,19 @@
+ #
+ ################################################################################
+ 
+-# 'nagios' contact definition
++# In this simple config file, a single contact will receive all alerts.
+ define contact {
+-	contact_name			nagios
++	contact_name			nagios-admin
+ 	alias				Nagios Admin
+ 
+ 	service_notification_period	24x7
+ 	host_notification_period	24x7
+ 
+-	service_notification_options	w,u,c,r
+-	host_notification_options	d,u,r
++        service_notification_options    w,u,c,r
++        host_notification_options       d,r
+ 
+-	service_notification_commands	notify-by-email,notify-by-epager
+-	host_notification_commands	host-notify-by-email,host-notify-by-epager
++        service_notification_commands   notify-by-email
++        host_notification_commands      host-notify-by-email
+ 
+ 	email				root@localhost
+ 	pager				root@localhost
+diff -u ./hostextinfo.cfg /etc/nagios/hostextinfo.cfg
+--- ./sample-config/hostextinfo.cfg	2005-05-02 22:26:58.000000000 +0300
++++ ./sample-config/hostextinfo.cfg	2005-05-04 13:38:11.377538064 +0300
+@@ -12,28 +12,28 @@
+ #
+ # SYNTAX:
+ # define hostextinfo {
+-#	host_name	host_name	
+-#	notes	note_string	
+-#	notes_url	url	
+-#	action_url	url	
+-#	icon_image	image_file	
+-#	icon_image_alt	alt_string	
+-#	vrml_image	image_file	
+-#	statusmap_image	image_file	
+-#	2d_coords	x_coord,y_coord	
+-#	3d_coords	x_coord,y_coord,z_coord	
++#	host_name	host_name
++#	notes		note_string
++#	notes_url	url
++#	action_url	url
++#	icon_image	image_file
++#	icon_image_alt	alt_string
++#	vrml_image	image_file
++#	statusmap_image	image_file
++#	2d_coords	x_coord,y_coord
++#	3d_coords	x_coord,y_coord,z_coord
+ # }
+ #
+ # http://nagios.sourceforge.net/docs/2_0/xodtemplate.html#hostextinfo
+ ################################################################################
+ 
+ define hostextinfo {
+-	host_name		linux
+-	notes			This is the PLD Linux server
+-	icon_image      base/pld.png
+-	icon_image_alt  PLD Ac
+-	vrml_image      base/pld.png
+-	statusmap_image base/pld.gd2
++	host_name		localhost
++	notes			PLD Linux server
++	icon_image		base/pld.png
++	icon_image_alt		PLD Ac
++	vrml_image		base/pld.png
++	statusmap_image		base/pld.gd2
+ 	2d_coords		100,250
+ 	3d_coords		100.0,50.0,75.0
+ }
+diff -u ./hostgroups.cfg /etc/nagios/hostgroups.cfg
+--- ./sample-config/hostgroups.cfg	2005-05-02 22:26:58.000000000 +0300
++++ ./sample-config/hostgroups.cfg	2005-05-03 21:51:02.723824827 +0300
+@@ -8,11 +8,12 @@
+ #
+ ################################################################################
+ 
+-# 'linux-boxes' host group definition
++# We only have one host in our simple config file, so there is no need to
++# create more than one hostgroup.
+ define hostgroup {
+-	hostgroup_name	linux-boxes
++	hostgroup_name	test
+ 	alias		Linux Servers
+-	members		linux
++	members		localhost
+ }
+ 
+ # vim:ts=8:sw=8
+diff -u ./hosts.cfg /etc/nagios/hosts.cfg
+--- ./sample-config/hosts.cfg	2005-05-02 22:26:58.000000000 +0300
++++ ./sample-config/hosts.cfg	2005-05-04 13:35:39.119723662 +0300
+@@ -8,7 +8,7 @@
+ #
+ ################################################################################
+ 
+-# Generic host definition template
++# Generic host definition template - This is NOT a real host, just a template!
+ define host {
+ 	name				generic-host	; The name of this host template
+ 							; - referenced in other host definitions,
+@@ -16,6 +16,7 @@
+ 	notifications_enabled		1		; Host notifications are enabled
+ 	event_handler_enabled		1		; Host event handler is enabled
+ 	flap_detection_enabled		1		; Flap detection is enabled
++        failure_prediction_enabled      1       	; Failure prediction is enabled
+ 	process_perf_data		1		; Process performance data
+ 	retain_status_information	1		; Retain status information across program restarts
+ 	retain_nonstatus_information	1		; Retain non-status information across program restarts
+@@ -24,23 +25,23 @@
+ 							; - ITS NOT A REAL HOST, JUST A TEMPLATE!
+ }
+ 
+-# 'linux' host definition
++# Since this is a simple configuration file, we only monitor one host - the
++# local host (this machine).
+ define host {
+ 	use			generic-host		; Name of host template to use
+ 
+-	host_name		linux
++        host_name               localhost
+ 	alias			Linux Server
+ 	address			127.0.0.1
+ 
+ 	check_command		check-host-alive
+ 	max_check_attempts	10
+ 
+-	notification_interval	480
++        notification_interval   120
+ 	notification_period	24x7
+-	notification_options	d,u,r
++        notification_options    d,r
+ 
+-	contact_groups		linux-admins
++	contact_groups		admins
+ }
+ 
+-
+ # vim:ts=8:sw=8
+diff -u ./misccommands.cfg /etc/nagios/misccommands.cfg
+--- ./sample-config/misccommands.cfg	2005-05-02 22:26:58.000000000 +0300
++++ ./sample-config/misccommands.cfg	2005-05-04 14:11:13.242202592 +0300
+@@ -34,28 +34,30 @@
+ #
+ # NOTIFICATION COMMANDS
+ #
+-# These are some example notification commands.  They may or may not work on
+-# your system without modification.
++# This is a sample service notification command that can be used to send email
++# notifications (about service alerts) to contacts.
+ #
+ ################################################################################
+ 
+ 
+-# 'notify-by-email' command definition
++# This is a sample service notification command that can be used to send email
++# notifications (about service alerts) to contacts.
+ define command {
+ 	command_name	notify-by-email
+-	command_line	/bin/printf "%b" "***** Nagios *****\n\nNotification Type: $NOTIFICATIONTYPE$\n\nService: $SERVICEDESC$\nHost: $HOSTALIAS$\nAddress: $HOSTADDRESS$\nState: $SERVICESTATE$\n\nDate/Time: $LONGDATETIME$\n\nAdditional Info:\n\n$SERVICEOUTPUT$" | /bin/mail -s "** $NOTIFICATIONTYPE$ alert - $HOSTALIAS$/$SERVICEDESC$ is $SERVICESTATE$ **" $CONTACTEMAIL$
++	command_line	/bin/printf "%b" "***** Nagios *****\n\nNotification Type: $NOTIFICATIONTYPE$\n\nService: $SERVICEDESC$\nHost: $HOSTALIAS$\nAddress: $HOSTADDRESS$\nState: $SERVICESTATE$\n\nDate/Time: $LONGDATETIME$\n\nAdditional Info:\n\n$OUTPUT$" | /bin/mail -s "** $NOTIFICATIONTYPE$ alert - $HOSTALIAS$/$SERVICEDESC$ is $SERVICESTATE$ **" $CONTACTEMAIL$
+ }
+ 
+ # 'notify-by-epager' command definition
+ define command {
+ 	command_name	notify-by-epager
+-	command_line	/bin/printf "%b" "Service: $SERVICEDESC$\nHost: $HOSTNAME$\nAddress: $HOSTADDRESS$\nState: $SERVICESTATE$\nInfo: $SERVICEOUTPUT$\nDate: $LONGDATETIME$" | /bin/mail -s "$NOTIFICATIONTYPE$: $HOSTALIAS$/$SERVICEDESC$ is $SERVICESTATE$" $CONTACTPAGER$
++	command_line	/bin/printf "%b" "Service: $SERVICEDESC$\nHost: $HOSTNAME$\nAddress: $HOSTADDRESS$\nState: $SERVICESTATE$\nInfo: $OUTPUT$\nDate: $LONGDATETIME$" | /bin/mail -s "$NOTIFICATIONTYPE$: $HOSTALIAS$/$SERVICEDESC$ is $SERVICESTATE$" $CONTACTPAGER$
+ }
+ 
+-# 'host-notify-by-email' command definition
++# This is a sample host notification command that can be used to send email
++# notifications (about host alerts) to contacts.
+ define command {
+ 	command_name	host-notify-by-email
+-	command_line	/bin/printf "%b" "***** Nagios *****\n\nNotification Type: $NOTIFICATIONTYPE$\nHost: $HOSTNAME$\nState: $HOSTSTATE$\nAddress: $HOSTADDRESS$\nInfo: $HOSTOUTPUT$\n\nDate/Time: $LONGDATETIME$\n" | /bin/mail -s "Host $HOSTSTATE$ alert for $HOSTNAME$!" $CONTACTEMAIL$
++	command_line	/bin/printf "%b" "***** Nagios *****\n\nNotification Type: $NOTIFICATIONTYPE$\nHost: $HOSTNAME$\nState: $HOSTSTATE$\nAddress: $HOSTADDRESS$\nInfo: $OUTPUT$\n\nDate/Time: $LONGDATETIME$\n" | /bin/mail -s "Host $HOSTSTATE$ alert for $HOSTNAME$!" $CONTACTEMAIL$
+ }
+ 
+ # 'host-notify-by-epager' command definition
+@@ -79,11 +81,11 @@
+ # 'process-host-perfdata' command definition
+ define command {
+ 	command_name	process-host-perfdata
+-	command_line	/bin/printf "%b" "$LASTHOSTCHECK$\t$HOSTNAME$\t$HOSTSTATE$\t$HOSTATTEMPT$\t$HOSTSTATETYPE$\t$HOSTEXECUTIONTIME$\t$HOSTOUTPUT$\t$HOSTPERFDATA$" >> /var/lib/nagios/host-perfdata.out
++	command_line	/bin/printf "%b" "$LASTHOSTCHECK$\t$HOSTNAME$\t$HOSTSTATE$\t$HOSTATTEMPT$\t$HOSTSTATETYPE$\t$HOSTEXECUTIONTIME$\t$OUTPUT$\t$HOSTPERFDATA$" >> /var/lib/nagios/host-perfdata.out
+ }
+ 
+ # 'process-service-perfdata' command definition
+ define command {
+ 	command_name	process-service-perfdata
+-	command_line	/bin/printf "%b" "$LASTSERVICECHECK$\t$HOSTNAME$\t$SERVICEDESC$\t$SERVICESTATE$\t$SERVICEATTEMPT$\t$SERVICESTATETYPE$\t$SERVICEEXECUTIONTIME$\t$SERVICELATENCY$\t$SERVICEOUTPUT$\t$SERVICEPERFDATA$" >> /var/lib/nagios/service-perfdata.out
++	command_line	/bin/printf "%b" "$LASTSERVICECHECK$\t$HOSTNAME$\t$SERVICEDESC$\t$SERVICESTATE$\t$SERVICEATTEMPT$\t$SERVICESTATETYPE$\t$SERVICEEXECUTIONTIME$\t$SERVICELATENCY$\t$OUTPUT$\t$SERVICEPERFDATA$" >> /var/lib/nagios/service-perfdata.out
+ }
+diff -u ./nagios.cfg /etc/nagios/nagios.cfg
+--- ./sample-config/nagios.cfg.in	2005-05-02 22:27:51.000000000 +0300
++++ ./sample-config/nagios.cfg.in	2005-05-04 14:11:36.969121990 +0300
+@@ -13,7 +13,7 @@
+ 
+ # LOG FILE
+ # This is the main log file where service and host events are logged
+-# for historical purposes.  This should be the first option specified 
++# for historical purposes.  This should be the first option specified
+ # in the config file!!!
+ 
+ log_file=/var/log/nagios/nagios.log
+@@ -27,7 +27,7 @@
+ # reasons it isn't.  You can split object definitions into several
+ # different config files by using multiple cfg_file statements here.
+ # Nagios will read and process all the config files you define.
+-# This can be very useful if you want to keep command definitions 
++# This can be very useful if you want to keep command definitions
+ # separate from host and contact definitions...
+ 
+ # Plugin commands (service and host check commands)
+@@ -43,21 +43,21 @@
+ # config files if you wish (as done here), or keep them all in a
+ # single config file.
+ 
+-cfg_file=@sysconfdir@/minimal.cfg
++#cfg_file=@sysconfdir@/minimal.cfg
+ 
+-#cfg_file=@sysconfdir@/contactgroups.cfg
+-#cfg_file=@sysconfdir@/contacts.cfg
+-#cfg_file=@sysconfdir@/dependencies.cfg
+-#cfg_file=@sysconfdir@/escalations.cfg
+-#cfg_file=@sysconfdir@/hostgroups.cfg
+-#cfg_file=@sysconfdir@/hosts.cfg
+-#cfg_file=@sysconfdir@/services.cfg
+-#cfg_file=@sysconfdir@/timeperiods.cfg
++cfg_file=@sysconfdir@/contactgroups.cfg
++cfg_file=@sysconfdir@/contacts.cfg
++cfg_file=@sysconfdir@/dependencies.cfg
++cfg_file=@sysconfdir@/escalations.cfg
++cfg_file=@sysconfdir@/hostgroups.cfg
++cfg_file=@sysconfdir@/hosts.cfg
++cfg_file=@sysconfdir@/services.cfg
++cfg_file=@sysconfdir@/timeperiods.cfg
+ 
+ # Extended host/service info definitions are now stored along with
+ # other object definitions:
+-#cfg_file=@sysconfdir@/hostextinfo.cfg
+-#cfg_file=@sysconfdir@/serviceextinfo.cfg
++cfg_file=@sysconfdir@/hostextinfo.cfg
++cfg_file=@sysconfdir@/serviceextinfo.cfg
+ 
+ # You can also tell Nagios to process all config files (with a .cfg
+ # extension) in a particular directory by using the cfg_dir
+@@ -72,7 +72,7 @@
+ 
+ # OBJECT CACHE FILE
+ # This option determines where object definitions are cached when
+-# Nagios starts/restarts.  The CGIs read object definitions from 
++# Nagios starts/restarts.  The CGIs read object definitions from
+ # this cache file (rather than looking at the object config files
+ # directly) in order to prevent inconsistencies that can occur
+ # when the config files are modified after Nagios starts.
+@@ -105,7 +105,7 @@
+ 
+ 
+ # NAGIOS USER
+-# This determines the effective user that Nagios should run as.  
++# This determines the effective user that Nagios should run as.
+ # You can either supply a username or a UID.
+ 
+ nagios_user=nagios
+@@ -113,7 +113,7 @@
+ 
+ 
+ # NAGIOS GROUP
+-# This determines the effective group that Nagios should run as.  
++# This determines the effective group that Nagios should run as.
+ # You can either supply a group name or a GID.
+ 
+ nagios_group=nagios
+@@ -139,7 +139,7 @@
+ # Nagios to check for external commands every minute.  If you specify a
+ # number followed by an "s" (i.e. 15s), this will be interpreted to mean
+ # actual seconds rather than a multiple of the interval_length variable.
+-# Note: In addition to reading the external command file at regularly 
++# Note: In addition to reading the external command file at regularly
+ # scheduled intervals, Nagios will also check for external commands after
+ # event handlers are executed.
+ # NOTE: Setting this value to -1 causes Nagios to check the external
+@@ -155,7 +155,7 @@
+ # This is the file that Nagios checks for external command requests.
+ # It is also where the command CGI will write commands that are submitted
+ # by users, so it must be writeable by the user that the web server
+-# is running as (usually 'nobody').  Permissions should be set at the 
++# is running as (usually 'nobody').  Permissions should be set at the
+ # directory level instead of on the file, as the file is deleted every
+ # time its contents are processed.
+ 
+@@ -237,7 +237,7 @@
+ 
+ 
+ # LOG ARCHIVE PATH
+-# This is the directory where archived (rotated) log files should be 
++# This is the directory where archived (rotated) log files should be
+ # placed (assuming you've chosen to do log rotation).
+ 
+ log_archive_path=/var/log/nagios/archives
+@@ -400,7 +400,7 @@
+ 
+ 
+ # MAXIMUM CONCURRENT SERVICE CHECKS
+-# This option allows you to specify the maximum number of 
++# This option allows you to specify the maximum number of
+ # service checks that can be run in parallel at any given time.
+ # Specifying a value of 1 for this variable essentially prevents
+ # any service checks from being parallelized.  A value of 0
+@@ -424,7 +424,7 @@
+ # This option determines whether or not Nagios will attempt to
+ # automatically reschedule active host and service checks to
+ # "smooth" them out over time.  This can help balance the load on
+-# the monitoring server.  
++# the monitoring server.
+ # WARNING: THIS IS AN EXPERIMENTAL FEATURE - IT CAN DEGRADE
+ # PERFORMANCE, RATHER THAN INCREASE IT, IF USED IMPROPERLY
+ 
+@@ -488,7 +488,7 @@
+ # This setting determines whether or not Nagios will save state
+ # information for services and hosts before it shuts down.  Upon
+ # startup Nagios will reload all saved service and host state
+-# information before starting to monitor.  This is useful for 
++# information before starting to monitor.  This is useful for
+ # maintaining long-term data on state statistics, etc, but will
+ # slow Nagios down a bit when it (re)starts.  Since its only
+ # a one-time penalty, I think its well worth the additional
+@@ -500,7 +500,7 @@
+ 
+ # STATE RETENTION FILE
+ # This is the file that Nagios should use to store host and
+-# service state information before it shuts down.  The state 
++# service state information before it shuts down.  The state
+ # information in this file is also read immediately prior to
+ # starting to monitor the network when Nagios is restarted.
+ # This file is used only if the preserve_state_information
+@@ -523,7 +523,7 @@
+ 
+ 
+ # USE RETAINED PROGRAM STATE
+-# This setting determines whether or not Nagios will set 
++# This setting determines whether or not Nagios will set
+ # program status variables based on the values saved in the
+ # retention file.  If you want to use retained program status
+ # information, set this value to 1.  If not, set this value
+@@ -567,7 +567,7 @@
+ 
+ # SERVICE CHECK EXECUTION OPTION
+ # This determines whether or not Nagios will actively execute
+-# service checks when it initially starts.  If this option is 
++# service checks when it initially starts.  If this option is
+ # disabled, checks are not actively made, but Nagios can still
+ # receive and process passive check results that come in.  Unless
+ # you're implementing redundant hosts or have a special need for
+@@ -589,7 +589,7 @@
+ 
+ # HOST CHECK EXECUTION OPTION
+ # This determines whether or not Nagios will actively execute
+-# host checks when it initially starts.  If this option is 
++# host checks when it initially starts.  If this option is
+ # disabled, checks are not actively made, but Nagios can still
+ # receive and process passive check results that come in.  Unless
+ # you're implementing redundant hosts or have a special need for
+@@ -646,7 +646,7 @@
+ # These commands are run after every host and service check is
+ # performed.  These commands are executed only if the
+ # enable_performance_data option (above) is set to 1.  The command
+-# argument is the short name of a command definition that you 
++# argument is the short name of a command definition that you
+ # define in your host configuration file.  Read the HTML docs for
+ # more information on performance data.
+ 
+@@ -726,7 +726,7 @@
+ # OBSESSIVE COMPULSIVE SERVICE PROCESSOR COMMAND
+ # This is the command that is run for every service check that is
+ # processed by Nagios.  This command is executed only if the
+-# obsess_over_service option (above) is set to 1.  The command 
++# obsess_over_service option (above) is set to 1.  The command
+ # argument is the short name of a command definition that you
+ # define in your host configuration file. Read the HTML docs for
+ # more information on implementing distributed monitoring.
+@@ -736,9 +736,9 @@
+ 
+ 
+ # ORPHANED SERVICE CHECK OPTION
+-# This determines whether or not Nagios will periodically 
++# This determines whether or not Nagios will periodically
+ # check for orphaned services.  Since service checks are not
+-# rescheduled until the results of their previous execution 
++# rescheduled until the results of their previous execution
+ # instance are processed, there exists a possibility that some
+ # checks may never get rescheduled.  This seems to be a rare
+ # problem and should not happen under normal circumstances.
+@@ -791,7 +791,7 @@
+ 
+ 
+ # AGGREGATED STATUS UPDATES
+-# This option determines whether or not Nagios will 
++# This option determines whether or not Nagios will
+ # aggregate updates of host, service, and program status
+ # data.  Normally, status data is updated immediately when
+ # a change occurs.  This can result in high CPU loads if
+@@ -807,7 +807,7 @@
+ # AGGREGATED STATUS UPDATE INTERVAL
+ # Combined with the aggregate_status_updates option,
+ # this option determines the frequency (in seconds!) that
+-# Nagios will periodically dump program, host, and 
++# Nagios will periodically dump program, host, and
+ # service status data.  If you are not using aggregated
+ # status data updates, this option has no effect.
+ 
+@@ -817,9 +817,9 @@
+ 
+ # FLAP DETECTION OPTION
+ # This option determines whether or not Nagios will try
+-# and detect hosts and services that are "flapping".  
++# and detect hosts and services that are "flapping".
+ # Flapping occurs when a host or service changes between
+-# states too frequently.  When Nagios detects that a 
++# states too frequently.  When Nagios detects that a
+ # host or service is flapping, it will temporarily supress
+ # notifications for that host/service until it stops
+ # flapping.  Flap detection is very experimental, so read
+@@ -905,7 +905,7 @@
+ 
+ 
+ # "TRUE" REGULAR EXPRESSION MATCHING
+-# This option controls whether or not "true" regular expression 
++# This option controls whether or not "true" regular expression
+ # matching takes place in the object config files.  This option
+ # only has an effect if regular expression matching is enabled
+ # (see above).  If this option is DISABLED, regular expression
+diff -u ./services.cfg /etc/nagios/services.cfg
+--- ./sample-config/services.cfg	2005-05-02 22:26:58.000000000 +0300
++++ ./sample-config/services.cfg	2005-05-04 14:11:43.493999829 +0300
+@@ -20,6 +20,7 @@
+ 	notifications_enabled		1		; Service notifications are enabled
+ 	event_handler_enabled		1		; Service event handler is enabled
+ 	flap_detection_enabled		1		; Flap detection is enabled
++	failure_prediction_enabled	1		; Failure prediction is enabled
+ 	process_perf_data		1		; Process performance data
+ 	retain_status_information	1		; Retain status information across program restarts
+ 	retain_nonstatus_information	1		; Retain non-status information across program restarts
+@@ -28,26 +29,93 @@
+ 							; - ITS NOT A REAL SERVICE, JUST A TEMPLATE!
+ }
+ 
+-define service {
+-	use				generic-service		; Name of service template to use
++# Define a service to "ping" the local machine
++# Define a service to "ping" the local machine
+ 
+-	host_name			linux
+-	service_description		SSH
++define service {
++	use			generic-service		; Name of service template to use
++	host_name		localhost
++	service_description	PING
++	is_volatile		0
++	check_period		24x7
++	max_check_attempts	4
++	normal_check_interval	5
++	retry_check_interval	1
++	contact_groups		admins
++	notification_interval	960
++	notification_period	24x7
++	check_command		check_ping!100.0,20%!500.0,60%
++}
+ 
+-	is_volatile			0
+-	check_period			24x7
++# Define a service to check the disk space of the root partition
++# on the local machine.  Warning if < 20% free, critical if
++# < 10% free space on partition.
++define service {
++	use			generic-service		; Name of service template to use
++	host_name		localhost
++	service_description	Root Partition
++	is_volatile		0
++	check_period		24x7
++	max_check_attempts	4
++	normal_check_interval	5
++	retry_check_interval	1
++	contact_groups		admins
++	notification_interval	960
++	notification_period	24x7
++	check_command		check_local_disk!20%!10%!/
++}
+ 
+-	max_check_attempts		3
+-	normal_check_interval		2
+-	retry_check_interval		1
++# Define a service to check the number of currently logged in
++# users on the local machine.  Warning if > 20 users, critical
++# if > 50 users.
++define service {
++	use			generic-service		; Name of service template to use
++	host_name		localhost
++	service_description	Current Users
++	is_volatile		0
++	check_period		24x7
++	max_check_attempts	4
++	normal_check_interval	5
++	retry_check_interval	1
++	contact_groups		admins
++	notification_interval	960
++	notification_period	24x7
++	check_command		check_local_users!20!50
++}
+ 
+-	contact_groups			linux-admins
++# Define a service to check the number of currently running procs
++# on the local machine.  Warning if > 250 processes, critical if
++# > 400 users.
++define service {
++	use			generic-service		; Name of service template to use
++	host_name		localhost
++	service_description	Total Processes
++	is_volatile		0
++	check_period		24x7
++	max_check_attempts	4
++	normal_check_interval	5
++	retry_check_interval	1
++	contact_groups		admins
++	notification_interval	960
++	notification_period	24x7
++	check_command		check_local_procs!250!400
++}
+ 
+-	notification_interval		240
+-	notification_period		24x7
+-	notification_options		w,u,c,r
+ 
+-	check_command			check_ssh
++# Define a service to check the load on the local machine.
++define service {
++	use			generic-service		; Name of service template to use
++	host_name		localhost
++	service_description	Current Load
++	is_volatile		0
++	check_period		24x7
++	max_check_attempts	4
++	normal_check_interval	5
++	retry_check_interval	1
++	contact_groups		admins
++	notification_interval	960
++	notification_period	24x7
++	check_command		check_local_load!5.0,4.0,3.0!10.0,6.0,4.0
+ }
+ 
+ # vim:ts=8:sw=8
+diff -u ./timeperiods.cfg /etc/nagios/timeperiods.cfg
+--- ./sample-config/timeperiods.cfg	2005-05-02 22:26:58.000000000 +0300
++++ ./sample-config/timeperiods.cfg	2005-05-04 14:11:45.538648186 +0300
+@@ -8,7 +8,8 @@
+ #
+ ################################################################################
+ 
+-# '24x7' timeperiod definition
++# This defines a timeperiod where all times are valid for checks,
++# notifications, etc.  The classic "24x7" support nightmare. :-)
+ define timeperiod {
+ 	timeperiod_name	24x7
+ 	alias		24 Hours A Day, 7 Days A Week
