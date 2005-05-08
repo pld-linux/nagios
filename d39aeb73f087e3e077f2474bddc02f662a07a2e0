@@ -1,0 +1,3 @@
+- due object_cache_feature the config files are no longer needed to be
+  readable by webserver. change config group to nagios (for nagios
+  daemon itself)
