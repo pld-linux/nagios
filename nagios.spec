@@ -8,7 +8,7 @@ Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	2.0
 %define	_rc     b3
-Release:	0.%{_rc}.23
+Release:	0.%{_rc}.26
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}%{_rc}.tar.gz
@@ -32,24 +32,13 @@ BuildRequires:	libpng-devel
 BuildRequires:	sed >= 4.0
 %endif
 BuildRequires:	rpmbuild(macros) >= 1.202
+PreReq:		%{name}-common = %{version}-%{release}
 PreReq:		rc-scripts
 PreReq:		sh-utils
 Requires:	mailx
 Requires:	nagios-plugins
-Requires(pre):	/usr/bin/getgid
-Requires(pre):	/bin/id
-Requires(pre):	/usr/sbin/groupadd
-Requires(pre):	/usr/sbin/groupmod
-Requires(pre):	/usr/sbin/useradd
-Requires(pre):	/usr/sbin/usermod
-Requires(post,postun):	/sbin/chkconfig
-Requires(postun):	/usr/sbin/groupdel
-Requires(postun):	/usr/sbin/userdel
 Requires(triggerpostun):	sed >= 4.0
 Provides:	nagios-core
-Provides:	user(nagios)
-Provides:	group(nagios)
-Provides:	group(nagios-data)
 Conflicts:	iputils-ping < 1:ss020124
 Obsoletes:	netsaint
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -98,6 +87,25 @@ quando surgir um problema e quando ele for resolvido. Nagios é escrito
 em C e foi desenvolvido para rodar em plataformas Linux (e algumas
 variações de *NIX) como um processo em segundo plano, periodicamente
 executando checagens nos diversos serviços que forem especificados.
+
+%package common
+Summary:	Common files needed by both nagios and nrpe
+Group:		Networking
+Requires(pre):	/usr/bin/getgid
+Requires(pre):	/bin/id
+Requires(pre):	/usr/sbin/groupadd
+Requires(pre):	/usr/sbin/groupmod
+Requires(pre):	/usr/sbin/useradd
+Requires(pre):	/usr/sbin/usermod
+Requires(post,postun):	/sbin/chkconfig
+Requires(postun):	/usr/sbin/groupdel
+Requires(postun):	/usr/sbin/userdel
+Provides:	user(nagios)
+Provides:	group(nagios)
+Provides:	group(nagios-data)
+
+%description common
+Common files needed by both nagios and nrpe.
 
 %package cgi
 Summary:	CGI webinterface for Nagios
@@ -201,17 +209,6 @@ done
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%pre
-if [ "`getgid netsaint`" = "72" ]; then
-	/usr/sbin/groupmod -n nagios netsaint
-fi
-%groupadd -g 72 nagios
-%groupadd -g 147 -f nagios-data
-if [ -n "`id -u netsaint 2>/dev/null`" ] && [ "`id -u netsaint`" = "72" ]; then
-	/usr/sbin/usermod -d %{_libdir}/nagios -l nagios -c "Nagios User" -G nagios-data netsaint
-fi
-%useradd -u 72 -d %{_libdir}/nagios -s /bin/false -c "Nagios User" -g nagios -G nagios-data nagios
-
 %post
 /sbin/chkconfig --add %{name}
 if [ -f /var/lock/subsys/%{name} ]; then
@@ -232,7 +229,18 @@ if [ "$1" = "0" ] ; then
 	/sbin/chkconfig --del %{name}
 fi
 
-%postun
+%pre common
+if [ "`getgid netsaint`" = "72" ]; then
+	/usr/sbin/groupmod -n nagios netsaint
+fi
+%groupadd -g 72 nagios
+%groupadd -g 147 -f nagios-data
+if [ -n "`id -u netsaint 2>/dev/null`" ] && [ "`id -u netsaint`" = "72" ]; then
+	/usr/sbin/usermod -d %{_libdir}/nagios -l nagios -c "Nagios User" -G nagios-data netsaint
+fi
+%useradd -u 72 -d %{_libdir}/nagios -s /bin/false -c "Nagios User" -g nagios -G nagios-data nagios
+
+%postun common
 if [ "$1" = "0" ]; then
 	%userremove nagios
 	%groupremove nagios
@@ -343,16 +351,12 @@ there are changes that no longer work in Nagios 2.0"
 %defattr(644,root,root,755)
 %doc Changelog README* UPGRADING INSTALLING LICENSE
 %doc sample-config/template-object/{bigger,minimal}.cfg
-%attr(750,root,nagios-data) %dir %{_sysconfdir}
 %attr(640,root,nagios-data) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/nagios.cfg
 %attr(640,root,nagios) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/[!n]*.cfg
 %exclude %{_sysconfdir}/cgi.cfg
 
 %attr(754,root,root) /etc/rc.d/init.d/%{name}
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/%{name}
-
-%dir %{_libdir}/%{name}
-%dir %{_libdir}/%{name}/plugins
 
 %attr(755,root,root) %{_bindir}/%{name}
 %attr(755,root,root) %{_bindir}/nagiostats
@@ -370,6 +374,11 @@ there are changes that no longer work in Nagios 2.0"
 
 %{_examplesdir}/%{name}-%{version}
 
+%files common
+%defattr(644,root,root,755)
+%attr(750,root,nagios-data) %dir %{_sysconfdir}
+%dir %{_libdir}/%{name}
+%dir %{_libdir}/%{name}/plugins
 %dir %{_libdir}/%{name}/eventhandlers
 
 %files cgi
