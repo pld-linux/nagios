@@ -301,7 +301,7 @@ fi
 chgrp nagios-data %{_sysconfdir}/*.cfg
 %addusertogroup nagios nagios-data
 if [ -f /var/lock/subsys/%{name} ]; then
-	/etc/rc.d/init.d/%{name} restart 1>&2
+	/etc/rc.d/init.d/%{name} restart 1>&2 || :
 fi
 
 %files
