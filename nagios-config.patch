@@ -427,8 +427,8 @@
  #host_unreachable_sound=hostdown.wav
  #host_down_sound=hostdown.wav
 --- /dev/null	2005-02-16 21:06:48.000000000 +0200
-+++ nagios-2.0b3.fuu/sample-config/checkcommands.cfg	2005-05-04 14:24:24.000000000 +0300
-@@ -0,0 +1,227 @@
++++ ./sample-config/checkcommands.cfg	2005-05-08 18:17:19.000000000 +0300
+@@ -0,0 +1,257 @@
 +################################################################################
 +# object config file for Nagios
 +#
@@ -522,10 +522,25 @@
 +	command_line	$USER1$/check_http -I $HOSTADDRESS$ -H $ARG1$ -u $ARG2$
 +}
 +
++define command {
++	command_name	check_http_uri_string
++	command_line	$USER1$/check_http -I $HOSTADDRESS$ -H $ARG1$ -p $ARG2$ -u $ARG3$ -s '$ARG4$'
++}
++
 +# check http service with URI and expect regex
 +define command {
 +	command_name	check_http_regex
 +	command_line	$USER1$/check_http -I $HOSTADDRESS$ -H $ARG1$ -u $ARG2$ -r $ARG3$
++}
++
++define command {
++	command_name	check_https
++	command_line	$USER1$/check_http -I $HOSTADDRESS$ -H $ARG1$ -S
++}
++
++define command {
++	command_name	check_https_string
++	command_line	$USER1$/check_http -I $HOSTADDRESS$ -H $ARG1$ -S -s '$ARG2$'
 +}
 +
 +# 'check_telnet' command definition
@@ -543,7 +558,18 @@
 +# 'check_dns' command definition
 +define command {
 +	command_name	check_dns
-+	command_line	$USER1$/check_dns -H www.yahoo.com -s $HOSTADDRESS$
++	command_line	$USER1$/check_dns -s $HOSTADDRESS$ -H www.yahoo.com
++}
++
++define command {
++	command_name	check_dns_custom
++	command_line	$USER1$/check_dns -s $HOSTADDRESS$ -H $ARG1$
++}
++
++# check if DNSBL is returning success on test record 127.0.0.2
++define command {
++	command_name	check_dnsbl
++	command_line	$USER1$/check_dns -s $HOSTADDRESS$ -H 2.0.0.127.$ARG1$ -a 127.0.0.2
 +}
 +
 +# 'check_hpjd' command definition
@@ -590,10 +616,9 @@
 +	command_line	$USER1$/check_mysql -H $ARG1$ -u $USER3$ -p $USER4$ -P$ARG2$
 +}
 +
-+# check if DNSBL is returning success on test record 127.0.0.2
 +define command {
-+	command_name	check_dnsbl
-+	command_line	$USER1$/check_dns -s $HOSTNAME$ -H 2.0.0.127.$ARG1$ -a 127.0.0.2
++	command_name	check_mysql-slave
++	command_line	$USER1$/check_mysql -H $ARG1$ -u $USER3$ -p $USER4$ -P$ARG2$ -S
 +}
 +
 +# check secure imap
@@ -608,10 +633,10 @@
 +	command_line	$USER1$/check_ircd -H $HOSTADDRESS$ -w $ARG1$ -c $ARG2$
 +}
 +
-+# check for SNMP
++# check for SNMPd
 +# $USER5$ is used for SNMP v1 community string
 +define command {
-+	command_name	check_snmp
++	command_name	check_snmpd
 +	command_line	$USER1$/check_snmp -H $HOSTADDRESS$ -C $USER5$ -o system.sysName.0 -P 1
 +}
 +
@@ -620,8 +645,14 @@
 +# $ARG2$ Critical Level
 +# $ARG3$ warning Level
 +define command {
-+	command_name	check_snmp_oid
-+	command_line	$USER1$/check_snmp -H $HOSTADDRESS$ -C sw -P 1 -o $ARG1$ -w $ARG2$ -c $ARG3$
++	command_name	check_snmp
++	command_line	$USER1$/check_snmp -H $HOSTADDRESS$ -C $USER5$ -P 1 -o $ARG1$ -w $ARG2$ -c $ARG3$
++}
++
++# check via SNMP 'proc' directives
++define command {
++	command_name	check_snmp_proc
++	command_line	$USER1$/check_snmp_proc -H $HOSTADDRESS$ -C $USER5$
 +}
 +
 +# check for disk with nagios-snmp-plugins
@@ -643,7 +674,6 @@
 +#
 +################################################################################
 +
-+
 +# This command checks to see if a host is "alive" by pinging it
 +# The check must result in a 100% packet loss or 5 second (5000ms) round trip
 +# average time to produce a critical error.
@@ -652,7 +682,7 @@
 +# Command to check to see if a host is "alive" (up) by pinging it
 +define command {
 +	command_name	check-host-alive
-+        command_line    $USER1$/check_ping -H $HOSTADDRESS$ -w 99,99% -c 100,100% -p 1
++	command_line	$USER1$/check_ping -H $HOSTADDRESS$ -w 99,99% -c 100,100% -p 1
 +}
 +
 +# vim:ts=8:sw=8
@@ -1159,5 +1189,43 @@
 +	timeperiod_name	none
 +	alias		No Time Is A Good Time
 +}
++
++# vim:ts=8:sw=8
+--- /dev/null	2005-02-16 21:06:48.000000000 +0200
++++ ./sample-config/serviceextinfo.cfg	2005-05-08 18:45:45.000000000 +0300
+@@ -0,0 +1,35 @@
++################################################################################
++# object config file for Nagios
++#
++################################################################################
++
++################################################################################
++# EXTENDED SERVICE INFORMATION
++#
++# Extended service information entries are basically used to make the output
++# from the status and extinfo CGIs look pretty. They have no effect on
++# monitoring and are completely optional.
++#
++# SYNTAX:
++# define serviceextinfo {
++#	host_name		host_name
++#	service_description	service_description
++#	notes			note_string
++#	notes_url		url
++#	action_url		url
++#	icon_image		image_file
++#	icon_image_alt		alt_string
++# }
++# http://nagios.sourceforge.net/docs/2_0/xodtemplate.html#serviceextinfo
++################################################################################
++
++#define serviceextinfo {
++#	host_name		localhost
++#	service_description	Log Anomalies
++#	notes			Security-related log anomalies on secondary Linux server
++#	notes_url		http://webserver.localhost.localdomain/serviceinfo.pl?host=linux2&service=Log+Anomalies
++#	icon_image		security.png
++#	icon_image_alt		Security-Related Alerts
++#}
 +
 +# vim:ts=8:sw=8
