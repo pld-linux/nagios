@@ -1,0 +1,4 @@
+- added serviceextinfo.cfg config
+- trigger fixes:
+  - cgi.cfg needs different permission
+  - $DATETIME$ variable seems gone
