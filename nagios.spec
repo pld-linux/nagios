@@ -15,7 +15,7 @@ Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	2.0
 %define	_rc     b3
-Release:	0.%{_rc}.9
+Release:	0.%{_rc}.18
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}%{_rc}.tar.gz
@@ -194,7 +194,7 @@ install %{SOURCE4} $RPM_BUILD_ROOT%{_datadir}
 # install templated configuration files
 install sample-config/{nagios,cgi,resource}.cfg $RPM_BUILD_ROOT%{_sysconfdir}
 install sample-config/{contact{s,groups},{misccommand,dependencie,escalation,hostgroup,host,service,timeperiod,checkcommand}s}.cfg $RPM_BUILD_ROOT%{_sysconfdir}
-install sample-config/hostextinfo.cfg $RPM_BUILD_ROOT%{_sysconfdir}
+install sample-config/{service,host}extinfo.cfg $RPM_BUILD_ROOT%{_sysconfdir}
 > $RPM_BUILD_ROOT%{_sysconfdir}/passwd
 echo 'nagios:' > $RPM_BUILD_ROOT%{_sysconfdir}/group
 
@@ -292,8 +292,11 @@ if [ "$1" = "0" ]; then
 	fi
 fi
 
-%triggerpostun -- nagios < 2.0-0.b3.6
-chgrp nagios-data %{_sysconfdir}/*.cfg
+%triggerpostun -- nagios-cgi < 2.0-0.b3.10
+chown root:http %{_sysconfdir}/cgi.cfg
+
+%triggerpostun -- nagios < 2.0-0.b3.14
+chown root:nagios-data %{_sysconfdir}/*.cfg
 %addusertogroup nagios nagios-data
 
 # must unify nagios.cfg
@@ -312,6 +315,11 @@ s,^use_agressive_host_checking=,use_aggressive_host_checking=,
 s,^freshness_check_interval=,service_freshness_check_interval=,
 
 ' %{_sysconfdir}/nagios.cfg
+
+sed -i -e '
+s,\$DATETIME\$,$LONGDATETIME$,g
+s,Nagios/1.2,Nagios/%{version},g
+' %{_sysconfdir}/misccommands.cfg
 
 mv -f /var/log/nagios/status.log %{_localstatedir}/status.dat 2>/dev/null
 mv -f /var/log/nagios/comment.log %{_localstatedir}/comments.dat 2>/dev/null
