@@ -25,7 +25,6 @@ Source2:	%{name}.init
 Source3:	%{name}.sysconfig
 Source4:	http://www.nagios.org/images/favicon.ico
 # Source4-md5:	1c4201c7da53d6c7e48251d3a9680449
-Patch0:		%{name}-pgsql.patch
 Patch1:		%{name}-resources.patch
 Patch2:		%{name}-iconv-in-libc.patch
 Patch3:		%{name}-config.patch
@@ -147,7 +146,6 @@ aplicativos para o Nagios.
 
 %prep
 %setup -q -n %{name}-%{version}%{?_rc}
-%{?with_pgsql:%patch0 -p1}
 %patch1 -p0
 %patch2 -p1
 %patch3 -p1
