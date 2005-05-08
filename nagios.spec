@@ -1,7 +1,5 @@
 #
 # Conditional build:
-%bcond_with	pgsql	# enable PostgreSQL support
-%bcond_with	mysql	# enable MySQL support
 %bcond_without	gd	# without statusmap and trends, which require gd library
 #
 # TODO:
@@ -9,21 +7,29 @@
 #   - cgi.cfg contains sensitive information
 #   - /etc/nagios/*.cfg should be readable by nagios (and webserver if -cgi is used)
 #   - all files should be owned by root as there's no write permission needed
+#  - create group "nagios-data" for sharing access with httpd user (/etc/nagios/*.cfg)
+
 Summary:	Host/service/network monitoring program
 Summary(pl):	Program do monitorowania serwerów/us³ug/sieci
 Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
-Version:	1.2
-Release:	8
+Version:	2.0
+%define	_rc     b3
+Release:	0.%{_rc}.22
 License:	GPL v2
 Group:		Networking
-Source0:	http://dl.sourceforge.net/%{name}/%{name}-%{version}.tar.gz
-# Source0-md5:	414d70e5269d5b8d7c21bf3ee129309f
+Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}%{_rc}.tar.gz
+# Source0-md5:	051760458d961b6ee015b5932a8437c4
 Source1:	%{name}-apache.conf
 Source2:	%{name}.init
+Source3:	%{name}.sysconfig
+Source4:	http://www.nagios.org/images/favicon.ico
+# Source4-md5:	1c4201c7da53d6c7e48251d3a9680449
 Patch0:		%{name}-pgsql.patch
 Patch1:		%{name}-resources.patch
 Patch2:		%{name}-iconv-in-libc.patch
+Patch3:		%{name}-config.patch
+Patch4:		%{name}-favicon.patch
 URL:		http://www.nagios.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -31,12 +37,13 @@ BuildRequires:	automake
 BuildRequires:	gd-devel
 BuildRequires:	libjpeg-devel
 BuildRequires:	libpng-devel
+BuildRequires:	sed >= 4.0
 %endif
-%{?with_mysql:BuildRequires:	mysql-devel}
-%{?with_pgsql:BuildRequires:	postgresql-devel}
 BuildRequires:	rpmbuild(macros) >= 1.202
 PreReq:		rc-scripts
 PreReq:		sh-utils
+Requires:	mailx
+Requires:	nagios-plugins
 Requires(pre):	/usr/bin/getgid
 Requires(pre):	/bin/id
 Requires(pre):	/usr/sbin/groupadd
@@ -46,9 +53,11 @@ Requires(pre):	/usr/sbin/usermod
 Requires(post,postun):	/sbin/chkconfig
 Requires(postun):	/usr/sbin/groupdel
 Requires(postun):	/usr/sbin/userdel
+Requires(triggerpostun):	sed >= 4.0
 Provides:	nagios-core
 Provides:	user(nagios)
 Provides:	group(nagios)
+Provides:	group(nagios-data)
 Conflicts:	iputils-ping < 1:ss020124
 Obsoletes:	netsaint
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -58,6 +67,9 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_sbindir	%{_libdir}/%{name}/cgi
 %define		_datadir	%{_prefix}/share/%{name}
 %define		_localstatedir	/var/lib/%{name}
+
+%define		_apache1dir	/etc/apache
+%define		_apache2dir	/etc/httpd
 
 %description
 Nagios is a program that will monitor hosts and services on your
@@ -102,7 +114,11 @@ Group:		Networking
 # for dirs... and accessing local logs(?)
 Requires:	%{name} = %{version}-%{release}
 Requires:	%{name}-imagepaks
-Requires:	apache-mod_auth
+Requires:	webserver = apache
+Requires:	apache(mod_alias)
+Requires:	apache(mod_cgi)
+Requires:	apache(mod_auth)
+Requires:	group(http)
 
 %description cgi
 CGI webinterface for Nagios.
@@ -130,68 +146,92 @@ Este pacote contém arquivos de cabeçalho usados no desenvolvimento de
 aplicativos para o Nagios.
 
 %prep
-%setup -q
+%setup -q -n %{name}-%{version}%{?_rc}
 %{?with_pgsql:%patch0 -p1}
 %patch1 -p0
 %patch2 -p1
+%patch3 -p1
+%patch4 -p1
+
+sed -i -e '
+	s,".*/var/rw/nagios.cmd,"%{_localstatedir}/rw/nagios.cmd,
+	s,".*/libexec/eventhandlers,"%{_libdir}/%{name}/eventhandlers,
+' $(find contrib/eventhandlers -type f)
 
 %build
+cp -f /usr/share/automake/config.sub .
 %{__aclocal}
 %{__autoconf}
 %configure \
 	--with-nagios-user=%{name} \
 	--with-nagios-grp=%{name} \
-	--with-command-user=nobody \
-	--with-command-grp=nobody \
-	--with-lockfile=/var/run/%{name}.pid \
+	--with-command-user=%{name} \
+	--with-command-grp=%{name} \
+	--with-lockfile=%{_localstatedir}/%{name}.pid \
 	--with-ping_command='/bin/ping -n %%s -c %%d' \
-	%{?with_mysql:--with-mysql-xdata --with-mysql-status --with-mysql-comments --with-mysql-extinfo --with-mysql-retention --with-mysql-downtime --with-mysql-lib=%{_libdir} --with-mysql-inc=%{_includedir}/mysql} \
-	%{?with_pgsql:--with-pgsql-xdata --with-pgsql-status --with-pgsql-comments --with-pgsql-extinfo --with-pgsql-retention --with-pgsql-downtime--with-pgsql-lib=%{_libdir} --with-pgsql-inc=%{_includedir}/postgresql} \
 	%{!?with_gd:--disable-statusmap --disable-trends}
 
 %{__make} all
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{/etc/{rc.d/init.d,httpd},%{_includedir}/%{name},%{_libdir}/%{name}/plugins} \
-	$RPM_BUILD_ROOT{%{_var}/log/%{name},%{_localstatedir}}
+install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},%{_includedir}/%{name},%{_libdir}/%{name}/{eventhandlers,plugins}} \
+	$RPM_BUILD_ROOT{%{_var}/log/%{name}/archives,%{_localstatedir},%{_sysconfdir},%{_examplesdir}/%{name}-%{version}}
 
-install common/locations.h	$RPM_BUILD_ROOT%{_includedir}/%{name}
+install include/locations.h	$RPM_BUILD_ROOT%{_includedir}/%{name}
 
-%{__make} install install-html install-config install-init install-commandmode fullinstall \
+%{__make} install install-html install-init install-commandmode fullinstall \
 	DESTDIR=$RPM_BUILD_ROOT \
 	INSTALL_OPTS="" \
 	INIT_OPTS="" \
 	COMMAND_OPTS=""
 
-install %{SOURCE1} $RPM_BUILD_ROOT/etc/httpd/%{name}.conf
+install %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/apache-%{name}.conf
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
+install %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/%{name}
+install %{SOURCE4} $RPM_BUILD_ROOT%{_datadir}
 
-# rename configs without sample extension
-for f in $RPM_BUILD_ROOT%{_sysconfdir}/*-sample; do
-	mv $f ${f%%-sample}
+# install templated configuration files
+install sample-config/{nagios,cgi,resource}.cfg $RPM_BUILD_ROOT%{_sysconfdir}
+install sample-config/{contact{s,groups},{misccommand,dependencie,escalation,hostgroup,host,service,timeperiod,checkcommand}s}.cfg $RPM_BUILD_ROOT%{_sysconfdir}
+install sample-config/{service,host}extinfo.cfg $RPM_BUILD_ROOT%{_sysconfdir}
+> $RPM_BUILD_ROOT%{_sysconfdir}/passwd
+echo 'nagios:' > $RPM_BUILD_ROOT%{_sysconfdir}/group
+
+# install event handlers
+cp -a contrib/eventhandlers $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
+
+# Object data/cache files
+for i in {objects.cache,{comments,downtime,retention,status}.dat,nagios.tmp}; do
+	> $RPM_BUILD_ROOT%{_localstatedir}/$i
 done
+> $RPM_BUILD_ROOT%{_localstatedir}/rw/nagios.cmd
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %pre
-# move to trigger?
-if [ -n "`getgid netsaint`" ] && [ "`getgid netsaint`" = "72" ]; then
+if [ "`getgid netsaint`" = "72" ]; then
 	/usr/sbin/groupmod -n nagios netsaint
 fi
 %groupadd -g 72 nagios
-# move to trigger?
+%groupadd -g 147 -f nagios-data
 if [ -n "`id -u netsaint 2>/dev/null`" ] && [ "`id -u netsaint`" = "72" ]; then
-	/usr/sbin/usermod -d /tmp -l nagios netsaint
+	/usr/sbin/usermod -d %{_libdir}/nagios -l nagios -c "Nagios User" -G nagios-data netsaint
 fi
-%useradd -u 72 -d %{_libdir}/nagios -s /bin/false -c "%{name} User" -g nagios nagios
+%useradd -u 72 -d %{_libdir}/nagios -s /bin/false -c "Nagios User" -g nagios -G nagios-data nagios
 
 %post
 /sbin/chkconfig --add %{name}
 if [ -f /var/lock/subsys/%{name} ]; then
 	/etc/rc.d/init.d/%{name} restart 1>&2
 fi
+
+for i in %{_localstatedir}/{objects.cache,{comments,downtime,retention,status}.dat}; do
+	[ ! -f $i ] && touch $i
+	chown root:nagios $i
+	chmod 664 $i
+done
 
 %preun
 if [ "$1" = "0" ] ; then
@@ -205,57 +245,150 @@ fi
 if [ "$1" = "0" ]; then
 	%userremove nagios
 	%groupremove nagios
+	%groupremove nagios-data
 fi
 
 %post cgi
-if [ -f /etc/httpd/httpd.conf ] && ! grep -q "^Include.*%{name}.conf" /etc/httpd/httpd.conf; then
-	echo "Include /etc/httpd/%{name}.conf" >> /etc/httpd/httpd.conf
-	if [ -f /var/lock/subsys/httpd ]; then
-		/usr/sbin/apachectl restart 1>&2
+%addusertogroup http nagios-data
+
+# apache1
+if [ -d %{_apache1dir}/conf.d ]; then
+	ln -sf %{_sysconfdir}/apache-%{name}.conf %{_apache1dir}/conf.d/99_%{name}.conf
+	if [ -f /var/lock/subsys/apache ]; then
+		/etc/rc.d/init.d/apache restart 1>&2
 	fi
-elif [ -d /etc/httpd/httpd.conf ]; then
-	ln -sf /etc/httpd/%{name}.conf /etc/httpd/httpd.conf/99_%{name}.conf
+fi
+# apache2
+if [ -d %{_apache2dir}/httpd.conf ]; then
+	ln -sf %{_sysconfdir}/apache-%{name}.conf %{_apache2dir}/httpd.conf/99_%{name}.conf
 	if [ -f /var/lock/subsys/httpd ]; then
-		/usr/sbin/apachectl restart 1>&2
+		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
+fi
+
+if [ "$1" = 1 ]; then
+%banner %{name} -e <<EOF
+NOTE:
+You need to add user to %{_sysconfdir}/passwd and %{_sysconfdir}/group to acccess nagios via web.
+
+EOF
 fi
 
 %preun cgi
 if [ "$1" = "0" ]; then
-	umask 027
-	if [ -d /etc/httpd/httpd.conf ]; then
-		rm -f /etc/httpd/httpd.conf/99_%{name}.conf
-	else
-		grep -v "^Include.*%{name}.conf" /etc/httpd/httpd.conf > \
-			/etc/httpd/httpd.conf.tmp
-		mv -f /etc/httpd/httpd.conf.tmp /etc/httpd/httpd.conf
+	# apache1
+	if [ -d %{_apache1dir}/conf.d ]; then
+		rm -f %{_apache1dir}/conf.d/99_%{name}.conf
+		if [ -f /var/lock/subsys/apache ]; then
+			/etc/rc.d/init.d/apache restart 1>&2
+		fi
 	fi
-	if [ -f /var/lock/subsys/httpd ]; then
-		/usr/sbin/apachectl restart 1>&2
+	# apache2
+	if [ -d %{_apache2dir}/httpd.conf ]; then
+		rm -f %{_apache2dir}/httpd.conf/99_%{name}.conf
+		if [ -f /var/lock/subsys/httpd ]; then
+			/etc/rc.d/init.d/httpd restart 1>&2
+		fi
 	fi
 fi
 
+%triggerpostun -- nagios-cgi < 2.0-0.b3.21
+chown root:http %{_sysconfdir}/cgi.cfg
+
+%triggerpostun -- nagios < 2.0-0.b3.21
+chown root:nagios %{_sysconfdir}/*.cfg
+chown root:nagios-data %{_sysconfdir}/nagios.cfg
+%addusertogroup nagios nagios-data
+
+# must unify nagios.cfg
+sed -i -e '
+s,^status_file=.*,status_file=%{_localstatedir}/status.dat,
+s,^comment_file=.*,comment_file=%{_localstatedir}/comments.dat,
+s,^downtime_file=.*,downtime_file=%{_localstatedir}/downtime.dat,
+s,^lock_file=.*,lock_file=%{_localstatedir}/nagios.pid,
+s,^temp_file=.*,temp_file=%{_localstatedir}/nagios.tmp,
+s,^state_retention_file=.*,state_retention_file=%{_localstatedir}/retention.dat,
+
+# option changes
+s,^log_passive_service_checks=,log_passive_checks=,
+s,^inter_check_delay_method=,service_inter_check_delay_method=,
+s,^use_agressive_host_checking=,use_aggressive_host_checking=,
+s,^freshness_check_interval=,service_freshness_check_interval=,
+
+' %{_sysconfdir}/nagios.cfg
+
+sed -i -e '
+s,\$DATETIME\$,$LONGDATETIME$,g
+s,Nagios/1.2,Nagios/%{version},g
+' %{_sysconfdir}/misccommands.cfg
+
+mv -f /var/log/nagios/status.log %{_localstatedir}/status.dat 2>/dev/null
+mv -f /var/log/nagios/comment.log %{_localstatedir}/comments.dat 2>/dev/null
+mv -f /var/log/nagios/downtime.log %{_localstatedir}/downtime.dat 2>/dev/null
+mv -f /var/run/nagios.pid %{_localstatedir}/nagios.pid 2>/dev/null
+mv -f /var/log/nagios/nagios.tmp %{_localstatedir}/nagios.tmp 2>/dev/null
+mv -f /var/log/nagios/status.sav %{_localstatedir}/retention.dat 2>/dev/null
+chown nagios:nagios %{_localstatedir}/nagios.pid 2>/dev/null
+chown nagios:nagios-data %{_localstatedir}/rw/nagios.cmd 2>/dev/null
+
+if [ -f /var/lock/subsys/%{name} ]; then
+	/etc/rc.d/init.d/%{name} restart 1>&2 || :
+fi
+
+# apache2 config was also moved.
+if [ -f /etc/httpd/nagios.conf.rpmsave ]; then
+	cp -f %{_sysconfdir}/apache-%{name}.conf{,.rpmnew}
+	mv -f /etc/httpd/nagios.conf.rpmsave %{_sysconfdir}/apache-%{name}.conf
+
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd restart 1>&2 || :
+	fi
+fi
+
+echo "Please read http://nagios.sourceforge.net/docs/2_0/whatsnew.html
+there are changes that no longer work in Nagios 2.0"
+
 %files
 %defattr(644,root,root,755)
-%doc Changelog README* UPGRADING contrib/database
+%doc Changelog README* UPGRADING INSTALLING LICENSE
+%doc sample-config/template-object/{bigger,minimal}.cfg
+%attr(750,root,nagios-data) %dir %{_sysconfdir}
+%attr(640,root,nagios-data) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/nagios.cfg
+%attr(640,root,nagios) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/[!n]*.cfg
+%exclude %{_sysconfdir}/cgi.cfg
+
 %attr(754,root,root) /etc/rc.d/init.d/%{name}
-%attr(751,root,nagios) %dir %{_sysconfdir}
-%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/[!c]*
-%attr(644,root,nagios) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/c[!g]*
+%config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/%{name}
+
 %dir %{_libdir}/%{name}
 %dir %{_libdir}/%{name}/plugins
+
 %attr(755,root,root) %{_bindir}/%{name}
-%attr(771,nagios,http) %{_var}/log/%{name}
-%attr(775,nagios,nagios) %dir %{_localstatedir}
-%attr(775,nagios,nagios) %dir %{_localstatedir}/archives
-%attr(2775,nagios,http) %dir %{_localstatedir}/rw
+%attr(755,root,root) %{_bindir}/nagiostats
+
+%attr(770,root,nagios-data) %{_var}/log/%{name}
+%attr(770,root,nagios-data) %dir %{_var}/log/%{name}/archives
+
+%attr(770,root,nagios-data) %dir %{_localstatedir}
+%attr(2770,root,nagios-data) %dir %{_localstatedir}/rw
+# NOTE: the permissions are set in post script
+%ghost %{_localstatedir}/rw/nagios.cmd
+%ghost %{_localstatedir}/objects.cache
+%ghost %{_localstatedir}/*.dat
+%ghost %{_localstatedir}/%{name}.tmp
+
+%{_examplesdir}/%{name}-%{version}
+
+%dir %{_libdir}/%{name}/eventhandlers
 
 %files cgi
 %defattr(644,root,root,755)
-%attr(640,root,http) %config(noreplace) %verify(not size mtime md5) /etc/httpd/%{name}.conf
-%attr(644,root,http) %config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/cgi.cfg
-%dir %{_libdir}/%{name}/cgi
-%attr(755,root,root) %{_libdir}/%{name}/cgi/*.cgi
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/apache-%{name}.conf
+%attr(640,root,http) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/cgi.cfg
+%attr(640,root,http) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/passwd
+%attr(640,root,http) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/group
+%dir %{_sbindir}
+%attr(755,root,root) %{_sbindir}/*.cgi
 %{_datadir}
 
 %files devel
