@@ -898,7 +898,7 @@
 +
 +# vim:ts=8:sw=8
 --- /dev/null	2005-02-16 21:06:48.000000000 +0200
-+++ nagios-2.0b3.fuu/sample-config/misccommands.cfg	2005-05-04 14:24:24.000000000 +0300
++++ ./sample-config/misccommands.cfg	2005-05-08 19:09:09.000000000 +0300
 @@ -0,0 +1,91 @@
 +################################################################################
 +# Object config file for Nagios
@@ -946,20 +946,20 @@
 +# notifications (about service alerts) to contacts.
 +define command {
 +	command_name	notify-by-email
-+	command_line	/bin/printf "%b" "***** Nagios *****\n\nNotification Type: $NOTIFICATIONTYPE$\n\nService: $SERVICEDESC$\nHost: $HOSTALIAS$\nAddress: $HOSTADDRESS$\nState: $SERVICESTATE$\n\nDate/Time: $LONGDATETIME$\n\nAdditional Info:\n\n$OUTPUT$" | /bin/mail -s "** $NOTIFICATIONTYPE$ alert - $HOSTALIAS$/$SERVICEDESC$ is $SERVICESTATE$ **" $CONTACTEMAIL$
++	command_line	/bin/printf "%b" "***** Nagios *****\n\nNotification Type: $NOTIFICATIONTYPE$\n\nService: $SERVICEDESC$\nHost: $HOSTALIAS$\nAddress: $HOSTADDRESS$\nState: $SERVICESTATE$\n\nDate/Time: $LONGDATETIME$\n\nAdditional Info:\n\n$SERVICEOUTPUT$" | /bin/mail -s "** $NOTIFICATIONTYPE$ alert - $HOSTALIAS$/$SERVICEDESC$ is $SERVICESTATE$ **" $CONTACTEMAIL$
 +}
 +
 +# 'notify-by-epager' command definition
 +define command {
 +	command_name	notify-by-epager
-+	command_line	/bin/printf "%b" "Service: $SERVICEDESC$\nHost: $HOSTNAME$\nAddress: $HOSTADDRESS$\nState: $SERVICESTATE$\nInfo: $OUTPUT$\nDate: $LONGDATETIME$" | /bin/mail -s "$NOTIFICATIONTYPE$: $HOSTALIAS$/$SERVICEDESC$ is $SERVICESTATE$" $CONTACTPAGER$
++	command_line	/bin/printf "%b" "Service: $SERVICEDESC$\nHost: $HOSTNAME$\nAddress: $HOSTADDRESS$\nState: $SERVICESTATE$\nInfo: $SERVICEOUTPUT$\nDate: $LONGDATETIME$" | /bin/mail -s "$NOTIFICATIONTYPE$: $HOSTALIAS$/$SERVICEDESC$ is $SERVICESTATE$" $CONTACTPAGER$
 +}
 +
 +# This is a sample host notification command that can be used to send email
 +# notifications (about host alerts) to contacts.
 +define command {
 +	command_name	host-notify-by-email
-+	command_line	/bin/printf "%b" "***** Nagios *****\n\nNotification Type: $NOTIFICATIONTYPE$\nHost: $HOSTNAME$\nState: $HOSTSTATE$\nAddress: $HOSTADDRESS$\nInfo: $OUTPUT$\n\nDate/Time: $LONGDATETIME$\n" | /bin/mail -s "Host $HOSTSTATE$ alert for $HOSTNAME$!" $CONTACTEMAIL$
++	command_line	/bin/printf "%b" "***** Nagios *****\n\nNotification Type: $NOTIFICATIONTYPE$\nHost: $HOSTNAME$\nState: $HOSTSTATE$\nAddress: $HOSTADDRESS$\nInfo: $HOSTOUTPUT$\n\nDate/Time: $LONGDATETIME$\n" | /bin/mail -s "Host $HOSTSTATE$ alert for $HOSTNAME$!" $CONTACTEMAIL$
 +}
 +
 +# 'host-notify-by-epager' command definition
@@ -983,13 +983,13 @@
 +# 'process-host-perfdata' command definition
 +define command {
 +	command_name	process-host-perfdata
-+	command_line	/bin/printf "%b" "$LASTHOSTCHECK$\t$HOSTNAME$\t$HOSTSTATE$\t$HOSTATTEMPT$\t$HOSTSTATETYPE$\t$HOSTEXECUTIONTIME$\t$OUTPUT$\t$HOSTPERFDATA$" >> /var/lib/nagios/host-perfdata.out
++	command_line	/bin/printf "%b" "$LASTHOSTCHECK$\t$HOSTNAME$\t$HOSTSTATE$\t$HOSTATTEMPT$\t$HOSTSTATETYPE$\t$HOSTEXECUTIONTIME$\t$HOSTOUTPUT$\t$HOSTPERFDATA$" >> /var/lib/nagios/host-perfdata.out
 +}
 +
 +# 'process-service-perfdata' command definition
 +define command {
 +	command_name	process-service-perfdata
-+	command_line	/bin/printf "%b" "$LASTSERVICECHECK$\t$HOSTNAME$\t$SERVICEDESC$\t$SERVICESTATE$\t$SERVICEATTEMPT$\t$SERVICESTATETYPE$\t$SERVICEEXECUTIONTIME$\t$SERVICELATENCY$\t$OUTPUT$\t$SERVICEPERFDATA$" >> /var/lib/nagios/service-perfdata.out
++	command_line	/bin/printf "%b" "$LASTSERVICECHECK$\t$HOSTNAME$\t$SERVICEDESC$\t$SERVICESTATE$\t$SERVICEATTEMPT$\t$SERVICESTATETYPE$\t$SERVICEEXECUTIONTIME$\t$SERVICELATENCY$\t$SERVICEOUTPUT$\t$SERVICEPERFDATA$" >> /var/lib/nagios/service-perfdata.out
 +}
 --- /dev/null	2005-02-16 21:06:48.000000000 +0200
 +++ nagios-2.0b3.fuu/sample-config/services.cfg	2005-05-04 14:24:24.000000000 +0300
