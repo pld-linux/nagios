@@ -2,20 +2,13 @@
 # Conditional build:
 %bcond_without	gd	# without statusmap and trends, which require gd library
 #
-# TODO:
-#  - permissions in /etc. things to consider:
-#   - cgi.cfg contains sensitive information
-#   - /etc/nagios/*.cfg should be readable by nagios (and webserver if -cgi is used)
-#   - all files should be owned by root as there's no write permission needed
-#  - create group "nagios-data" for sharing access with httpd user (/etc/nagios/*.cfg)
-
 Summary:	Host/service/network monitoring program
 Summary(pl):	Program do monitorowania serwerów/us³ug/sieci
 Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	2.0
 %define	_rc     b3
-Release:	0.%{_rc}.22
+Release:	0.%{_rc}.23
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}%{_rc}.tar.gz
@@ -25,10 +18,10 @@ Source2:	%{name}.init
 Source3:	%{name}.sysconfig
 Source4:	http://www.nagios.org/images/favicon.ico
 # Source4-md5:	1c4201c7da53d6c7e48251d3a9680449
-Patch1:		%{name}-resources.patch
-Patch2:		%{name}-iconv-in-libc.patch
-Patch3:		%{name}-config.patch
-Patch4:		%{name}-favicon.patch
+Patch0:		%{name}-resources.patch
+Patch1:		%{name}-iconv-in-libc.patch
+Patch2:		%{name}-config.patch
+Patch3:		%{name}-favicon.patch
 URL:		http://www.nagios.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -146,10 +139,10 @@ aplicativos para o Nagios.
 
 %prep
 %setup -q -n %{name}-%{version}%{?_rc}
-%patch1 -p0
+%patch0 -p0
+%patch1 -p1
 %patch2 -p1
 %patch3 -p1
-%patch4 -p1
 
 sed -i -e '
 	s,".*/var/rw/nagios.cmd,"%{_localstatedir}/rw/nagios.cmd,
