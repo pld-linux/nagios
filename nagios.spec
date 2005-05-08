@@ -15,7 +15,7 @@ Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	2.0
 %define	_rc     b3
-Release:	0.%{_rc}.18
+Release:	0.%{_rc}.21
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}%{_rc}.tar.gz
@@ -292,11 +292,12 @@ if [ "$1" = "0" ]; then
 	fi
 fi
 
-%triggerpostun -- nagios-cgi < 2.0-0.b3.10
+%triggerpostun -- nagios-cgi < 2.0-0.b3.21
 chown root:http %{_sysconfdir}/cgi.cfg
 
-%triggerpostun -- nagios < 2.0-0.b3.14
-chown root:nagios-data %{_sysconfdir}/*.cfg
+%triggerpostun -- nagios < 2.0-0.b3.21
+chown root:nagios %{_sysconfdir}/*.cfg
+chown root:nagios-data %{_sysconfdir}/nagios.cfg
 %addusertogroup nagios nagios-data
 
 # must unify nagios.cfg
@@ -352,8 +353,8 @@ there are changes that no longer work in Nagios 2.0"
 %doc Changelog README* UPGRADING INSTALLING LICENSE
 %doc sample-config/template-object/{bigger,minimal}.cfg
 %attr(750,root,nagios-data) %dir %{_sysconfdir}
-%attr(640,root,nagios-data) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/[!r]*.cfg
-%attr(640,root,nagios) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/resource.cfg
+%attr(640,root,nagios-data) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/nagios.cfg
+%attr(640,root,nagios) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/[!n]*.cfg
 %exclude %{_sysconfdir}/cgi.cfg
 
 %attr(754,root,root) /etc/rc.d/init.d/%{name}
