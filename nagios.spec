@@ -37,6 +37,7 @@ PreReq:		rc-scripts
 PreReq:		sh-utils
 Requires:	mailx
 Requires:	nagios-plugins
+Requires(post,postun):	/sbin/chkconfig
 Requires(triggerpostun):	sed >= 4.0
 Provides:	nagios-core
 Conflicts:	iputils-ping < 1:ss020124
@@ -97,7 +98,6 @@ Requires(pre):	/usr/sbin/groupadd
 Requires(pre):	/usr/sbin/groupmod
 Requires(pre):	/usr/sbin/useradd
 Requires(pre):	/usr/sbin/usermod
-Requires(post,postun):	/sbin/chkconfig
 Requires(postun):	/usr/sbin/groupdel
 Requires(postun):	/usr/sbin/userdel
 Provides:	user(nagios)
