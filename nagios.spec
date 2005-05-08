@@ -15,7 +15,7 @@ Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	2.0
 %define	_rc     b3
-Release:	0.%{_rc}.6
+Release:	0.%{_rc}.9
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}%{_rc}.tar.gz
@@ -313,12 +313,14 @@ s,^freshness_check_interval=,service_freshness_check_interval=,
 
 ' %{_sysconfdir}/nagios.cfg
 
-mv -f /var/log/nagios/status.log /var/lib/nagios/status.dat >/dev/null 2>&1
-mv -f /var/log/nagios/comment.log /var/lib/nagios/comments.dat >/dev/null 2>&1
-mv -f /var/log/nagios/downtime.log /var/lib/nagios/downtime.dat >/dev/null 2>&1
-mv -f /var/run/nagios.pid /var/lib/nagios/nagios.pid >/dev/null 2>&1
-mv -f /var/log/nagios/nagios.tmp /var/lib/nagios/nagios.tmp >/dev/null 2>&1
-mv -f /var/log/nagios/status.sav /var/lib/nagios/retention.dat >/dev/null 2>&1
+mv -f /var/log/nagios/status.log %{_localstatedir}/status.dat 2>/dev/null
+mv -f /var/log/nagios/comment.log %{_localstatedir}/comments.dat 2>/dev/null
+mv -f /var/log/nagios/downtime.log %{_localstatedir}/downtime.dat 2>/dev/null
+mv -f /var/run/nagios.pid %{_localstatedir}/nagios.pid 2>/dev/null
+mv -f /var/log/nagios/nagios.tmp %{_localstatedir}/nagios.tmp 2>/dev/null
+mv -f /var/log/nagios/status.sav %{_localstatedir}/retention.dat 2>/dev/null
+chown nagios:nagios %{_localstatedir}/nagios.pid 2>/dev/null
+chown nagios:nagios-data %{_localstatedir}/rw/nagios.cmd 2>/dev/null
 
 if [ -f /var/lock/subsys/%{name} ]; then
 	/etc/rc.d/init.d/%{name} restart 1>&2 || :
