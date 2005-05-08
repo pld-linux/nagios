@@ -50,10 +50,6 @@ start)
 		RETVAL=$?
 		if [ $RETVAL -eq 0 ]; then
 			touch /var/lock/subsys/nagios
-
-			if [ -e /var/lib/nagios/rw/nagios.cmd ]; then
-				chgrp http /var/lib/nagios/rw/nagios.cmd
-			fi
 		fi
 	else
 		msg_already_running nagios
