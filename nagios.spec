@@ -1,7 +1,5 @@
 #
 # Conditional build:
-%bcond_with	pgsql	# enable PostgreSQL support
-%bcond_with	mysql	# enable MySQL support
 %bcond_without	gd	# without statusmap and trends, which require gd library
 #
 # TODO:
@@ -17,7 +15,7 @@ Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	2.0
 %define	_rc     b3
-Release:	0.%{_rc}.4
+Release:	0.%{_rc}.6
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}%{_rc}.tar.gz
@@ -41,8 +39,6 @@ BuildRequires:	libjpeg-devel
 BuildRequires:	libpng-devel
 BuildRequires:	sed >= 4.0
 %endif
-%{?with_mysql:BuildRequires:	mysql-devel}
-%{?with_pgsql:BuildRequires:	postgresql-devel}
 BuildRequires:	rpmbuild(macros) >= 1.202
 PreReq:		rc-scripts
 PreReq:		sh-utils
@@ -57,6 +53,7 @@ Requires(pre):	/usr/sbin/usermod
 Requires(post,postun):	/sbin/chkconfig
 Requires(postun):	/usr/sbin/groupdel
 Requires(postun):	/usr/sbin/userdel
+Requires(triggerpostun):	sed >= 4.0
 Provides:	nagios-core
 Provides:	user(nagios)
 Provides:	group(nagios)
@@ -172,8 +169,6 @@ cp -f /usr/share/automake/config.sub .
 	--with-command-grp=%{name} \
 	--with-lockfile=%{_localstatedir}/%{name}.pid \
 	--with-ping_command='/bin/ping -n %%s -c %%d' \
-	%{?with_mysql:--with-mysql-xdata --with-mysql-status --with-mysql-comments --with-mysql-extinfo --with-mysql-retention --with-mysql-downtime --with-mysql-lib=%{_libdir} --with-mysql-inc=%{_includedir}/mysql} \
-	%{?with_pgsql:--with-pgsql-xdata --with-pgsql-status --with-pgsql-comments --with-pgsql-extinfo --with-pgsql-retention --with-pgsql-downtime--with-pgsql-lib=%{_libdir} --with-pgsql-inc=%{_includedir}/postgresql} \
 	%{!?with_gd:--disable-statusmap --disable-trends}
 
 %{__make} all
@@ -297,12 +292,50 @@ if [ "$1" = "0" ]; then
 	fi
 fi
 
-%triggerpostun -- nagios < 2.0-0.b2.66
+%triggerpostun -- nagios < 2.0-0.b3.6
 chgrp nagios-data %{_sysconfdir}/*.cfg
 %addusertogroup nagios nagios-data
+
+# must unify nagios.cfg
+sed -i -e '
+s,^status_file=.*,status_file=%{_localstatedir}/status.dat,
+s,^comment_file=.*,comment_file=%{_localstatedir}/comments.dat,
+s,^downtime_file=.*,downtime_file=%{_localstatedir}/downtime.dat,
+s,^lock_file=.*,lock_file=%{_localstatedir}/nagios.pid,
+s,^temp_file=.*,temp_file=%{_localstatedir}/nagios.tmp,
+s,^state_retention_file=.*,state_retention_file=%{_localstatedir}/retention.dat,
+
+# option changes
+s,^log_passive_service_checks=,log_passive_checks=,
+s,^inter_check_delay_method=,service_inter_check_delay_method=,
+s,^use_agressive_host_checking=,use_aggressive_host_checking=,
+s,^freshness_check_interval=,service_freshness_check_interval=,
+
+' %{_sysconfdir}/nagios.cfg
+
+mv -f /var/log/nagios/status.log /var/lib/nagios/status.dat >/dev/null 2>&1
+mv -f /var/log/nagios/comment.log /var/lib/nagios/comments.dat >/dev/null 2>&1
+mv -f /var/log/nagios/downtime.log /var/lib/nagios/downtime.dat >/dev/null 2>&1
+mv -f /var/run/nagios.pid /var/lib/nagios/nagios.pid >/dev/null 2>&1
+mv -f /var/log/nagios/nagios.tmp /var/lib/nagios/nagios.tmp >/dev/null 2>&1
+mv -f /var/log/nagios/status.sav /var/lib/nagios/retention.dat >/dev/null 2>&1
+
 if [ -f /var/lock/subsys/%{name} ]; then
 	/etc/rc.d/init.d/%{name} restart 1>&2 || :
 fi
+
+# apache2 config was also moved.
+if [ -f /etc/httpd/nagios.conf.rpmsave ]; then
+	cp -f %{_sysconfdir}/apache-%{name}.conf{,.rpmnew}
+	mv -f /etc/httpd/nagios.conf.rpmsave %{_sysconfdir}/apache-%{name}.conf
+
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd restart 1>&2 || :
+	fi
+fi
+
+echo "Please read http://nagios.sourceforge.net/docs/2_0/whatsnew.html
+there are changes that no longer work in Nagios 2.0"
 
 %files
 %defattr(644,root,root,755)
