@@ -91,6 +91,7 @@ executando checagens nos diversos serviços que forem especificados.
 
 %package common
 Summary:	Common files needed by both nagios and nrpe
+Summary(pl):	Wspólne pliki wymagane zarówno przez nagiosa jak i nrpe
 Group:		Networking
 Requires(pre):	/usr/bin/getgid
 Requires(pre):	/bin/id
@@ -106,6 +107,9 @@ Provides:	group(nagios-data)
 
 %description common
 Common files needed by both nagios and nrpe.
+
+%description common -l pl
+Wspólne pliki wymagane zarówno przez nagiosa jak i nrpe.
 
 %package cgi
 Summary:	CGI webinterface for Nagios
