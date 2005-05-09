@@ -682,7 +682,7 @@
 +# Command to check to see if a host is "alive" (up) by pinging it
 +define command {
 +	command_name	check-host-alive
-+	command_line	$USER1$/check_ping -H $HOSTADDRESS$ -w 100,99% -c 1000,100% -p 1
++	command_line	$USER1$/check_ping -H $HOSTADDRESS$ -w 100,99% -c 5000,100% -p 1
 +}
 +
 +# vim:ts=8:sw=8
