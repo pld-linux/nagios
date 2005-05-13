@@ -133,13 +133,17 @@ Interfejs CGI dla Nagiosa.
 
 %package theme-default
 Summary:	Default Nagios theme
+Summary(pl):	Domy¶lny motyw Nagiosa
 Group:		Applications/WWW
-Obsoletes:	nagios-theme
-Provides:	nagios-theme
 Requires:	nagios-cgi = %{version}-%{release}
+Provides:	nagios-theme
+Obsoletes:	nagios-theme
 
 %description theme-default
 Original theme from Nagios.
+
+%description theme-default -l pl
+Oryginalny motyw z Nagiosa.
 
 %package devel
 Summary:	Include files that Nagios-related applications may compile against
