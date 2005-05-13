@@ -8,7 +8,7 @@ Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	2.0
 %define	_rc     b3
-Release:	0.%{_rc}.28
+Release:	0.%{_rc}.31
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}%{_rc}.tar.gz
@@ -136,7 +136,7 @@ Summary:	Default Nagios theme
 Group:		Networking
 Obsoletes:	nagios-theme
 Provides:	nagios-theme
-Requires:	nagios-cgi
+Requires:	nagios-cgi = %{version}-%{release}
 
 %description theme-default
 Original theme from Nagios.
@@ -406,14 +406,20 @@ there are changes that no longer work in Nagios 2.0"
 %attr(755,root,root) %{_sbindir}/*.cgi
 
 %dir %{_datadir}
+%dir %{_datadir}/images
+%dir %{_datadir}/stylesheets
 %{_datadir}/favicon.ico
 %{_datadir}/robots.txt
+%{_datadir}/contexthelp
+%{_datadir}/docs
+%{_datadir}/media
+%{_datadir}/ssi
 
 %files theme-default
 %defattr(644,root,root,755)
-%{_datadir}/*
-%exclude %{_datadir}/favicon.ico
-%exclude %{_datadir}/robots.txt
+%{_datadir}/*.html
+%{_datadir}/images/*
+%{_datadir}/stylesheets/*
 
 %files devel
 %defattr(644,root,root,755)
