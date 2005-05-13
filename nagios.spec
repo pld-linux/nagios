@@ -8,7 +8,7 @@ Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	2.0
 %define	_rc     b3
-Release:	0.%{_rc}.26
+Release:	0.%{_rc}.28
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}%{_rc}.tar.gz
@@ -118,6 +118,7 @@ Group:		Networking
 # for dirs... and accessing local logs(?)
 Requires:	%{name} = %{version}-%{release}
 Requires:	%{name}-imagepaks
+Requires:	%{name}-theme
 Requires:	webserver = apache
 Requires:	apache(mod_alias)
 Requires:	apache(mod_cgi)
@@ -129,6 +130,16 @@ CGI webinterface for Nagios.
 
 %description cgi -l pl
 Interfejs CGI dla Nagiosa.
+
+%package theme-default
+Summary:	Default Nagios theme
+Group:		Networking
+Obsoletes:	nagios-theme
+Provides:	nagios-theme
+Requires:	nagios-cgi
+
+%description theme-default
+Original theme from Nagios.
 
 %package devel
 Summary:	Include files that Nagios-related applications may compile against
@@ -393,7 +404,16 @@ there are changes that no longer work in Nagios 2.0"
 %attr(640,root,http) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/group
 %dir %{_sbindir}
 %attr(755,root,root) %{_sbindir}/*.cgi
-%{_datadir}
+
+%dir %{_datadir}
+%{_datadir}/favicon.ico
+%{_datadir}/robots.txt
+
+%files theme-default
+%defattr(644,root,root,755)
+%{_datadir}/*
+%exclude %{_datadir}/favicon.ico
+%exclude %{_datadir}/robots.txt
 
 %files devel
 %defattr(644,root,root,755)
