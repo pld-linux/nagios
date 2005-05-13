@@ -114,7 +114,7 @@ Wspólne pliki wymagane zarówno przez nagiosa jak i nrpe.
 %package cgi
 Summary:	CGI webinterface for Nagios
 Summary(pl):	Interfejs WWW/CGI dla Nagiosa
-Group:		Networking
+Group:		Applications/WWW
 # for dirs... and accessing local logs(?)
 Requires:	%{name} = %{version}-%{release}
 Requires:	%{name}-imagepaks
@@ -133,7 +133,7 @@ Interfejs CGI dla Nagiosa.
 
 %package theme-default
 Summary:	Default Nagios theme
-Group:		Networking
+Group:		Applications/WWW
 Obsoletes:	nagios-theme
 Provides:	nagios-theme
 Requires:	nagios-cgi = %{version}-%{release}
