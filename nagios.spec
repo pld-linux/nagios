@@ -8,7 +8,7 @@ Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	2.0
 %define	_rc     b3
-Release:	0.%{_rc}.31
+Release:	0.%{_rc}.35
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}%{_rc}.tar.gz
@@ -18,10 +18,11 @@ Source2:	%{name}.init
 Source3:	%{name}.sysconfig
 Source4:	http://www.nagios.org/images/favicon.ico
 # Source4-md5:	1c4201c7da53d6c7e48251d3a9680449
+Source5:	nagios-config-20050514.tar.bz2
+# Source5-md5:	21beb2e868b4c4cf67c00892114c57bf
 Patch0:		%{name}-resources.patch
 Patch1:		%{name}-iconv-in-libc.patch
-Patch2:		%{name}-config.patch
-Patch3:		%{name}-favicon.patch
+Patch2:		%{name}-favicon.patch
 URL:		http://www.nagios.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -165,11 +166,10 @@ Este pacote contém arquivos de cabeçalho usados no desenvolvimento de
 aplicativos para o Nagios.
 
 %prep
-%setup -q -n %{name}-%{version}%{?_rc}
+%setup -q -n %{name}-%{version}%{?_rc} -a5
 %patch0 -p0
 %patch1 -p1
 %patch2 -p1
-%patch3 -p1
 
 sed -i -e '
 	s,".*/var/rw/nagios.cmd,"%{_localstatedir}/rw/nagios.cmd,
@@ -194,7 +194,7 @@ cp -f /usr/share/automake/config.sub .
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},%{_includedir}/%{name},%{_libdir}/%{name}/{eventhandlers,plugins}} \
-	$RPM_BUILD_ROOT{%{_var}/log/%{name}/archives,%{_localstatedir},%{_sysconfdir},%{_examplesdir}/%{name}-%{version}}
+	$RPM_BUILD_ROOT{%{_var}/log/%{name}/archives,%{_localstatedir},%{_sysconfdir}/{plugins,local},%{_examplesdir}/%{name}-%{version}}
 
 install include/locations.h	$RPM_BUILD_ROOT%{_includedir}/%{name}
 
@@ -210,9 +210,9 @@ install %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/%{name}
 install %{SOURCE4} $RPM_BUILD_ROOT%{_datadir}
 
 # install templated configuration files
-install sample-config/{nagios,cgi,resource}.cfg $RPM_BUILD_ROOT%{_sysconfdir}
-install sample-config/{contact{s,groups},{misccommand,dependencie,escalation,hostgroup,host,service,timeperiod,checkcommand}s}.cfg $RPM_BUILD_ROOT%{_sysconfdir}
-install sample-config/{service,host}extinfo.cfg $RPM_BUILD_ROOT%{_sysconfdir}
+PV=`basename %{SOURCE5}`
+install ${PV%.tar.bz2}/*.cfg $RPM_BUILD_ROOT%{_sysconfdir}
+
 > $RPM_BUILD_ROOT%{_sysconfdir}/passwd
 echo 'nagios:' > $RPM_BUILD_ROOT%{_sysconfdir}/group
 
@@ -396,6 +396,8 @@ there are changes that no longer work in Nagios 2.0"
 %files common
 %defattr(644,root,root,755)
 %attr(750,root,nagios-data) %dir %{_sysconfdir}
+%attr(750,root,nagios) %dir %{_sysconfdir}/plugins
+%attr(750,root,nagios) %dir %{_sysconfdir}/local
 %dir %{_libdir}/%{name}
 %dir %{_libdir}/%{name}/plugins
 %dir %{_libdir}/%{name}/eventhandlers
