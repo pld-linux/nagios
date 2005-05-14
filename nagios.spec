@@ -8,7 +8,7 @@ Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	2.0
 %define	_rc     b3
-Release:	0.%{_rc}.35
+Release:	0.%{_rc}.41
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}%{_rc}.tar.gz
@@ -19,7 +19,7 @@ Source3:	%{name}.sysconfig
 Source4:	http://www.nagios.org/images/favicon.ico
 # Source4-md5:	1c4201c7da53d6c7e48251d3a9680449
 Source5:	nagios-config-20050514.tar.bz2
-# Source5-md5:	21beb2e868b4c4cf67c00892114c57bf
+# Source5-md5:	a2883c65377ef7beb55d48af85ec7ef7
 Patch0:		%{name}-resources.patch
 Patch1:		%{name}-iconv-in-libc.patch
 Patch2:		%{name}-favicon.patch
@@ -33,6 +33,7 @@ BuildRequires:	libpng-devel
 BuildRequires:	sed >= 4.0
 %endif
 BuildRequires:	rpmbuild(macros) >= 1.202
+BuildRequires:	tar >= 1:1.15.1
 PreReq:		%{name}-common = %{version}-%{release}
 PreReq:		rc-scripts
 PreReq:		sh-utils
@@ -166,7 +167,7 @@ Este pacote contém arquivos de cabeçalho usados no desenvolvimento de
 aplicativos para o Nagios.
 
 %prep
-%setup -q -n %{name}-%{version}%{?_rc} -a5
+%setup -q -n %{name}-%{version}%{?_rc}
 %patch0 -p0
 %patch1 -p1
 %patch2 -p1
@@ -210,8 +211,7 @@ install %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/%{name}
 install %{SOURCE4} $RPM_BUILD_ROOT%{_datadir}
 
 # install templated configuration files
-PV=`basename %{SOURCE5}`
-install ${PV%.tar.bz2}/*.cfg $RPM_BUILD_ROOT%{_sysconfdir}
+tar jxf %{SOURCE5} --strip-components=1 -C $RPM_BUILD_ROOT%{_sysconfdir}
 
 > $RPM_BUILD_ROOT%{_sysconfdir}/passwd
 echo 'nagios:' > $RPM_BUILD_ROOT%{_sysconfdir}/group
@@ -385,19 +385,18 @@ there are changes that no longer work in Nagios 2.0"
 
 %attr(770,root,nagios-data) %dir %{_localstatedir}
 %attr(2770,root,nagios-data) %dir %{_localstatedir}/rw
-# NOTE: the permissions are set in post script
-%ghost %{_localstatedir}/rw/nagios.cmd
-%ghost %{_localstatedir}/objects.cache
-%ghost %{_localstatedir}/*.dat
-%ghost %{_localstatedir}/%{name}.tmp
+%attr(660,nagios,nagios-data) %ghost %{_localstatedir}/rw/nagios.cmd
+%attr(664,root,nagios) %ghost %{_localstatedir}/objects.cache
+%attr(664,root,nagios) %ghost %{_localstatedir}/*.dat
+%attr(664,root,nagios) %ghost %{_localstatedir}/%{name}.tmp
 
 %{_examplesdir}/%{name}-%{version}
 
 %files common
 %defattr(644,root,root,755)
 %attr(750,root,nagios-data) %dir %{_sysconfdir}
-%attr(750,root,nagios) %dir %{_sysconfdir}/plugins
-%attr(750,root,nagios) %dir %{_sysconfdir}/local
+%attr(2750,root,nagios) %dir %{_sysconfdir}/plugins
+%attr(2750,root,nagios) %dir %{_sysconfdir}/local
 %dir %{_libdir}/%{name}
 %dir %{_libdir}/%{name}/plugins
 %dir %{_libdir}/%{name}/eventhandlers
