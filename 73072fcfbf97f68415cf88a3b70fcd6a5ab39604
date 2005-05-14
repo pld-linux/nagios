@@ -1,0 +1,2 @@
+- internal theme gets strict deps
+- put core documents (help) and dirs back to -cgi package
