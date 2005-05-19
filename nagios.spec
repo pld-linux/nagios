@@ -363,8 +363,15 @@ if [ -f /etc/httpd/nagios.conf.rpmsave ]; then
 	fi
 fi
 
-echo "Please read http://nagios.sourceforge.net/docs/2_0/whatsnew.html
-there are changes that no longer work in Nagios 2.0"
+%banner -e %{name}-2.0 <<'EOF'
+Please read <http://nagios.sourceforge.net/docs/2_0/whatsnew.html>
+there are changes that no longer work in Nagios 2.0.
+
+You could also try use <http://oss.op5.se/nagios/object_config_fix.php.gz>
+to convert your config (yes i know it's too late to say it now, after
+the upgrade, but still :))
+EOF
+#'vim
 
 %files
 %defattr(644,root,root,755)
