@@ -1,3 +1,5 @@
+# TODO
+# - check if default config works out of box
 #
 # Conditional build:
 %bcond_without	gd	# without statusmap and trends, which require gd library
