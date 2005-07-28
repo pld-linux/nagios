@@ -26,11 +26,11 @@ else
 fi
 
 checkconfig() {
-	res=`/usr/sbin/nagios -v /etc/nagios/nagios.cfg`
+	/usr/sbin/nagios -v /etc/nagios/nagios.cfg > /dev/null
 	rc=$?
 	if [ $rc -gt 0 ]; then
 		fail
-		nls 'The configuration is broken. See details with %s "checkconfig"' $0
+		nls 'The configuration is broken. See details with %s "checkconfig"' /etc/rc.d/init.d/nagios
 	fi
 	return $rc
 }
@@ -69,7 +69,7 @@ status)
 	status nagios
 	exit $?
 	;;
-checkconfig|check)
+checkconfig|check|configtest)
 	/usr/sbin/nagios -v /etc/nagios/nagios.cfg
 	exit $?
 	;;
