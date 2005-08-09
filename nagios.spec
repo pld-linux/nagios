@@ -10,7 +10,8 @@ Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	2.0
 %define	_rc     b4
-Release:	0.%{_rc}.1
+%define	_rel	2
+Release:	0.%{_rc}.%{_rel}
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}%{_rc}.tar.gz
@@ -34,7 +35,7 @@ BuildRequires:	libjpeg-devel
 BuildRequires:	libpng-devel
 BuildRequires:	sed >= 4.0
 %endif
-BuildRequires:	rpmbuild(macros) >= 1.202
+BuildRequires:	rpmbuild(macros) >= 1.226
 BuildRequires:	tar >= 1:1.15.1
 PreReq:		%{name}-common = %{version}-%{release}
 PreReq:		rc-scripts
@@ -271,21 +272,6 @@ fi
 %post cgi
 %addusertogroup http nagios-data
 
-# apache1
-if [ -d %{_apache1dir}/conf.d ]; then
-	ln -sf %{_sysconfdir}/apache-%{name}.conf %{_apache1dir}/conf.d/99_%{name}.conf
-	if [ -f /var/lock/subsys/apache ]; then
-		/etc/rc.d/init.d/apache restart 1>&2
-	fi
-fi
-# apache2
-if [ -d %{_apache2dir}/httpd.conf ]; then
-	ln -sf %{_sysconfdir}/apache-%{name}.conf %{_apache2dir}/httpd.conf/99_%{name}.conf
-	if [ -f /var/lock/subsys/httpd ]; then
-		/etc/rc.d/init.d/httpd restart 1>&2
-	fi
-fi
-
 if [ "$1" = 1 ]; then
 %banner %{name} -e <<EOF
 NOTE:
@@ -294,23 +280,17 @@ You need to add user to %{_sysconfdir}/passwd and %{_sysconfdir}/group to accces
 EOF
 fi
 
-%preun cgi
-if [ "$1" = "0" ]; then
-	# apache1
-	if [ -d %{_apache1dir}/conf.d ]; then
-		rm -f %{_apache1dir}/conf.d/99_%{name}.conf
-		if [ -f /var/lock/subsys/apache ]; then
-			/etc/rc.d/init.d/apache restart 1>&2
-		fi
-	fi
-	# apache2
-	if [ -d %{_apache2dir}/httpd.conf ]; then
-		rm -f %{_apache2dir}/httpd.conf/99_%{name}.conf
-		if [ -f /var/lock/subsys/httpd ]; then
-			/etc/rc.d/init.d/httpd restart 1>&2
-		fi
-	fi
-fi
+%triggerin cgi -- apache1 >= 1.3.33-2
+%apache_config_install -v 1 -c %{_sysconfdir}/apache-%{name}.conf
+
+%triggerun cgi -- apache1 >= 1.3.33-2
+%apache_config_uninstall -v 1
+
+%triggerin cgi -- apache >= 2.0.0
+%apache_config_install -v 2 -c %{_sysconfdir}/apache-%{name}.conf
+
+%triggerun cgi -- apache >= 2.0.0
+%apache_config_uninstall -v 2
 
 %triggerpostun -- nagios-cgi < 2.0-0.b3.21
 chown root:http %{_sysconfdir}/cgi.cfg
