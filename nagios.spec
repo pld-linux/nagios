@@ -10,7 +10,7 @@ Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	2.0
 %define	_rc     b4
-%define	_rel	2
+%define	_rel	3
 Release:	0.%{_rc}.%{_rel}
 License:	GPL v2
 Group:		Networking
@@ -270,8 +270,6 @@ if [ "$1" = "0" ]; then
 fi
 
 %post cgi
-%addusertogroup http nagios-data
-
 if [ "$1" = 1 ]; then
 %banner %{name} -e <<EOF
 NOTE:
@@ -281,12 +279,14 @@ EOF
 fi
 
 %triggerin cgi -- apache1 >= 1.3.33-2
+%addusertogroup http nagios-data
 %apache_config_install -v 1 -c %{_sysconfdir}/apache-%{name}.conf
 
 %triggerun cgi -- apache1 >= 1.3.33-2
 %apache_config_uninstall -v 1
 
 %triggerin cgi -- apache >= 2.0.0
+%addusertogroup http nagios-data
 %apache_config_install -v 2 -c %{_sysconfdir}/apache-%{name}.conf
 
 %triggerun cgi -- apache >= 2.0.0
