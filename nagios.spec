@@ -21,7 +21,7 @@ Source2:	%{name}.init
 Source3:	%{name}.sysconfig
 Source4:	http://www.nagios.org/images/favicon.ico
 # Source4-md5:	1c4201c7da53d6c7e48251d3a9680449
-Source5:	nagios-config-20050514.tar.bz2
+Source5:	%{name}-config-20050514.tar.bz2
 # Source5-md5:	a2883c65377ef7beb55d48af85ec7ef7
 Patch0:		%{name}-resources.patch
 Patch1:		%{name}-iconv-in-libc.patch
@@ -33,13 +33,13 @@ BuildRequires:	automake
 BuildRequires:	gd-devel
 BuildRequires:	libjpeg-devel
 BuildRequires:	libpng-devel
-BuildRequires:	sed >= 4.0
 %endif
+BuildRequires:	sed >= 4.0
 BuildRequires:	rpmbuild(macros) >= 1.226
 BuildRequires:	tar >= 1:1.15.1
-PreReq:		%{name}-common = %{version}-%{release}
-PreReq:		rc-scripts
-PreReq:		sh-utils
+Requires:	%{name}-common = %{version}-%{release}
+Requires:	rc-scripts
+Requires:	sh-utils
 Requires:	/bin/mail
 Requires:	nagios-plugins
 Requires(post,postun):	/sbin/chkconfig
