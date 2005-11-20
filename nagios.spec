@@ -55,9 +55,6 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_datadir	%{_prefix}/share/%{name}
 %define		_localstatedir	/var/lib/%{name}
 
-%define		_apache1dir	/etc/apache
-%define		_apache2dir	/etc/httpd
-
 %description
 Nagios is a program that will monitor hosts and services on your
 network. It has the ability to email or page you when a problem arises
