@@ -10,7 +10,7 @@ Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	2.0
 %define	_rc     b4
-%define	_rel	3
+%define	_rel	3.10
 Release:	0.%{_rc}.%{_rel}
 License:	GPL v2
 Group:		Networking
@@ -26,6 +26,7 @@ Source5:	%{name}-config-20050514.tar.bz2
 Patch0:		%{name}-resources.patch
 Patch1:		%{name}-iconv-in-libc.patch
 Patch2:		%{name}-favicon.patch
+Patch3:		%{name}-webapps.patch
 URL:		http://www.nagios.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -35,7 +36,7 @@ BuildRequires:	libjpeg-devel
 BuildRequires:	libpng-devel
 %endif
 BuildRequires:	sed >= 4.0
-BuildRequires:	rpmbuild(macros) >= 1.226
+BuildRequires:	rpmbuild(macros) >= 1.264
 BuildRequires:	tar >= 1:1.15.1
 Requires:	%{name}-common = %{version}-%{release}
 Requires:	rc-scripts
@@ -54,6 +55,8 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_sbindir	%{_libdir}/%{name}/cgi
 %define		_datadir	%{_prefix}/share/%{name}
 %define		_localstatedir	/var/lib/%{name}
+%define		_webapps	/etc/webapps
+%define		_webapp		%{name}
 
 %description
 Nagios is a program that will monitor hosts and services on your
@@ -117,10 +120,11 @@ Wspólne pliki wymagane zarówno przez nagiosa jak i nrpe.
 Summary:	CGI webinterface for Nagios
 Summary(pl):	Interfejs WWW/CGI dla Nagiosa
 Group:		Applications/WWW
-# for dirs... and accessing local logs(?)
+# for dirs... and accessing local logs.
 Requires:	%{name} = %{version}-%{release}
 Requires:	%{name}-imagepaks
 Requires:	%{name}-theme
+Requires:	webapps
 Requires:	webserver = apache
 Requires:	apache(mod_alias)
 Requires:	apache(mod_cgi)
@@ -171,6 +175,7 @@ aplicativos para o Nagios.
 %patch0 -p0
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 
 sed -i -e '
 	s,".*/var/rw/nagios.cmd,"%{_localstatedir}/rw/nagios.cmd,
@@ -195,7 +200,8 @@ cp -f /usr/share/automake/config.sub .
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},%{_includedir}/%{name},%{_libdir}/%{name}/{eventhandlers,plugins}} \
-	$RPM_BUILD_ROOT{%{_var}/log/%{name}/archives,%{_localstatedir},%{_sysconfdir}/{plugins,local},%{_examplesdir}/%{name}-%{version}}
+	$RPM_BUILD_ROOT{%{_var}/log/%{name}/archives,%{_localstatedir},%{_sysconfdir}/{plugins,local},%{_examplesdir}/%{name}-%{version}} \
+	$RPM_BUILD_ROOT%{_webapps}/%{_webapp}
 
 install include/locations.h	$RPM_BUILD_ROOT%{_includedir}/%{name}
 
@@ -205,7 +211,6 @@ install include/locations.h	$RPM_BUILD_ROOT%{_includedir}/%{name}
 	INIT_OPTS="" \
 	COMMAND_OPTS=""
 
-install %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/apache-%{name}.conf
 install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 install %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/%{name}
 install %{SOURCE4} $RPM_BUILD_ROOT%{_datadir}
@@ -213,8 +218,12 @@ install %{SOURCE4} $RPM_BUILD_ROOT%{_datadir}
 # install templated configuration files
 tar jxf %{SOURCE5} --strip-components=1 -C $RPM_BUILD_ROOT%{_sysconfdir}
 
-> $RPM_BUILD_ROOT%{_sysconfdir}/passwd
-echo 'nagios:' > $RPM_BUILD_ROOT%{_sysconfdir}/group
+# webserver files
+install %{SOURCE1} $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/apache.conf
+install %{SOURCE1} $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/httpd.conf
+mv $RPM_BUILD_ROOT{%{_sysconfdir}/cgi.cfg,%{_webapps}/%{_webapp}}
+> $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/passwd
+echo 'nagios:' > $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/group
 
 # install event handlers
 cp -a contrib/eventhandlers $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
@@ -270,24 +279,25 @@ fi
 if [ "$1" = 1 ]; then
 %banner %{name} -e <<EOF
 NOTE:
-You need to add user to %{_sysconfdir}/passwd and %{_sysconfdir}/group to acccess nagios via web.
+You need to add user to %{_webapps}/%{_webapp}/passwd and
+%{_webapps}/%{_webapp}/group to access nagios via web.
 
 EOF
 fi
 
-%triggerin cgi -- apache1 >= 1.3.33-2
+%triggerin cgi -- apache1
 %addusertogroup http nagios-data
-%apache_config_install -v 1 -c %{_sysconfdir}/apache-%{name}.conf
+%webapp_register apache %{_webapp}
 
-%triggerun cgi -- apache1 >= 1.3.33-2
-%apache_config_uninstall -v 1
+%triggerun cgi -- apache1
+%webapp_unregister apache %{_webapp}
 
 %triggerin cgi -- apache >= 2.0.0
 %addusertogroup http nagios-data
-%apache_config_install -v 2 -c %{_sysconfdir}/apache-%{name}.conf
+%webapp_register httpd %{_webapp}
 
-%triggerun cgi -- apache >= 2.0.0
-%apache_config_uninstall -v 2
+%triggerun -- apache >= 2.0.0
+%webapp_unregister httpd %{_webapp}
 
 %triggerpostun -- nagios-cgi < 2.0-0.b3.21
 chown root:http %{_sysconfdir}/cgi.cfg
@@ -328,19 +338,7 @@ mv -f /var/log/nagios/status.sav %{_localstatedir}/retention.dat 2>/dev/null
 chown nagios:nagios %{_localstatedir}/nagios.pid 2>/dev/null
 chown nagios:nagios-data %{_localstatedir}/rw/nagios.cmd 2>/dev/null
 
-if [ -f /var/lock/subsys/%{name} ]; then
-	/etc/rc.d/init.d/%{name} restart 1>&2 || :
-fi
-
-# apache2 config was also moved.
-if [ -f /etc/httpd/nagios.conf.rpmsave ]; then
-	cp -f %{_sysconfdir}/apache-%{name}.conf{,.rpmnew}
-	mv -f /etc/httpd/nagios.conf.rpmsave %{_sysconfdir}/apache-%{name}.conf
-
-	if [ -f /var/lock/subsys/httpd ]; then
-		/etc/rc.d/init.d/httpd restart 1>&2 || :
-	fi
-fi
+%service %{name} restart
 
 %banner -e %{name}-2.0 <<'EOF'
 Please read <http://nagios.sourceforge.net/docs/2_0/whatsnew.html>
@@ -352,13 +350,64 @@ the upgrade, but still :))
 EOF
 #'vim
 
+# webapps trigger
+%triggerpostun cgi -- %{name}-cgi < 2.0-0.b4.3.8
+for i in cgi.cfg group passwd; do
+	if [ -f /etc/nagios/$i.rpmsave ]; then
+		mv -f %{_webapps}/%{_webapp}/$i{,.rpmnew}
+		mv -f /etc/nagios/$i.rpmsave %{_webapps}/%{_webapp}/$i
+	fi
+done
+
+# migrate from httpd (apache2) config dir
+if [ -f /etc/httpd/%{name}.conf.rpmsave ]; then
+	cp -f %{_webapps}/%{_webapp}/httpd.conf{,.rpmnew}
+	mv -f /etc/httpd/%{name}.conf.rpmsave %{_webapps}/%{_webapp}/httpd.conf
+fi
+
+# migrate from apache-config macros
+if [ -f /etc/%{name}/apache-nagios.conf.rpmsave ]; then
+	if [ -d /etc/apache/webapps.d ]; then
+		cp -f %{_webapps}/%{_webapp}/apache.conf{,.rpmnew}
+		cp -f /etc/%{name}/apache-nagios.conf.rpmsave %{_webapps}/%{_webapp}/apache.conf
+	fi
+
+	if [ -d /etc/httpd/webapps.d ]; then
+		cp -f %{_webapps}/%{_webapp}/httpd.conf{,.rpmnew}
+		cp -f /etc/%{name}/apache-nagios.conf.rpmsave %{_webapps}/%{_webapp}/httpd.conf
+	fi
+	rm -f /etc/%{name}/apache-nagios.conf.rpmsave
+fi
+
+# place new config location, as trigger puts config only on first install, do it here.
+# apache1
+if [ -d /etc/apache/webapps.d ]; then
+	/usr/sbin/webapp register apache %{_webapp}
+	apache_reload=1
+fi
+# apache2
+if [ -d /etc/httpd/webapps.d ]; then
+	/usr/sbin/webapp register httpd %{_webapp}
+	httpd_reload=1
+fi
+
+if [ "$httpd_reload" ]; then
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd reload 1>&2
+	fi
+fi
+if [ "$apache_reload" ]; then
+	if [ -f /var/lock/subsys/apache ]; then
+		/etc/rc.d/init.d/apache reload 1>&2
+	fi
+fi
+
 %files
 %defattr(644,root,root,755)
 %doc Changelog README* UPGRADING INSTALLING LICENSE
 %doc sample-config/template-object/{bigger,minimal}.cfg
 %attr(640,root,nagios-data) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/nagios.cfg
 %attr(640,root,nagios) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/[!n]*.cfg
-%exclude %{_sysconfdir}/cgi.cfg
 
 %attr(754,root,root) /etc/rc.d/init.d/%{name}
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/%{name}
@@ -366,7 +415,7 @@ EOF
 %attr(755,root,root) %{_bindir}/%{name}
 %attr(755,root,root) %{_bindir}/nagiostats
 
-%attr(770,root,nagios-data) %{_var}/log/%{name}
+%attr(770,root,nagios-data) %dir %{_var}/log/%{name}
 %attr(770,root,nagios-data) %dir %{_var}/log/%{name}/archives
 
 %attr(770,root,nagios-data) %dir %{_localstatedir}
@@ -389,10 +438,12 @@ EOF
 
 %files cgi
 %defattr(644,root,root,755)
-%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/apache-%{name}.conf
-%attr(640,root,http) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/cgi.cfg
-%attr(640,root,http) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/passwd
-%attr(640,root,http) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/group
+%dir %attr(750,root,http) %{_webapps}/%{_webapp}
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_webapps}/%{_webapp}/apache.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_webapps}/%{_webapp}/httpd.conf
+%attr(640,root,http) %config(noreplace) %verify(not md5 mtime size) %{_webapps}/%{_webapp}/cgi.cfg
+%attr(640,root,http) %config(noreplace) %verify(not md5 mtime size) %{_webapps}/%{_webapp}/passwd
+%attr(640,root,http) %config(noreplace) %verify(not md5 mtime size) %{_webapps}/%{_webapp}/group
 %dir %{_sbindir}
 %attr(755,root,root) %{_sbindir}/*.cgi
 
