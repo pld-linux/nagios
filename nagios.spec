@@ -9,13 +9,13 @@ Summary(pl):	Program do monitorowania serwerów/us³ug/sieci
 Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	2.0
-%define	_rc     b4
-%define	_rel	3.10
+%define	_rc     b6
+%define	_rel	0.1
 Release:	0.%{_rc}.%{_rel}
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}%{_rc}.tar.gz
-# Source0-md5:	206ea26230d1360cc8871c0fee80b4c4
+# Source0-md5:	c4a08697f852b0d535bf34fff0bf8b1f
 Source1:	%{name}-apache.conf
 Source2:	%{name}.init
 Source3:	%{name}.sysconfig
