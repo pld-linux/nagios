@@ -10,7 +10,7 @@ Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	2.0
 %define	_rc     b6
-%define	_rel	0.1
+%define	_rel	0.2
 Release:	0.%{_rc}.%{_rel}
 License:	GPL v2
 Group:		Networking
@@ -351,7 +351,7 @@ EOF
 #'vim
 
 # webapps trigger
-%triggerpostun cgi -- %{name}-cgi < 2.0-0.b4.3.8
+%triggerpostun cgi -- %{name}-cgi < 2.0-0.b6.0.2
 for i in cgi.cfg group passwd; do
 	if [ -f /etc/nagios/$i.rpmsave ]; then
 		mv -f %{_webapps}/%{_webapp}/$i{,.rpmnew}
@@ -380,25 +380,25 @@ if [ -f /etc/%{name}/apache-nagios.conf.rpmsave ]; then
 fi
 
 # place new config location, as trigger puts config only on first install, do it here.
-# apache1
-if [ -d /etc/apache/webapps.d ]; then
-	/usr/sbin/webapp register apache %{_webapp}
+if [ -L /etc/apache/conf.d/99_%{name}.conf ]; then
+	rm -f /etc/apache/conf.d/99_%{name}.conf
 	apache_reload=1
 fi
-# apache2
-if [ -d /etc/httpd/webapps.d ]; then
-	/usr/sbin/webapp register httpd %{_webapp}
+if [ -L /etc/httpd/httpd.conf/99_%{name}.conf ]; then
+	rm -f /etc/httpd/httpd.conf/99_%{name}.conf
 	httpd_reload=1
 fi
 
-if [ "$httpd_reload" ]; then
-	if [ -f /var/lock/subsys/httpd ]; then
-		/etc/rc.d/init.d/httpd reload 1>&2
-	fi
-fi
 if [ "$apache_reload" ]; then
+	/usr/sbin/webapp register apache %{_webapp}
 	if [ -f /var/lock/subsys/apache ]; then
 		/etc/rc.d/init.d/apache reload 1>&2
+	fi
+fi
+if [ "$httpd_reload" ]; then
+	/usr/sbin/webapp register httpd %{_webapp}
+	if [ -f /var/lock/subsys/httpd ]; then
+		/etc/rc.d/init.d/httpd reload 1>&2
 	fi
 fi
 
