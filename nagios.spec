@@ -1,6 +1,3 @@
-# TODO
-# - check if default config works out of box
-#
 # Conditional build:
 %bcond_without	gd	# without statusmap and trends, which require gd library
 #
@@ -10,7 +7,7 @@ Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	2.0
 %define	_rc     b6
-%define	_rel	0.2
+%define	_rel	1
 Release:	0.%{_rc}.%{_rel}
 License:	GPL v2
 Group:		Networking
