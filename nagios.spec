@@ -7,7 +7,7 @@ Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	2.0
 %define	_rc     b6
-%define	_rel	1
+%define	_rel	2
 Release:	0.%{_rc}.%{_rel}
 License:	GPL v2
 Group:		Networking
@@ -32,19 +32,19 @@ BuildRequires:	gd-devel
 BuildRequires:	libjpeg-devel
 BuildRequires:	libpng-devel
 %endif
+BuildRequires:	rpmbuild(macros) >= 1.268
 BuildRequires:	sed >= 4.0
-BuildRequires:	rpmbuild(macros) >= 1.264
 BuildRequires:	tar >= 1:1.15.1
-Requires:	%{name}-common = %{version}-%{release}
-Requires:	rc-scripts
-Requires:	sh-utils
-Requires:	/bin/mail
-Requires:	nagios-plugins
 Requires(post,postun):	/sbin/chkconfig
 Requires(triggerpostun):	sed >= 4.0
+Requires:	%{name}-common = %{version}-%{release}
+Requires:	/bin/mail
+Requires:	nagios-plugins
+Requires:	rc-scripts
+Requires:	sh-utils
 Provides:	nagios-core
-Conflicts:	iputils-ping < 1:ss020124
 Obsoletes:	netsaint
+Conflicts:	iputils-ping < 1:ss020124
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_sysconfdir	/etc/%{name}
@@ -95,17 +95,17 @@ executando checagens nos diversos serviços que forem especificados.
 Summary:	Common files needed by both nagios and nrpe
 Summary(pl):	Wspólne pliki wymagane zarówno przez nagiosa jak i nrpe
 Group:		Networking
-Requires(pre):	/usr/bin/getgid
+Requires(postun):	/usr/sbin/groupdel
+Requires(postun):	/usr/sbin/userdel
 Requires(pre):	/bin/id
+Requires(pre):	/usr/bin/getgid
 Requires(pre):	/usr/sbin/groupadd
 Requires(pre):	/usr/sbin/groupmod
 Requires(pre):	/usr/sbin/useradd
 Requires(pre):	/usr/sbin/usermod
-Requires(postun):	/usr/sbin/groupdel
-Requires(postun):	/usr/sbin/userdel
-Provides:	user(nagios)
 Provides:	group(nagios)
 Provides:	group(nagios-data)
+Provides:	user(nagios)
 
 %description common
 Common files needed by both nagios and nrpe.
@@ -121,12 +121,12 @@ Group:		Applications/WWW
 Requires:	%{name} = %{version}-%{release}
 Requires:	%{name}-imagepaks
 Requires:	%{name}-theme
+Requires:	apache(mod_alias)
+Requires:	apache(mod_auth)
+Requires:	apache(mod_cgi)
+Requires:	group(http)
 Requires:	webapps
 Requires:	webserver = apache
-Requires:	apache(mod_alias)
-Requires:	apache(mod_cgi)
-Requires:	apache(mod_auth)
-Requires:	group(http)
 
 %description cgi
 CGI webinterface for Nagios.
@@ -388,15 +388,11 @@ fi
 
 if [ "$apache_reload" ]; then
 	/usr/sbin/webapp register apache %{_webapp}
-	if [ -f /var/lock/subsys/apache ]; then
-		/etc/rc.d/init.d/apache reload 1>&2
-	fi
+	%service apache reload
 fi
 if [ "$httpd_reload" ]; then
 	/usr/sbin/webapp register httpd %{_webapp}
-	if [ -f /var/lock/subsys/httpd ]; then
-		/etc/rc.d/init.d/httpd reload 1>&2
-	fi
+	%service httpd reload
 fi
 
 %files
