@@ -289,11 +289,11 @@ fi
 %triggerun cgi -- apache1
 %webapp_unregister apache %{_webapp}
 
-%triggerin cgi -- apache >= 2.0.0
+%triggerin cgi -- apache < 2.2.0, apache-base
 %addusertogroup http nagios-data
 %webapp_register httpd %{_webapp}
 
-%triggerun -- apache < 2.2.0, apache-base
+%triggerun cgi -- apache < 2.2.0, apache-base
 %webapp_unregister httpd %{_webapp}
 
 %triggerpostun -- nagios-cgi < 2.0-0.b3.21
