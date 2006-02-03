@@ -7,7 +7,7 @@ Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	2.0
 %define	_rc     b6
-%define	_rel	2
+%define	_rel	3
 Release:	0.%{_rc}.%{_rel}
 License:	GPL v2
 Group:		Networking
