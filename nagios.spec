@@ -6,13 +6,11 @@ Summary(pl):	Program do monitorowania serwerów/us³ug/sieci
 Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	2.0
-%define	_rc     b6
-%define	_rel	3
-Release:	0.%{_rc}.%{_rel}
+Release:	1
 License:	GPL v2
 Group:		Networking
-Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}%{_rc}.tar.gz
-# Source0-md5:	c4a08697f852b0d535bf34fff0bf8b1f
+Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}.tar.gz
+# Source0-md5:	2a30ccf68bdbebc9c6f5a06e9c09e757
 Source1:	%{name}-apache.conf
 Source2:	%{name}.init
 Source3:	%{name}.sysconfig
@@ -168,7 +166,7 @@ Este pacote contém arquivos de cabeçalho usados no desenvolvimento de
 aplicativos para o Nagios.
 
 %prep
-%setup -q -n %{name}-%{version}%{?_rc}
+%setup -q
 %patch0 -p0
 %patch1 -p1
 %patch2 -p1
