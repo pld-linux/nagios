@@ -233,22 +233,18 @@ done
 rm -rf $RPM_BUILD_ROOT
 
 %post
-/sbin/chkconfig --add %{name}
-if [ -f /var/lock/subsys/%{name} ]; then
-	/etc/rc.d/init.d/%{name} restart 1>&2
-fi
-
 for i in %{_localstatedir}/{objects.cache,{comments,downtime,retention,status}.dat}; do
 	[ ! -f $i ] && touch $i
 	chown root:nagios $i
 	chmod 664 $i
 done
 
+/sbin/chkconfig --add %{name}
+%service %{name} restart
+
 %preun
 if [ "$1" = "0" ] ; then
-	if [ -f /var/lock/subsys/%{name} ]; then
-		/etc/rc.d/init.d/%{name} stop 1>&2
-	fi
+	%service %{name} stop
 	/sbin/chkconfig --del %{name}
 fi
 
@@ -275,7 +271,7 @@ if [ "$1" = 1 ]; then
 %banner %{name} -e <<EOF
 NOTE:
 You need to add user to %{_webapps}/%{_webapp}/passwd and
-%{_webapps}/%{_webapp}/group to access nagios via web.
+%{_webapps}/%{_webapp}/group to access Nagios via web.
 
 EOF
 fi
