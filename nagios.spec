@@ -6,7 +6,7 @@ Summary(pl):	Program do monitorowania serwerów/us³ug/sieci
 Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	2.0
-Release:	1
+Release:	2
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}.tar.gz
@@ -214,6 +214,7 @@ install %{SOURCE4} $RPM_BUILD_ROOT%{_datadir}
 
 # install templated configuration files
 tar jxf %{SOURCE5} --strip-components=1 -C $RPM_BUILD_ROOT%{_sysconfdir}
+sed -i -e 's,%{_prefix}/lib/,%{_libdir}/,' $RPM_BUILD_ROOT%{_sysconfdir}/resource.cfg
 
 # webserver files
 install apache.conf $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/apache.conf
@@ -242,7 +243,7 @@ for i in %{_localstatedir}/{objects.cache,{comments,downtime,retention,status}.d
 done
 
 /sbin/chkconfig --add %{name}
-%service %{name} restart
+%service %{name} restart "Nagios service"
 
 %preun
 if [ "$1" = "0" ] ; then
@@ -331,7 +332,7 @@ mv -f /var/log/nagios/status.sav %{_localstatedir}/retention.dat 2>/dev/null
 chown nagios:nagios %{_localstatedir}/nagios.pid 2>/dev/null
 chown nagios:nagios-data %{_localstatedir}/rw/nagios.cmd 2>/dev/null
 
-%service %{name} restart
+%service -q %{name} restart
 
 %banner -e %{name}-2.0 <<'EOF'
 Please read <http://nagios.sourceforge.net/docs/2_0/whatsnew.html>
@@ -384,11 +385,11 @@ fi
 
 if [ "$apache_reload" ]; then
 	/usr/sbin/webapp register apache %{_webapp}
-	%service apache reload
+	%service -q apache reload
 fi
 if [ "$httpd_reload" ]; then
 	/usr/sbin/webapp register httpd %{_webapp}
-	%service httpd reload
+	%service -q httpd reload
 fi
 
 %files
