@@ -177,6 +177,8 @@ sed -i -e '
 	s,".*/libexec/eventhandlers,"%{_libdir}/%{name}/eventhandlers,
 ' $(find contrib/eventhandlers -type f)
 
+sed -e 's,%{_prefix}/lib/,%{_libdir}/,' %{SOURCE1} > apache.conf
+
 %build
 cp -f /usr/share/automake/config.sub .
 %{__aclocal}
@@ -214,8 +216,8 @@ install %{SOURCE4} $RPM_BUILD_ROOT%{_datadir}
 tar jxf %{SOURCE5} --strip-components=1 -C $RPM_BUILD_ROOT%{_sysconfdir}
 
 # webserver files
-install %{SOURCE1} $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/apache.conf
-install %{SOURCE1} $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/httpd.conf
+install apache.conf $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/apache.conf
+install apache.conf $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/httpd.conf
 mv $RPM_BUILD_ROOT{%{_sysconfdir}/cgi.cfg,%{_webapps}/%{_webapp}}
 > $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/passwd
 echo 'nagios:' > $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/group
