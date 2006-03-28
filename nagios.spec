@@ -5,12 +5,12 @@ Summary:	Host/service/network monitoring program
 Summary(pl):	Program do monitorowania serwerów/us³ug/sieci
 Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
-Version:	2.0
-Release:	2
+Version:	2.1
+Release:	0.1
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}.tar.gz
-# Source0-md5:	2a30ccf68bdbebc9c6f5a06e9c09e757
+# Source0-md5:	ec559a13dbf3a403e9325c90425076df
 Source1:	%{name}-apache.conf
 Source2:	%{name}.init
 Source3:	%{name}.sysconfig
@@ -190,6 +190,7 @@ cp -f /usr/share/automake/config.sub .
 	--with-command-grp=%{name} \
 	--with-lockfile=%{_localstatedir}/%{name}.pid \
 	--with-ping_command='/bin/ping -n %%s -c %%d' \
+	--enable-event-broker \
 	%{!?with_gd:--disable-statusmap --disable-trends}
 
 %{__make} all
