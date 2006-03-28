@@ -6,7 +6,7 @@ Summary(pl):	Program do monitorowania serwerów/us³ug/sieci
 Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	2.1
-Release:	0.1
+Release:	0.2
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}.tar.gz
@@ -201,7 +201,7 @@ install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},%{_includedir}/%{name},%
 	$RPM_BUILD_ROOT{%{_var}/log/%{name}/archives,%{_localstatedir},%{_sysconfdir}/{plugins,local},%{_examplesdir}/%{name}-%{version}} \
 	$RPM_BUILD_ROOT%{_webapps}/%{_webapp}
 
-install include/locations.h	$RPM_BUILD_ROOT%{_includedir}/%{name}
+install include/*.h	$RPM_BUILD_ROOT%{_includedir}/%{name}
 
 %{__make} install install-html install-init install-commandmode fullinstall \
 	DESTDIR=$RPM_BUILD_ROOT \
