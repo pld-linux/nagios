@@ -33,7 +33,7 @@ BuildRequires:	libpng-devel
 BuildRequires:	rpmbuild(macros) >= 1.268
 BuildRequires:	sed >= 4.0
 BuildRequires:	tar >= 1:1.15.1
-Requires(post,postun):	/sbin/chkconfig
+Requires(post,preun):	/sbin/chkconfig
 Requires(triggerpostun):	sed >= 4.0
 Requires:	%{name}-common = %{version}-%{release}
 Requires:	/bin/mail
