@@ -81,7 +81,7 @@ reload|force-reload)
 		killproc nagios -HUP
 		RETVAL=$?
 	else
-		msg_not_running nagios >&2
+		msg_not_running nagios
 		exit 7
 	fi
 	;;
