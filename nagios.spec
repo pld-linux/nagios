@@ -198,12 +198,12 @@ cp -f /usr/share/automake/config.sub .
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},%{_includedir}/%{name},%{_libdir}/%{name}/{eventhandlers,plugins}} \
-	$RPM_BUILD_ROOT{%{_var}/log/%{name}/archives,%{_localstatedir},%{_sysconfdir}/{plugins,local},%{_examplesdir}/%{name}-%{version}} \
+	$RPM_BUILD_ROOT{%{_var}/log/%{name}/archives,%{_localstatedir}/rw,%{_sysconfdir}/{plugins,local},%{_examplesdir}/%{name}-%{version}} \
 	$RPM_BUILD_ROOT%{_webapps}/%{_webapp}
 
 install include/*.h	$RPM_BUILD_ROOT%{_includedir}/%{name}
 
-%{__make} install install-html install-init install-commandmode fullinstall \
+%{__make} install-unstripped \
 	DESTDIR=$RPM_BUILD_ROOT \
 	INSTALL_OPTS="" \
 	INIT_OPTS="" \
