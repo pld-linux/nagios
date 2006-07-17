@@ -6,7 +6,7 @@ Summary(pl):	Program do monitorowania serwerów/us³ug/sieci
 Summary(pt_BR):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	2.5
-Release:	1
+Release:	1.6
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}.tar.gz
@@ -18,6 +18,7 @@ Source4:	http://www.nagios.org/images/favicon.ico
 # Source4-md5:	1c4201c7da53d6c7e48251d3a9680449
 Source5:	%{name}-config-20050514.tar.bz2
 # Source5-md5:	a2883c65377ef7beb55d48af85ec7ef7
+Source6:	%{name}-lighttpd.conf
 Patch0:		%{name}-resources.patch
 Patch1:		%{name}-iconv-in-libc.patch
 Patch2:		%{name}-favicon.patch
@@ -119,12 +120,13 @@ Group:		Applications/WWW
 Requires:	%{name} = %{version}-%{release}
 Requires:	%{name}-imagepaks
 Requires:	%{name}-theme
-Requires:	apache(mod_alias)
-Requires:	apache(mod_auth)
-Requires:	apache(mod_cgi)
 Requires:	group(http)
 Requires:	webapps
-Requires:	webserver = apache
+Requires:	webserver
+Requires:	webserver(alias)
+Requires:	webserver(auth)
+Requires:	webserver(cgi)
+Requires:	webserver(indexfile)
 
 %description cgi
 CGI webinterface for Nagios.
@@ -178,6 +180,7 @@ sed -i -e '
 ' $(find contrib/eventhandlers -type f)
 
 sed -e 's,%{_prefix}/lib/,%{_libdir}/,' %{SOURCE1} > apache.conf
+sed -e 's,%{_prefix}/lib/,%{_libdir}/,' %{SOURCE6} > lighttpd.conf
 
 %build
 cp -f /usr/share/automake/config.sub .
@@ -220,6 +223,7 @@ sed -i -e 's,%{_prefix}/lib/,%{_libdir}/,' $RPM_BUILD_ROOT%{_sysconfdir}/resourc
 # webserver files
 install apache.conf $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/apache.conf
 install apache.conf $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/httpd.conf
+install lighttpd.conf $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/lighttpd.conf
 mv $RPM_BUILD_ROOT{%{_sysconfdir}/cgi.cfg,%{_webapps}/%{_webapp}}
 > $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/passwd
 echo 'nagios:' > $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/group
@@ -293,6 +297,13 @@ fi
 
 %triggerun cgi -- apache < 2.2.0, apache-base
 %webapp_unregister httpd %{_webapp}
+
+%triggerin cgi -- lighttpd
+%addusertogroup lighttpd nagios-data
+%webapp_register lighttpd %{_webapp}
+
+%triggerun cgi -- lighttpd
+%webapp_unregister lighttpd %{_webapp}
 
 %triggerpostun -- nagios-cgi < 2.0-0.b3.21
 chown root:http %{_sysconfdir}/cgi.cfg
@@ -432,6 +443,7 @@ fi
 %dir %attr(750,root,http) %{_webapps}/%{_webapp}
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_webapps}/%{_webapp}/apache.conf
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_webapps}/%{_webapp}/httpd.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_webapps}/%{_webapp}/lighttpd.conf
 %attr(640,root,http) %config(noreplace) %verify(not md5 mtime size) %{_webapps}/%{_webapp}/cgi.cfg
 %attr(640,root,http) %config(noreplace) %verify(not md5 mtime size) %{_webapps}/%{_webapp}/passwd
 %attr(640,root,http) %config(noreplace) %verify(not md5 mtime size) %{_webapps}/%{_webapp}/group
