@@ -284,11 +284,11 @@ You need to add user to %{_webapps}/%{_webapp}/passwd and
 EOF
 fi
 
-%triggerin cgi -- apache1
+%triggerin cgi -- apache1 < 1.3.37-3, apache1-base
 %addusertogroup http nagios-data
 %webapp_register apache %{_webapp}
 
-%triggerun cgi -- apache1
+%triggerun cgi -- apache1 < 1.3.37-3, apache1-base
 %webapp_unregister apache %{_webapp}
 
 %triggerin cgi -- apache < 2.2.0, apache-base
