@@ -10,8 +10,8 @@
 #  - create group "nagios-data" for sharing access with httpd user (/etc/nagios/*.cfg)
 
 Summary:	Host/service/network monitoring program
-Summary(pl):	Program do monitorowania serwerów/us³ug/sieci
-Summary(pt_BR):	Programa para monitoração de máquinas e serviços
+Summary(pl.UTF-8):   Program do monitorowania serwerÃ³w/usÅ‚ug/sieci
+Summary(pt_BR.UTF-8):   Programa para monitoraÃ§Ã£o de mÃ¡quinas e serviÃ§os
 Name:		nagios
 Version:	2.0
 %define	_rc     b3
@@ -85,31 +85,31 @@ available in nagios-plugins packages.
 
 Nagios is successor to NetSaint.
 
-%description -l pl
-Nagios to program, który monitoruje serwery oraz us³ugi w naszej
-sieci. Posiada on mo¿liwo¶æ wysy³ania informacji o wyst±pieniu oraz
-rozwi±zaniu problemu. Nagios zosta³ napisany w C oraz jest
-zaprojektowany do pracy pod Linuksem (i niektórymi innymi uniksami)
-jako proces pracuj±cy w tle i bezustannie wykonuj±cy pewne operacje
-sprawdzaj±ce.
+%description -l pl.UTF-8
+Nagios to program, ktÃ³ry monitoruje serwery oraz usÅ‚ugi w naszej
+sieci. Posiada on moÅ¼liwoÅ›Ä‡ wysyÅ‚ania informacji o wystÄ…pieniu oraz
+rozwiÄ…zaniu problemu. Nagios zostaÅ‚ napisany w C oraz jest
+zaprojektowany do pracy pod Linuksem (i niektÃ³rymi innymi uniksami)
+jako proces pracujÄ…cy w tle i bezustannie wykonujÄ…cy pewne operacje
+sprawdzajÄ…ce.
 
-W³a¶ciwe sprawdzanie jest wykonywane przez osobne programy
-("wtyczki"), które zwracaj± informacje o statusie do Nagiosa. Wtyczki
-s± dostêpne na stronie w pakietach nagios-plugins.
+WÅ‚aÅ›ciwe sprawdzanie jest wykonywane przez osobne programy
+("wtyczki"), ktÃ³re zwracajÄ… informacje o statusie do Nagiosa. Wtyczki
+sÄ… dostÄ™pne na stronie w pakietach nagios-plugins.
 
-Nagios jest nastêpc± NetSainta.
+Nagios jest nastÄ™pcÄ… NetSainta.
 
-%description -l pt_BR
-O Nagios é um programa que monitora máquinas e serviços na sua rede.
+%description -l pt_BR.UTF-8
+O Nagios Ã© um programa que monitora mÃ¡quinas e serviÃ§os na sua rede.
 Ele pode enviar um email ou um aviso de pager para o administrador
-quando surgir um problema e quando ele for resolvido. Nagios é escrito
+quando surgir um problema e quando ele for resolvido. Nagios Ã© escrito
 em C e foi desenvolvido para rodar em plataformas Linux (e algumas
-variações de *NIX) como um processo em segundo plano, periodicamente
-executando checagens nos diversos serviços que forem especificados.
+variaÃ§Ãµes de *NIX) como um processo em segundo plano, periodicamente
+executando checagens nos diversos serviÃ§os que forem especificados.
 
 %package cgi
 Summary:	CGI webinterface for Nagios
-Summary(pl):	Interfejs WWW/CGI dla Nagiosa
+Summary(pl.UTF-8):   Interfejs WWW/CGI dla Nagiosa
 Group:		Networking
 # for dirs... and accessing local logs(?)
 Requires:	%{name} = %{version}-%{release}
@@ -123,13 +123,13 @@ Requires:	group(http)
 %description cgi
 CGI webinterface for Nagios.
 
-%description cgi -l pl
+%description cgi -l pl.UTF-8
 Interfejs CGI dla Nagiosa.
 
 %package devel
 Summary:	Include files that Nagios-related applications may compile against
-Summary(pl):	Pliki nag³ówkowe, wykorzystywane przez aplikacje nagiosa
-Summary(pt_BR):	Arquivos de cabeçalho necessários para desenvolvimento de aplicativos para o Nagios
+Summary(pl.UTF-8):   Pliki nagÅ‚Ã³wkowe, wykorzystywane przez aplikacje nagiosa
+Summary(pt_BR.UTF-8):   Arquivos de cabeÃ§alho necessÃ¡rios para desenvolvimento de aplicativos para o Nagios
 Group:		Development/Libraries
 # doesn't require base
 
@@ -137,12 +137,12 @@ Group:		Development/Libraries
 This package provides include files that Nagios-related applications
 may compile against.
 
-%description devel -l pl
-Ten pakiet dostarcza pliki nag³ówkowe, które mog± byæ wykorzystywane
-przez aplikacje zwi±zane z nagiosem podczas kompilacji.
+%description devel -l pl.UTF-8
+Ten pakiet dostarcza pliki nagÅ‚Ã³wkowe, ktÃ³re mogÄ… byÄ‡ wykorzystywane
+przez aplikacje zwiÄ…zane z nagiosem podczas kompilacji.
 
-%description devel -l pt_BR
-Este pacote contém arquivos de cabeçalho usados no desenvolvimento de
+%description devel -l pt_BR.UTF-8
+Este pacote contÃ©m arquivos de cabeÃ§alho usados no desenvolvimento de
 aplicativos para o Nagios.
 
 %prep
