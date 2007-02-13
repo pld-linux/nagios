@@ -2,8 +2,8 @@
 %bcond_without	gd	# without statusmap and trends, which require gd library
 #
 Summary:	Host/service/network monitoring program
-Summary(pl.UTF-8):   Program do monitorowania serwerów/usług/sieci
-Summary(pt_BR.UTF-8):   Programa para monitoração de máquinas e serviços
+Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
+Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	2.7
 Release:	1
@@ -92,7 +92,7 @@ executando checagens nos diversos serviços que forem especificados.
 
 %package common
 Summary:	Common files needed by both nagios and nrpe
-Summary(pl.UTF-8):   Wspólne pliki wymagane zarówno przez nagiosa jak i nrpe
+Summary(pl.UTF-8):	Wspólne pliki wymagane zarówno przez nagiosa jak i nrpe
 Group:		Networking
 Requires(postun):	/usr/sbin/groupdel
 Requires(postun):	/usr/sbin/userdel
@@ -114,7 +114,7 @@ Wspólne pliki wymagane zarówno przez nagiosa jak i nrpe.
 
 %package cgi
 Summary:	CGI webinterface for Nagios
-Summary(pl.UTF-8):   Interfejs WWW/CGI dla Nagiosa
+Summary(pl.UTF-8):	Interfejs WWW/CGI dla Nagiosa
 Group:		Applications/WWW
 # for dirs... and accessing local logs.
 Requires:	%{name} = %{version}-%{release}
@@ -136,7 +136,7 @@ Interfejs CGI dla Nagiosa.
 
 %package theme-default
 Summary:	Default Nagios theme
-Summary(pl.UTF-8):   Domyślny motyw Nagiosa
+Summary(pl.UTF-8):	Domyślny motyw Nagiosa
 Group:		Applications/WWW
 Requires:	nagios-cgi = %{version}-%{release}
 Provides:	nagios-theme
@@ -150,8 +150,8 @@ Oryginalny motyw z Nagiosa.
 
 %package devel
 Summary:	Include files that Nagios-related applications may compile against
-Summary(pl.UTF-8):   Pliki nagłówkowe, wykorzystywane przez aplikacje nagiosa
-Summary(pt_BR.UTF-8):   Arquivos de cabeçalho necessários para desenvolvimento de aplicativos para o Nagios
+Summary(pl.UTF-8):	Pliki nagłówkowe, wykorzystywane przez aplikacje nagiosa
+Summary(pt_BR.UTF-8):	Arquivos de cabeçalho necessários para desenvolvimento de aplicativos para o Nagios
 Group:		Development/Libraries
 # doesn't require base
 
