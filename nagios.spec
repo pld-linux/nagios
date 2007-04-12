@@ -5,12 +5,12 @@ Summary:	Host/service/network monitoring program
 Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
 Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
-Version:	2.7
+Version:	2.9
 Release:	1
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}.tar.gz
-# Source0-md5:	d664d2785cdca3c5c8a3e84c033e8e6e
+# Source0-md5:	b6e3a21c91edb063c00712c6001e15ec
 Source1:	%{name}-apache.conf
 Source2:	%{name}.init
 Source3:	%{name}.sysconfig
