@@ -7,7 +7,7 @@ Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
 Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	2.9
-Release:	1
+Release:	2
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}.tar.gz
@@ -201,10 +201,15 @@ cp -f /usr/share/automake/config.sub .
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},%{_includedir}/%{name},%{_libdir}/%{name}/{eventhandlers,plugins}} \
-	$RPM_BUILD_ROOT{%{_var}/log/%{name}/archives,%{_localstatedir}/rw,%{_sysconfdir}/{plugins,local},%{_examplesdir}/%{name}-%{version}} \
-	$RPM_BUILD_ROOT%{_webapps}/%{_webapp}
+install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},%{_webapps}/%{_webapp}} \
+	$RPM_BUILD_ROOT{%{_var}/log/%{name}/archives,%{_localstatedir}/rw} \
+	$RPM_BUILD_ROOT%{_sysconfdir}/{plugins,local} \
+	$RPM_BUILD_ROOT%{_libdir}/%{name}/{eventhandlers,plugins} \
+%if "%{_lib}" != "lib"
+	$RPM_BUILD_ROOT%{_prefix}/lib/%{name}/{eventhandlers,plugins} \
+%endif
 
+install -d $RPM_BUILD_ROOT%{_includedir}/%{name}
 install include/*.h	$RPM_BUILD_ROOT%{_includedir}/%{name}
 
 %{__make} install-unstripped \
@@ -230,6 +235,7 @@ mv $RPM_BUILD_ROOT{%{_sysconfdir}/cgi.cfg,%{_webapps}/%{_webapp}}
 echo 'nagios:' > $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/group
 
 # install event handlers
+install -d $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
 cp -a contrib/eventhandlers $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
 
 # Object data/cache files
@@ -438,6 +444,12 @@ fi
 %dir %{_libdir}/%{name}
 %dir %{_libdir}/%{name}/plugins
 %dir %{_libdir}/%{name}/eventhandlers
+
+%if "%{_lib}" != "lib"
+%dir %{_prefix}/lib/%{name}
+%dir %{_prefix}/lib/%{name}/plugins
+%dir %{_prefix}/lib/%{name}/eventhandlers
+%endif
 
 %files cgi
 %defattr(644,root,root,755)
