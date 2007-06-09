@@ -124,6 +124,7 @@ Requires:	%{name}-theme
 Requires:	group(http)
 Requires:	webapps
 Requires:	webserver
+Requires:	webserver(access)
 Requires:	webserver(alias)
 Requires:	webserver(auth)
 Requires:	webserver(cgi)
