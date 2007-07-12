@@ -1,0 +1,35 @@
+Index: nagios/base/nagios.c
+diff -u nagios/base/nagios.c:1.87.2.17 nagios/base/nagios.c:1.87.2.18
+--- nagios/base/nagios.c:1.87.2.17	Tue Apr 10 15:08:32 2007
++++ nagios/base/nagios.c	Mon Apr 30 21:22:32 2007
+@@ -142,7 +142,7 @@
+ 
+ int             sigshutdown=FALSE;
+ int             sigrestart=FALSE;
+-char            *sigs[]={"EXIT","HUP","INT","QUIT","ILL","TRAP","ABRT","BUS","FPE","KILL","USR1","SEGV","USR2","PIPE","ALRM","TERM","STKFLT","CHLD","CONT","STOP","TSTP","TTIN","TTOU","URG","XCPU","XFSZ","VTALRM","PROF","WINCH","IO","PWR","UNUSED","ZERR","DEBUG",(char *)NULL};
++char            *sigs[35]={"EXIT","HUP","INT","QUIT","ILL","TRAP","ABRT","BUS","FPE","KILL","USR1","SEGV","USR2","PIPE","ALRM","TERM","STKFLT","CHLD","CONT","STOP","TSTP","TTIN","TTOU","URG","XCPU","XFSZ","VTALRM","PROF","WINCH","IO","PWR","UNUSED","ZERR","DEBUG",(char *)NULL};
+ int             caught_signal=FALSE;
+ int             sig_id=0;
+ 
+Index: nagios/base/utils.c
+diff -u nagios/base/utils.c:1.111.2.12 nagios/base/utils.c:1.111.2.13
+--- nagios/base/utils.c:1.111.2.12	Tue Apr 10 14:50:22 2007
++++ nagios/base/utils.c	Mon Apr 30 21:22:32 2007
+@@ -3,7 +3,7 @@
+  * UTILS.C - Miscellaneous utility functions for Nagios
+  *
+  * Copyright (c) 1999-2007 Ethan Galstad (nagios@nagios.org)
+- * Last Modified:   04-10-2007
++ * Last Modified:   04-30-2007
+  *
+  * License:
+  *
+@@ -76,7 +76,7 @@
+ 
+ extern int      sigshutdown;
+ extern int      sigrestart;
+-extern char     **sigs;
++extern char     *sigs[35];
+ extern int      caught_signal;
+ extern int      sig_id;
+ 
