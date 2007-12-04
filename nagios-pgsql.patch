@@ -1,0 +1,48 @@
+diff -Nur netsaint-0.0.7b7.orig/xdata/xcddb.c netsaint-0.0.7b7/xdata/xcddb.c
+--- netsaint-0.0.7b7.orig/xdata/xcddb.c	Tue Aug  7 03:36:50 2001
++++ netsaint-0.0.7b7/xdata/xcddb.c	Fri Dec 14 13:29:04 2001
+@@ -51,7 +51,7 @@
+ #endif
+ 
+ #ifdef USE_XCDPGSQL
+-#include <pgsql/libpq-fe.h>
++#include <libpq-fe.h>
+ #endif
+ 
+ 
+diff -Nur netsaint-0.0.7b7.orig/xdata/xeddb.c netsaint-0.0.7b7/xdata/xeddb.c
+--- netsaint-0.0.7b7.orig/xdata/xeddb.c	Sat Aug  4 22:35:40 2001
++++ netsaint-0.0.7b7/xdata/xeddb.c	Fri Dec 14 13:29:09 2001
+@@ -44,7 +44,7 @@
+ #endif
+ 
+ #ifdef USE_XEDPGSQL
+-#include <pgsql/libpq-fe.h>
++#include <libpq-fe.h>
+ #endif
+ 
+ 
+diff -Nur netsaint-0.0.7b7.orig/xdata/xrddb.c netsaint-0.0.7b7/xdata/xrddb.c
+--- netsaint-0.0.7b7.orig/xdata/xrddb.c	Sat Aug  4 22:35:40 2001
++++ netsaint-0.0.7b7/xdata/xrddb.c	Fri Dec 14 13:29:14 2001
+@@ -43,7 +43,7 @@
+ #endif
+ 
+ #ifdef USE_XRDPGSQL
+-#include <pgsql/libpq-fe.h>
++#include <libpq-fe.h>
+ #endif
+ 
+ 
+diff -Nur netsaint-0.0.7b7.orig/xdata/xsddb.c netsaint-0.0.7b7/xdata/xsddb.c
+--- netsaint-0.0.7b7.orig/xdata/xsddb.c	Sat Aug  4 22:35:40 2001
++++ netsaint-0.0.7b7/xdata/xsddb.c	Fri Dec 14 13:29:46 2001
+@@ -48,7 +48,7 @@
+ #endif
+ 
+ #ifdef USE_XSDPGSQL
+-#include <pgsql/libpq-fe.h>
++#include <libpq-fe.h>
+ #endif
+ 
+ 

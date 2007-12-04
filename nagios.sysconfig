@@ -1,0 +1,4 @@
+# Customized settings for nagios
+
+# Nice level for nagios
+#SERVICE_RUN_NICE_LEVEL="+5"

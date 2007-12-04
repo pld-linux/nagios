@@ -1,0 +1,11 @@
+--- nagios-1.2/configure.in.orig	Tue Feb  3 05:45:08 2004
++++ nagios-1.2/configure.in	Fri May  7 11:28:28 2004
+@@ -533,7 +533,7 @@
+ if test x$TRYGD = xyep; then
+ 
+ 	dnl libiconv is required on some systems - tack it on if found
+-	AC_CHECK_LIB(iconv,main,ICONV=-liconv,)
++	AC_CHECK_FUNC(iconv,,[AC_CHECK_LIB(iconv,iconv,ICONV=-liconv,)])
+ 
+ 	dnl See if the GD lib is available and supports PNG images...
+ 

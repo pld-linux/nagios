@@ -1,0 +1,29 @@
+--- sample-config/resource.cfg.in~	2002-02-26 05:04:12.000000000 +0100
++++ sample-config/resource.cfg.in	2004-04-15 13:57:51.065286208 +0200
+@@ -21,7 +21,7 @@
+ ###########################################################################
+ 
+ # Sets $USER1$ to be the path to the plugins
+-$USER1$=@libexecdir@
++$USER1$=@libexecdir@/nagios/plugins
+ 
+ # Sets $USER2$ to be the path to event handlers
+ #$USER2$=@libexecdir@/eventhandlers
+--- sample-config/resource.cfg.in~	2005-03-06 22:48:02.872945749 +0200
++++ sample-config/resource.cfg.in	2005-03-06 22:51:29.845002873 +0200
+@@ -26,9 +26,11 @@
+ $USER1$=@libexecdir@/nagios/plugins
+ 
+ # Sets $USER2$ to be the path to event handlers
+-#$USER2$=@libexecdir@/eventhandlers
++$USER2$=@libexecdir@/nagios/eventhandlers
+ 
+-# Store some usernames and passwords (hidden from the CGIs)
+-#$USER3$=someuser
+-#$USER4$=somepassword
++# Store MySQL usernames/password (hidden from the CGIs)
++$USER3$=mysql
++#$USER4$=
+ 
++# This is used for SNMP v1 community string in checkcommands.cfg
++$USER5$=public
