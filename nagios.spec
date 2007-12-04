@@ -271,9 +271,9 @@ fi
 %groupadd -g 72 nagios
 %groupadd -g 147 -f nagios-data
 if [ -n "`id -u netsaint 2>/dev/null`" ] && [ "`id -u netsaint`" = "72" ]; then
-	/usr/sbin/usermod -d %{_libdir}/nagios -l nagios -c "Nagios User" -G nagios-data netsaint
+	/usr/sbin/usermod -d %{_libdir}/nagios -l nagios -c "Nagios Daemon" -G nagios-data netsaint
 fi
-%useradd -u 72 -d %{_libdir}/nagios -s /bin/false -c "Nagios User" -g nagios -G nagios-data nagios
+%useradd -u 72 -d %{_libdir}/nagios -s /bin/false -c "Nagios Daemon" -g nagios -G nagios-data nagios
 
 %postun common
 if [ "$1" = "0" ]; then
