@@ -2,23 +2,24 @@
 # Conditional build:
 %bcond_without	gd	# without statusmap and trends, which require gd library
 #
+%define		_rc	rc1
 Summary:	Host/service/network monitoring program
 Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
 Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
-Version:	2.10
-Release:	1
+Version:	3.0
+Release:	1.1
 License:	GPL v2
 Group:		Networking
-Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}.tar.gz
-# Source0-md5:	8c3a29e138f2ff8c8abbd3dd8a40c4b6
+Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}%{_rc}.tar.gz
+# Source0-md5:	d8b4fbf1c2527ddcc18a39372a41dba3
 Source1:	%{name}-apache.conf
 Source2:	%{name}.init
 Source3:	%{name}.sysconfig
 Source4:	http://www.nagios.org/images/favicon.ico
 # Source4-md5:	1c4201c7da53d6c7e48251d3a9680449
-Source5:	%{name}-config-20050514.tar.bz2
-# Source5-md5:	a2883c65377ef7beb55d48af85ec7ef7
+Source5:	%{name}-config-20071217.tar.bz2
+# Source5-md5:	c50e60b73f86b8bfbc36f486d583f67b
 Source6:	%{name}-lighttpd.conf
 Patch0:		%{name}-resources.patch
 Patch1:		%{name}-iconv-in-libc.patch
@@ -170,7 +171,7 @@ Este pacote contém arquivos de cabeçalho usados no desenvolvimento de
 aplicativos para o Nagios.
 
 %prep
-%setup -q
+%setup -q -n %{name}-%{version}%{_rc}
 %patch0 -p0
 %patch1 -p1
 %patch2 -p1
@@ -434,6 +435,8 @@ fi
 %attr(664,root,nagios) %ghost %{_localstatedir}/objects.cache
 %attr(664,root,nagios) %ghost %{_localstatedir}/*.dat
 %attr(664,root,nagios) %ghost %{_localstatedir}/%{name}.tmp
+%attr(770,root,nagios) %dir %{_localstatedir}/spool
+%attr(770,root,nagios) %dir %{_localstatedir}/spool/checkresults
 
 %{_examplesdir}/%{name}-%{version}
 
