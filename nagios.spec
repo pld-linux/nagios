@@ -6,12 +6,12 @@ Summary:	Host/service/network monitoring program
 Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
 Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
-Version:	2.11
+Version:	3.0
 Release:	1
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}.tar.gz
-# Source0-md5:	058c1f4829de748b42da1b584cccc941
+# Source0-md5:	2e7b82622d187d88a3b94f48b8549630
 Source1:	%{name}-apache.conf
 Source2:	%{name}.init
 Source3:	%{name}.sysconfig
@@ -22,8 +22,7 @@ Source5:	%{name}-config-20050514.tar.bz2
 Source6:	%{name}-lighttpd.conf
 Patch0:		%{name}-resources.patch
 Patch1:		%{name}-iconv-in-libc.patch
-Patch2:		%{name}-favicon.patch
-Patch3:		%{name}-webapps.patch
+Patch2:		%{name}-webapps.patch
 URL:		http://www.nagios.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -174,7 +173,6 @@ aplicativos para o Nagios.
 %patch0 -p0
 %patch1 -p1
 %patch2 -p1
-%patch3 -p1
 
 sed -i -e '
 	s,".*/var/rw/nagios.cmd,"%{_localstatedir}/rw/nagios.cmd,
