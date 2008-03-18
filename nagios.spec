@@ -429,6 +429,8 @@ fi
 %attr(770,root,nagios-data) %dir %{_localstatedir}
 %attr(2770,root,nagios-data) %dir %{_localstatedir}/rw
 %attr(660,nagios,nagios-data) %ghost %{_localstatedir}/rw/nagios.cmd
+%attr(2770,root,nagios-data) %dir %{_localstatedir}/spool
+%attr(2770,root,nagios-data) %dir %{_localstatedir}/spool/checkresults
 %attr(664,root,nagios) %ghost %{_localstatedir}/objects.cache
 %attr(664,root,nagios) %ghost %{_localstatedir}/*.dat
 %attr(664,root,nagios) %ghost %{_localstatedir}/%{name}.tmp
