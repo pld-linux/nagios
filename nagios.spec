@@ -38,7 +38,6 @@ Requires(post,preun):	/sbin/chkconfig
 Requires(triggerpostun):	sed >= 4.0
 Requires:	%{name}-common = %{version}-%{release}
 Requires:	/bin/mail
-Requires:	nagios-plugins
 Requires:	rc-scripts
 Requires:	sh-utils
 Provides:	nagios-core
