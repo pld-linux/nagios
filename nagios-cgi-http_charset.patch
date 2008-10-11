@@ -189,9 +189,18 @@
  
  		if(embedded==TRUE)
  			return;
---- nagios-3.0.3/cgi/history.c	2008-06-23 23:47:44.000000000 +0300
-+++ nagios-3.0.3-cgi/cgi/history.c	2008-10-11 12:34:44.480657862 +0300
-@@ -315,7 +315,7 @@
+--- nagios-3.0.3-cgi/cgi/history.c	2008-10-11 12:34:44.480657862 +0300
++++ nagios-3.0.3/cgi/history.c	2008-10-11 12:38:12.164637148 +0300
+@@ -57,6 +57,8 @@
+ extern char url_images_path[MAX_FILENAME_LENGTH];
+ extern char url_stylesheets_path[MAX_FILENAME_LENGTH];
+ 
++extern char *http_charset;
++
+ extern int log_rotation_method;
+ 
+ extern int enable_splunk_integration;
+@@ -315,7 +317,7 @@
  	get_time_string(&expire_time,date_time,sizeof(date_time),HTTP_DATE_TIME);
  	printf("Expires: %s\r\n",date_time);
  
