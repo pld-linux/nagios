@@ -7,7 +7,7 @@ Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
 Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	3.0.3
-Release:	3
+Release:	4
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}.tar.gz
@@ -23,6 +23,7 @@ Source6:	%{name}-lighttpd.conf
 Patch0:		%{name}-resources.patch
 Patch1:		%{name}-iconv-in-libc.patch
 Patch2:		%{name}-webapps.patch
+Patch3:		%{name}-cgi-http_charset.patch
 URL:		http://www.nagios.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -172,6 +173,7 @@ aplicativos para o Nagios.
 %patch0 -p0
 %patch1 -p1
 %patch2 -p1
+%patch3 -p1
 
 sed -i -e '
 	s,".*/var/rw/nagios.cmd,"%{_localstatedir}/rw/nagios.cmd,
