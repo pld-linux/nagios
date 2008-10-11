@@ -1,52 +1,3 @@
---- nagios-3.0.3/base/config.c	2008-04-13 21:34:27.000000000 +0300
-+++ nagios-3.0.3-cgi/base/config.c	2008-10-11 12:34:44.464656939 +0300
-@@ -60,6 +60,7 @@
- 
- extern char     *illegal_object_chars;
- extern char     *illegal_output_chars;
-+extern char     *http_charset;
- 
- extern int      use_regexp_matches;
- extern int      use_true_regexp_matching;
-@@ -1211,6 +1212,8 @@
- 		else if(!strcmp(variable,"illegal_macro_output_chars"))
- 			illegal_output_chars=(char *)strdup(value);
- 
-+		else if(!strcmp(variable,"http_charset"))
-+			http_charset=(char *)strdup(value);
- 
- 		else if(!strcmp(variable,"broker_module")){
- 			modptr=strtok(value," \n");
---- nagios-3.0.3/base/nagios.c	2008-06-25 21:16:30.000000000 +0300
-+++ nagios-3.0.3-cgi/base/nagios.c	2008-10-11 12:34:44.464656939 +0300
-@@ -82,6 +82,7 @@
- 
- char            *illegal_object_chars=NULL;
- char            *illegal_output_chars=NULL;
-+char            *http_charset=NULL;
- 
- int             use_regexp_matches=FALSE;
- int             use_true_regexp_matching=FALSE;
---- nagios-3.0.3/base/utils.c	2008-06-23 23:47:41.000000000 +0300
-+++ nagios-3.0.3-cgi/base/utils.c	2008-10-11 12:34:44.468657170 +0300
-@@ -87,6 +87,7 @@
- 
- extern char     *illegal_object_chars;
- extern char     *illegal_output_chars;
-+extern char     *http_charset;
- 
- extern int      use_regexp_matches;
- extern int      use_true_regexp_matching;
-@@ -4348,6 +4349,9 @@
- 	my_free(illegal_object_chars);
- 	my_free(illegal_output_chars);
- 
-+	/* free http charset variable */
-+	my_free(http_charset);
-+
- 	/* free nagios user and group */
- 	my_free(nagios_user);
- 	my_free(nagios_group);
 --- nagios-3.0.3/cgi/avail.c	2008-06-23 23:47:42.000000000 +0300
 +++ nagios-3.0.3-cgi/cgi/avail.c	2008-10-11 12:34:44.496658785 +0300
 @@ -37,6 +37,8 @@
@@ -412,16 +363,6 @@
  
  		if(embedded==TRUE)
  			return;
---- nagios-3.0.3/common/macros.c	2008-06-23 23:47:47.000000000 +0300
-+++ nagios-3.0.3-cgi/common/macros.c	2008-10-11 12:34:44.468657170 +0300
-@@ -40,6 +40,7 @@
- #endif
- 
- extern char     *illegal_output_chars;
-+extern char     *http_charset;
- 
- extern contact		*contact_list;
- extern contactgroup	*contactgroup_list;
 --- nagios-3.0.3/include/cgiutils.h.in	2007-11-11 01:34:26.000000000 +0200
 +++ nagios-3.0.3-cgi/include/cgiutils.h.in	2008-10-11 12:34:44.468657170 +0300
 @@ -422,6 +422,9 @@
