@@ -1,0 +1,441 @@
+--- nagios-3.0.3/base/config.c	2008-04-13 21:34:27.000000000 +0300
++++ nagios-3.0.3-cgi/base/config.c	2008-10-11 12:34:44.464656939 +0300
+@@ -60,6 +60,7 @@
+ 
+ extern char     *illegal_object_chars;
+ extern char     *illegal_output_chars;
++extern char     *http_charset;
+ 
+ extern int      use_regexp_matches;
+ extern int      use_true_regexp_matching;
+@@ -1211,6 +1212,8 @@
+ 		else if(!strcmp(variable,"illegal_macro_output_chars"))
+ 			illegal_output_chars=(char *)strdup(value);
+ 
++		else if(!strcmp(variable,"http_charset"))
++			http_charset=(char *)strdup(value);
+ 
+ 		else if(!strcmp(variable,"broker_module")){
+ 			modptr=strtok(value," \n");
+--- nagios-3.0.3/base/nagios.c	2008-06-25 21:16:30.000000000 +0300
++++ nagios-3.0.3-cgi/base/nagios.c	2008-10-11 12:34:44.464656939 +0300
+@@ -82,6 +82,7 @@
+ 
+ char            *illegal_object_chars=NULL;
+ char            *illegal_output_chars=NULL;
++char            *http_charset=NULL;
+ 
+ int             use_regexp_matches=FALSE;
+ int             use_true_regexp_matching=FALSE;
+--- nagios-3.0.3/base/utils.c	2008-06-23 23:47:41.000000000 +0300
++++ nagios-3.0.3-cgi/base/utils.c	2008-10-11 12:34:44.468657170 +0300
+@@ -87,6 +87,7 @@
+ 
+ extern char     *illegal_object_chars;
+ extern char     *illegal_output_chars;
++extern char     *http_charset;
+ 
+ extern int      use_regexp_matches;
+ extern int      use_true_regexp_matching;
+@@ -4348,6 +4349,9 @@
+ 	my_free(illegal_object_chars);
+ 	my_free(illegal_output_chars);
+ 
++	/* free http charset variable */
++	my_free(http_charset);
++
+ 	/* free nagios user and group */
+ 	my_free(nagios_user);
+ 	my_free(nagios_group);
+--- nagios-3.0.3/cgi/avail.c	2008-06-23 23:47:42.000000000 +0300
++++ nagios-3.0.3-cgi/cgi/avail.c	2008-10-11 12:34:44.496658785 +0300
+@@ -37,6 +37,8 @@
+ extern char url_images_path[MAX_FILENAME_LENGTH];
+ extern char url_stylesheets_path[MAX_FILENAME_LENGTH];
+ 
++extern char *http_charset;
++
+ extern host      *host_list;
+ extern hostgroup *hostgroup_list;
+ extern servicegroup *servicegroup_list;
+@@ -1079,9 +1081,9 @@
+ 	printf("Expires: %s\r\n",date_time);
+ 
+ 	if(output_format==HTML_OUTPUT)
+-		printf("Content-type: text/html\r\n\r\n");
++		printf("Content-type: text/html; charset=\"%s\"\r\n\r\n", http_charset);
+ 	else{
+-		printf("Content-type: text/plain\r\n\r\n");
++		printf("Content-type: text/plain; charset=\"%s\"\r\n\r\n", http_charset);
+ 		return;
+ 	        }
+ 
+--- nagios-3.0.3/cgi/cgiutils.c	2008-06-23 23:47:44.000000000 +0300
++++ nagios-3.0.3-cgi/cgi/cgiutils.c	2008-10-11 12:34:44.472657400 +0300
+@@ -55,6 +55,7 @@
+ char            *statuswrl_include=NULL;
+ 
+ char            *illegal_output_chars=NULL;
++char            *http_charset=NULL;
+ 
+ char            *notes_url_target=NULL;
+ char            *action_url_target=NULL;
+@@ -188,6 +189,9 @@
+ 	host_unreachable_sound=NULL;
+ 	normal_sound=NULL;
+ 
++	my_free(http_charset);
++	http_charset = strdup(DEFAULT_HTTP_CHARSET);
++
+ 	statusmap_background_image=NULL;
+ 	statuswrl_include=NULL;
+ 
+@@ -391,6 +395,9 @@
+ 		else if(!strcmp(var,"illegal_macro_output_chars"))
+ 			illegal_output_chars=strdup(val);
+ 
++		else if(!strcmp(var,"http_charset"))
++			http_charset=strdup(val);
++
+ 		else if(!strcmp(var,"notes_url_target"))
+ 			notes_url_target=strdup(val);
+ 
+--- nagios-3.0.3/cgi/cmd.c	2008-05-19 21:42:26.000000000 +0300
++++ nagios-3.0.3-cgi/cgi/cmd.c	2008-10-11 12:34:44.496658785 +0300
+@@ -39,6 +39,8 @@
+ 
+ extern char url_stylesheets_path[MAX_FILENAME_LENGTH];
+ 
++extern char *http_charset;
++
+ extern int  nagios_process_state;
+ 
+ extern int  check_external_commands;
+@@ -235,7 +237,7 @@
+ 
+ 	if(content_type==WML_CONTENT){
+ 
+-		printf("Content-type: text/vnd.wap.wml\r\n\r\n");
++		printf("Content-type: text/vnd.wap.wml; charset=\"%s\"\r\n\r\n", http_charset);
+ 
+ 		printf("<?xml version=\"1.0\"?>\n");
+ 		printf("<!DOCTYPE wml PUBLIC \"-//WAPFORUM//DTD WML 1.1//EN\" \"http://www.wapforum.org/DTD/wml_1.1.xml\">\n");
+@@ -247,7 +249,7 @@
+ 
+ 	else{
+ 
+-		printf("Content-type: text/html\r\n\r\n");
++		printf("Content-type: text/html; charset=\"%s\"\r\n\r\n", http_charset);
+ 
+ 		printf("<html>\n");
+ 		printf("<head>\n");
+--- nagios-3.0.3/cgi/config.c	2008-04-13 21:34:27.000000000 +0300
++++ nagios-3.0.3-cgi/cgi/config.c	2008-10-11 12:34:44.496658785 +0300
+@@ -37,6 +37,8 @@
+ extern char   url_logo_images_path[MAX_FILENAME_LENGTH];
+ extern char   url_stylesheets_path[MAX_FILENAME_LENGTH];
+ 
++extern char *http_charset;
++
+ extern host *host_list;
+ extern service *service_list;
+ extern hostgroup *hostgroup_list;
+@@ -293,7 +295,7 @@
+ 	printf("Pragma: no-cache\r\n");
+ 	printf("Last-Modified: %s\r\n",date_time);
+ 	printf("Expires: %s\r\n",date_time);
+-	printf("Content-type: text/html\r\n\r\n");
++	printf("Content-type: text/html; charset=\"%s\"\r\n\r\n", http_charset);
+ 
+ 	printf("<html>\n");
+ 	printf("<head>\n");
+--- nagios-3.0.3/cgi/extinfo.c	2008-01-24 04:51:30.000000000 +0200
++++ nagios-3.0.3-cgi/cgi/extinfo.c	2008-10-11 12:34:44.500659016 +0300
+@@ -38,6 +38,8 @@
+ extern int              nagios_process_state;
+ extern int              refresh_rate;
+ 
++extern char *http_charset;
++
+ extern time_t		program_start;
+ extern int              nagios_pid;
+ extern int              daemon_mode;
+@@ -584,7 +586,7 @@
+ 	get_time_string(&expire_time,date_time,(int)sizeof(date_time),HTTP_DATE_TIME);
+ 	printf("Expires: %s\r\n",date_time);
+ 
+-	printf("Content-type: text/html\r\n\r\n");
++	printf("Content-type: text/html; charset=\"%s\"\r\n\r\n", http_charset);
+ 
+ 	if(embedded==TRUE)
+ 		return;
+--- nagios-3.0.3/cgi/histogram.c	2008-05-19 21:42:26.000000000 +0300
++++ nagios-3.0.3-cgi/cgi/histogram.c	2008-10-11 12:34:44.512659708 +0300
+@@ -130,6 +130,8 @@
+ extern char url_stylesheets_path[MAX_FILENAME_LENGTH];
+ extern char physical_images_path[MAX_FILENAME_LENGTH];
+ 
++extern char *http_charset;
++
+ extern int     log_rotation_method;
+ 
+ extern host *host_list;
+@@ -994,7 +996,7 @@
+ 		get_time_string(&expire_time,date_time,sizeof(date_time),HTTP_DATE_TIME);
+ 		printf("Expires: %s\r\n",date_time);
+ 
+-		printf("Content-type: text/html\r\n\r\n");
++		printf("Content-type: text/html; charset=\"%s\"\r\n\r\n", http_charset);
+ 
+ 		if(embedded==TRUE)
+ 			return;
+--- nagios-3.0.3/cgi/history.c	2008-06-23 23:47:44.000000000 +0300
++++ nagios-3.0.3-cgi/cgi/history.c	2008-10-11 12:34:44.480657862 +0300
+@@ -315,7 +315,7 @@
+ 	get_time_string(&expire_time,date_time,sizeof(date_time),HTTP_DATE_TIME);
+ 	printf("Expires: %s\r\n",date_time);
+ 
+-	printf("Content-type: text/html\r\n\r\n");
++	printf("Content-type: text/html; charset=\"%s\"\r\n\r\n", http_charset);
+ 
+ 	if(embedded==TRUE)
+ 		return;
+--- nagios-3.0.3/cgi/notifications.c	2008-05-19 21:42:27.000000000 +0300
++++ nagios-3.0.3-cgi/cgi/notifications.c	2008-10-11 12:34:44.500659016 +0300
+@@ -37,6 +37,8 @@
+ extern char url_docs_path[MAX_FILENAME_LENGTH];
+ extern char url_stylesheets_path[MAX_FILENAME_LENGTH];
+ 
++extern char *http_charset;
++
+ extern int    log_rotation_method;
+ 
+ 
+@@ -303,7 +305,7 @@
+ 	get_time_string(&expire_time,date_time,(int)sizeof(date_time),HTTP_DATE_TIME);
+ 	printf("Expires: %s\r\n",date_time);
+ 
+-	printf("Content-type: text/html\r\n\r\n");
++	printf("Content-type: text/html; charset=\"%s\"\r\n\r\n", http_charset);
+ 
+ 	if(embedded==TRUE)
+ 		return;
+--- nagios-3.0.3/cgi/outages.c	2008-01-09 19:51:23.000000000 +0200
++++ nagios-3.0.3-cgi/cgi/outages.c	2008-10-11 12:34:44.500659016 +0300
+@@ -39,6 +39,8 @@
+ extern hoststatus *hoststatus_list;
+ extern servicestatus *servicestatus_list;
+ 
++extern char *http_charset;
++
+ extern char main_config_file[MAX_FILENAME_LENGTH];
+ extern char url_html_path[MAX_FILENAME_LENGTH];
+ extern char url_stylesheets_path[MAX_FILENAME_LENGTH];
+@@ -215,7 +217,7 @@
+ 	get_time_string(&expire_time,date_time,(int)sizeof(date_time),HTTP_DATE_TIME);
+ 	printf("Expires: %s\r\n",date_time);
+ 
+-	printf("Content-type: text/html\r\n\r\n");
++	printf("Content-type: text/html; charset=\"%s\"\r\n\r\n", http_charset);
+ 
+ 	if(embedded==TRUE)
+ 		return;
+--- nagios-3.0.3/cgi/showlog.c	2008-01-09 19:51:23.000000000 +0200
++++ nagios-3.0.3-cgi/cgi/showlog.c	2008-10-11 12:34:44.500659016 +0300
+@@ -37,6 +37,8 @@
+ extern char   url_images_path[MAX_FILENAME_LENGTH];
+ extern char   url_stylesheets_path[MAX_FILENAME_LENGTH];
+ 
++extern char *http_charset;
++
+ extern int    log_rotation_method;
+ 
+ extern int    enable_splunk_integration;
+@@ -188,7 +190,7 @@
+ 	get_time_string(&expire_time,date_time,(int)sizeof(date_time),HTTP_DATE_TIME);
+ 	printf("Expires: %s\r\n",date_time);
+ 
+-	printf("Content-type: text/html\r\n\r\n");
++	printf("Content-type: text/html; charset=\"%s\"\r\n\r\n", http_charset);
+ 
+ 	if(embedded==TRUE)
+ 		return;
+--- nagios-3.0.3/cgi/status.c	2008-06-23 23:47:46.000000000 +0300
++++ nagios-3.0.3-cgi/cgi/status.c	2008-10-11 12:34:44.504659246 +0300
+@@ -44,6 +44,8 @@
+ extern char url_media_path[MAX_FILENAME_LENGTH];
+ extern char log_file[MAX_FILENAME_LENGTH];
+ 
++extern char *http_charset;
++
+ extern char *service_critical_sound;
+ extern char *service_warning_sound;
+ extern char *service_unknown_sound;
+@@ -503,7 +505,7 @@
+ 	get_time_string(&expire_time,date_time,(int)sizeof(date_time),HTTP_DATE_TIME);
+ 	printf("Expires: %s\r\n",date_time);
+ 
+-	printf("Content-type: text/html\r\n\r\n");
++	printf("Content-type: text/html; charset=\"%s\"\r\n\r\n", http_charset);
+ 
+ 	if(embedded==TRUE)
+ 		return;
+--- nagios-3.0.3/cgi/statusmap.c	2008-05-19 21:42:28.000000000 +0300
++++ nagios-3.0.3-cgi/cgi/statusmap.c	2008-10-11 12:34:44.508659477 +0300
+@@ -54,6 +54,8 @@
+ extern char url_logo_images_path[MAX_FILENAME_LENGTH];
+ extern char url_stylesheets_path[MAX_FILENAME_LENGTH];
+ 
++extern char *http_charset;
++
+ extern host *host_list;
+ extern hostgroup *hostgroup_list;
+ extern service *service_list;
+@@ -320,7 +322,7 @@
+ 		get_time_string(&expire_time,date_time,sizeof(date_time),HTTP_DATE_TIME);
+ 		printf("Expires: %s\r\n",date_time);
+ 
+-		printf("Content-Type: text/html\r\n\r\n");
++		printf("Content-Type: text/html; charset=\"%s\"\r\n\r\n", http_charset);
+ 
+ 		if(embedded==TRUE)
+ 			return;
+--- nagios-3.0.3/cgi/statuswml.c	2008-05-19 21:42:28.000000000 +0300
++++ nagios-3.0.3-cgi/cgi/statuswml.c	2008-10-11 12:34:44.504659246 +0300
+@@ -40,6 +40,8 @@
+ extern hoststatus *hoststatus_list;
+ extern servicestatus *servicestatus_list;
+ 
++extern char *http_charset;
++
+ extern int      enable_notifications;
+ extern int      execute_service_checks;
+ extern int      nagios_process_state;
+@@ -193,7 +195,7 @@
+ 	get_time_string(&expire_time,date_time,(int)sizeof(date_time),HTTP_DATE_TIME);
+ 	printf("Expires: %s\r\n",date_time);
+ 
+-	printf("Content-type: text/vnd.wap.wml\r\n\r\n");
++	printf("Content-type: text/vnd.wap.wml; charset=\"%s\"\r\n\r\n", http_charset);
+ 
+ 	printf("<?xml version=\"1.0\"?>\n");
+ 	printf("<!DOCTYPE wml PUBLIC \"-//WAPFORUM//DTD WML 1.1//EN\" \"http://www.wapforum.org/DTD/wml_1.1.xml\">\n");
+--- nagios-3.0.3/cgi/statuswrl.c	2007-07-16 19:41:46.000000000 +0300
++++ nagios-3.0.3-cgi/cgi/statuswrl.c	2008-10-11 12:34:44.508659477 +0300
+@@ -41,6 +41,8 @@
+ extern char url_images_path[MAX_FILENAME_LENGTH];
+ extern char url_logo_images_path[MAX_FILENAME_LENGTH];
+ 
++extern char *http_charset;
++
+ extern char *statuswrl_include;
+ 
+ extern host *host_list;
+@@ -202,7 +204,7 @@
+ 	get_time_string(&expire_time,date_time,sizeof(date_time),HTTP_DATE_TIME);
+ 	printf("Expires: %s\r\n",date_time);
+ 
+-	printf("Content-Type: x-world/x-vrml\r\n\r\n");
++	printf("Content-Type: x-world/x-vrml; charset=\"%s\"\r\n\r\n", http_charset);
+ 
+ 	return;
+         }
+--- nagios-3.0.3/cgi/summary.c	2008-01-24 04:51:30.000000000 +0200
++++ nagios-3.0.3-cgi/cgi/summary.c	2008-10-11 12:34:44.504659246 +0300
+@@ -37,6 +37,8 @@
+ extern char url_images_path[MAX_FILENAME_LENGTH];
+ extern char url_stylesheets_path[MAX_FILENAME_LENGTH];
+ 
++extern char *http_charset;
++
+ extern host *host_list;
+ extern hostgroup *hostgroup_list;
+ extern service *service_list;
+@@ -698,9 +700,9 @@
+ 	printf("Expires: %s\r\n",date_time);
+ 
+ 	if(output_format==HTML_OUTPUT)
+-		printf("Content-type: text/html\r\n\r\n");
++		printf("Content-type: text/html; charset=\"%s\"\r\n\r\n", http_charset);
+ 	else{
+-		printf("Content-type: text/plain\r\n\r\n");
++		printf("Content-type: text/plain; charset=\"%s\"\r\n\r\n", http_charset);
+ 		return;
+ 	        }
+ 
+--- nagios-3.0.3/cgi/tac.c	2008-02-21 08:17:37.000000000 +0200
++++ nagios-3.0.3-cgi/cgi/tac.c	2008-10-11 12:34:44.508659477 +0300
+@@ -52,6 +52,8 @@
+ extern char   url_stylesheets_path[MAX_FILENAME_LENGTH];
+ extern char   url_media_path[MAX_FILENAME_LENGTH];
+ 
++extern char *http_charset;
++
+ extern int    refresh_rate;
+ 
+ extern char *service_critical_sound;
+@@ -381,7 +383,7 @@
+ 	get_time_string(&expire_time,date_time,(int)sizeof(date_time),HTTP_DATE_TIME);
+ 	printf("Expires: %s\r\n",date_time);
+ 
+-	printf("Content-type: text/html\r\n\r\n");
++	printf("Content-type: text/html; charset=\"%s\"\r\n\r\n", http_charset);
+ 
+ 	if(embedded==TRUE)
+ 		return;
+--- nagios-3.0.3/cgi/trends.c	2008-06-23 23:47:46.000000000 +0300
++++ nagios-3.0.3-cgi/cgi/trends.c	2008-10-11 12:34:44.512659708 +0300
+@@ -44,6 +44,8 @@
+ extern char url_stylesheets_path[MAX_FILENAME_LENGTH];
+ extern char physical_images_path[MAX_FILENAME_LENGTH];
+ 
++extern char *http_charset;
++
+ extern int     log_rotation_method;
+ 
+ extern host *host_list;
+@@ -1114,7 +1116,7 @@
+ 		get_time_string(&expire_time,date_time,sizeof(date_time),HTTP_DATE_TIME);
+ 		printf("Expires: %s\r\n",date_time);
+ 
+-		printf("Content-type: text/html\r\n\r\n");
++		printf("Content-type: text/html; charset=\"%s\"\r\n\r\n", http_charset);
+ 
+ 		if(embedded==TRUE)
+ 			return;
+--- nagios-3.0.3/common/macros.c	2008-06-23 23:47:47.000000000 +0300
++++ nagios-3.0.3-cgi/common/macros.c	2008-10-11 12:34:44.468657170 +0300
+@@ -40,6 +40,7 @@
+ #endif
+ 
+ extern char     *illegal_output_chars;
++extern char     *http_charset;
+ 
+ extern contact		*contact_list;
+ extern contactgroup	*contactgroup_list;
+--- nagios-3.0.3/include/cgiutils.h.in	2007-11-11 01:34:26.000000000 +0200
++++ nagios-3.0.3-cgi/include/cgiutils.h.in	2008-10-11 12:34:44.468657170 +0300
+@@ -422,6 +422,9 @@
+ #define LIFO_ERROR_FILE		2
+ #define LIFO_ERROR_DATA		3
+ 
++/************************** HTTP CHARSET ****************************/
++
++#define DEFAULT_HTTP_CHARSET "iso8859-1"
+ 
+ 
+ 
+--- nagios-3.0.3/sample-config/cgi.cfg.in	2007-10-07 22:42:52.000000000 +0300
++++ nagios-3.0.3-cgi/sample-config/cgi.cfg.in	2008-10-11 12:34:44.472657400 +0300
+@@ -36,6 +36,11 @@
+ url_html_path=@htmurl@
+ 
+ 
++# HTTP CHARSET
++# This defines charset that is sent with HTTP headers.
++
++http_charset=iso8859-1
++
+ 
+ # CONTEXT-SENSITIVE HELP
+ # This option determines whether or not a context-sensitive
