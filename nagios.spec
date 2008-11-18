@@ -7,7 +7,7 @@ Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
 Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	3.0.5
-Release:	1
+Release:	2
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}.tar.gz
@@ -266,7 +266,7 @@ if [ "$1" = "0" ] ; then
 fi
 
 %pre common
-if [ "`getgid netsaint`" = "72" ]; then
+if [ "`getgid netsaint 2>/dev/null`" = "72" ]; then
 	/usr/sbin/groupmod -n nagios netsaint
 fi
 %groupadd -g 72 nagios
