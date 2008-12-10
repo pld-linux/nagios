@@ -262,15 +262,15 @@
  			return;
 --- nagios-3.0.3/cgi/statuswml.c	2008-05-19 21:42:28.000000000 +0300
 +++ nagios-3.0.3-cgi/cgi/statuswml.c	2008-10-11 12:34:44.504659246 +0300
-@@ -40,6 +40,8 @@
- extern hoststatus *hoststatus_list;
- extern servicestatus *servicestatus_list;
+@@ -47,6 +47,8 @@
  
-+extern char *http_charset;
+ extern char     *ping_syntax;
+ 
++extern char	*http_charset;
 +
- extern int      enable_notifications;
- extern int      execute_service_checks;
- extern int      nagios_process_state;
+ #define DISPLAY_HOST		        0
+ #define DISPLAY_SERVICE                 1
+ #define DISPLAY_HOSTGROUP               2
 @@ -193,7 +195,7 @@
  	get_time_string(&expire_time,date_time,(int)sizeof(date_time),HTTP_DATE_TIME);
  	printf("Expires: %s\r\n",date_time);
