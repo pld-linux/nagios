@@ -1,6 +1,8 @@
 #
 # Conditional build:
 %bcond_without	gd	# without statusmap and trends, which require gd library
+# reeenable when http://tracker.nagios.org/view.php?id=51 is fixed
+%bcond_with	tests
 #
 Summary:	Host/service/network monitoring program
 Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
@@ -198,10 +200,13 @@ cp -f /usr/share/automake/config.sub .
 	--with-command-grp=%{name} \
 	--with-lockfile=%{_localstatedir}/%{name}.pid \
 	--with-ping_command='/bin/ping -n %%s -c %%d' \
-	--enable-event-broker \
-	%{!?with_gd:--disable-statusmap --disable-trends}
+	%{!?with_gd:--disable-statusmap --disable-trends} \
+	%{?with_tests:--enable-libtap} \
+	--enable-event-broker
 
 %{__make} all
+
+%{?with_tests:%{__make} test}
 
 %install
 rm -rf $RPM_BUILD_ROOT
