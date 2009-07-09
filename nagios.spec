@@ -6,12 +6,12 @@ Summary:	Host/service/network monitoring program
 Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
 Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
-Version:	3.0.6
+Version:	3.1.2
 Release:	1
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}.tar.gz
-# Source0-md5:	900e3f4164f4b2a18485420eeaefe812
+# Source0-md5:	f3c60428cba14264c709749182b8d93e
 Source1:	%{name}-apache.conf
 Source2:	%{name}.init
 Source3:	%{name}.sysconfig
@@ -140,6 +140,7 @@ Interfejs CGI dla Nagiosa.
 Summary:	Default Nagios theme
 Summary(pl.UTF-8):	Domyślny motyw Nagiosa
 Group:		Applications/WWW
+Requires:	webserver(php)
 Requires:	nagios-cgi = %{version}-%{release}
 Provides:	nagios-theme
 Obsoletes:	nagios-theme
@@ -190,6 +191,7 @@ cp -f /usr/share/automake/config.sub .
 %{__aclocal}
 %{__autoconf}
 %configure \
+	--datarootdir=%{_datadir} \
 	--with-nagios-user=%{name} \
 	--with-nagios-grp=%{name} \
 	--with-command-user=%{name} \
@@ -468,6 +470,7 @@ fi
 %attr(755,root,root) %{_sbindir}/*.cgi
 
 %dir %{_datadir}
+%dir %{_datadir}/includes
 %dir %{_datadir}/images
 %dir %{_datadir}/stylesheets
 %{_datadir}/favicon.ico
@@ -479,7 +482,8 @@ fi
 
 %files theme-default
 %defattr(644,root,root,755)
-%{_datadir}/*.html
+%{_datadir}/*.php
+%{_datadir}/includes/*
 %{_datadir}/images/*
 %{_datadir}/stylesheets/*
 
