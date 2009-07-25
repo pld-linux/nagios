@@ -41,9 +41,16 @@ checkconfig() {
 
 	if [ $details = 1 ]; then
 		# run config test and display report (status action)
-		show "Checking %s configuration" "Nagios"; busy; echo
-		configtest
+		show "Checking %s configuration" "Nagios"; busy
+		local out
+		out=`configtest 2>&1`
 		RETVAL=$?
+		if [ $RETVAL = 0 ]; then
+			ok
+		else
+			fail
+			echo >&2 "$out"
+		fi
 	else
 		# run config test and abort with nice message if failed
 		# (for actions checking status before action).
