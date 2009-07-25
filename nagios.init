@@ -27,12 +27,8 @@ fi
 
 # configtest itself
 configtest() {
-	local rc out
-	out=`/usr/sbin/nagios -v /etc/nagios/nagios.cfg 2>&1`; rc=$?
-	if [ $rc -gt 0 ]; then
-		echo >&2 "$out"
-	fi
-	return $rc
+	/usr/sbin/nagios -v /etc/nagios/nagios.cfg 2>&1
+	return $?
 }
 
 # wrapper for configtest:
@@ -49,8 +45,8 @@ checkconfig() {
 			ok
 		else
 			fail
-			echo >&2 "$out"
 		fi
+		[ "$out" ] && echo >&2 "$out"
 	else
 		# run config test and abort with nice message if failed
 		# (for actions checking status before action).
@@ -95,18 +91,6 @@ stop() {
 	rm -f /var/lock/subsys/nagios > /dev/null 2>&1
 }
 
-condrestart() {
-	if [ ! -f /var/lock/subsys/nagios ]; then
-		msg_not_running "Nagios"
-		RETVAL=$1
-		return
-	fi
-
-	checkconfig
-	stop
-	start
-}
-
 reload() {
 	if [ ! -f /var/lock/subsys/nagios ]; then
 		msg_not_running "Nagios"
@@ -119,6 +103,18 @@ reload() {
 
 	killproc nagios -HUP
 	RETVAL=$?
+}
+
+condrestart() {
+	if [ ! -f /var/lock/subsys/nagios ]; then
+		msg_not_running "Nagios"
+		RETVAL=$1
+		return
+	fi
+
+	checkconfig
+	stop
+	start
 }
 
 RETVAL=0
@@ -141,7 +137,7 @@ case "$1" in
   reload|force-reload)
   	reload
 	;;
-  checkconfig|check|configtest)
+  checkconfig|configtest)
 	checkconfig 1
 	;;
   status)
