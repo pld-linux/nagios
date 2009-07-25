@@ -18,7 +18,7 @@
 # Check that networking is up.
 if is_yes "${NETWORKING}"; then
 	if [ ! -f /var/lock/subsys/network -a "$1" != stop -a "$1" != status ]; then
-		msg_network_down Nagios
+		msg_network_down "Nagios"
 		exit 1
 	fi
 else
@@ -37,70 +37,91 @@ checkconfig() {
 
 start() {
 	# Check if the service is already running?
-	if [ ! -f /var/lock/subsys/nagios ]; then
-		msg_starting Nagios
-		checkconfig || exit
+	if [ -f /var/lock/subsys/nagios ]; then
+		msg_already_running "Nagios"
+		return
+	fi
 
-		# remove stale cmd pipe (or nagios won't start if it exists)
-		rm -f /var/lib/nagios/rw/nagios.cmd
-		daemon /usr/sbin/nagios -d /etc/nagios/nagios.cfg </dev/null
-		RETVAL=$?
-		if [ $RETVAL -eq 0 ]; then
-			touch /var/lock/subsys/nagios
-		fi
-	else
-		msg_already_running Nagios
+	msg_starting "Nagios"
+	checkconfig || exit
+
+	# remove stale cmd pipe (or nagios won't start if it exists)
+	rm -f /var/lib/nagios/rw/nagios.cmd
+	daemon /usr/sbin/nagios -d /etc/nagios/nagios.cfg </dev/null
+	RETVAL=$?
+	if [ $RETVAL -eq 0 ]; then
+		touch /var/lock/subsys/nagios
 	fi
 }
 
 stop() {
 	# Stop daemons.
-	if [ -f /var/lock/subsys/nagios ]; then
-		msg_stopping Nagios
-		killproc nagios -TERM
-		rm -f /var/lock/subsys/nagios > /dev/null 2>&1
-	else
-		msg_not_running Nagios
+	if [ ! -f /var/lock/subsys/nagios ]; then
+		msg_not_running "Nagios"
+		return
 	fi
+
+	msg_stopping "Nagios"
+	killproc nagios -TERM
+	rm -f /var/lock/subsys/nagios > /dev/null 2>&1
+}
+
+condrestart() {
+	if [ ! -f /var/lock/subsys/nagios ]; then
+		msg_not_running "Nagios"
+		RETVAL=$1
+		return
+	fi
+
+	stop
+	start
+}
+
+reload() {
+	if [ ! -f /var/lock/subsys/nagios ]; then
+		msg_not_running "Nagios"
+		RETVAL=7
+		return
+	fi
+
+	msg_reloading "Nagios"
+	checkconfig || exit
+
+	killproc nagios -HUP
+	RETVAL=$?
 }
 
 RETVAL=0
 # See how we were called.
 case "$1" in
-start)
+  start)
 	start
 	;;
-stop)
+  stop)
 	stop
 	;;
-checkconfig|check|configtest)
-	/usr/sbin/nagios -v /etc/nagios/nagios.cfg
-	exit $?
-	;;
-reload|force-reload)
-	if [ -f /var/lock/subsys/nagios ]; then
-		msg_reloading Nagios
-		checkconfig || exit
-
-		killproc nagios -HUP
-		RETVAL=$?
-	else
-		msg_not_running Nagios
-		exit 7
-	fi
-	;;
-restart)
-	msg_reloading Nagios
+  restart)
+	msg_reloading "Nagios"
 	checkconfig || exit && started
 	stop
 	start
 	;;
-status)
-	status nagios
+  try-restart)
+	condrestart 0
+	;;
+  reload|force-reload)
+  	reload
+	;;
+  checkconfig|check|configtest)
+	/usr/sbin/nagios -v /etc/nagios/nagios.cfg
 	exit $?
 	;;
+  status)
+	status nagios
+	RETVAL=$?
+	;;
 *)
-	msg_usage "$0 {start|stop|restart|reload|force-reload|status|checkconfig}"
+	msg_usage "$0 {start|stop|restart|try-restart|reload|force-reload|checkconfig|status}"
 	exit 3
 esac
 
