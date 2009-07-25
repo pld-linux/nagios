@@ -25,14 +25,36 @@ else
 	exit 0
 fi
 
-checkconfig() {
-	/usr/sbin/nagios -v /etc/nagios/nagios.cfg > /dev/null
-	rc=$?
+# configtest itself
+configtest() {
+	local rc out
+	out=`/usr/sbin/nagios -v /etc/nagios/nagios.cfg 2>&1`; rc=$?
 	if [ $rc -gt 0 ]; then
-		fail
-		nls 'The configuration is broken. See details with %s "checkconfig"' /etc/rc.d/init.d/nagios
+		echo >&2 "$out"
 	fi
 	return $rc
+}
+
+# wrapper for configtest:
+checkconfig() {
+	local details=${1:-0}
+
+	if [ $details = 1 ]; then
+		# run config test and display report (status action)
+		show "Checking %s configuration" "Nagios"; busy; echo
+		configtest
+		RETVAL=$?
+	else
+		# run config test and abort with nice message if failed
+		# (for actions checking status before action).
+		configtest >/dev/null 2>&1
+		RETVAL=$?
+		if [ $RETVAL != 0 ]; then
+			show "Checking %s configuration" "Nagios"; fail
+			nls 'Configuration test failed. See details with %s "checkconfig"' $0
+			exit $RETVAL
+		fi
+	fi
 }
 
 start() {
@@ -42,8 +64,8 @@ start() {
 		return
 	fi
 
+	checkconfig
 	msg_starting "Nagios"
-	checkconfig || exit
 
 	# remove stale cmd pipe (or nagios won't start if it exists)
 	rm -f /var/lib/nagios/rw/nagios.cmd
@@ -73,6 +95,7 @@ condrestart() {
 		return
 	fi
 
+	checkconfig
 	stop
 	start
 }
@@ -84,8 +107,8 @@ reload() {
 		return
 	fi
 
+	checkconfig
 	msg_reloading "Nagios"
-	checkconfig || exit
 
 	killproc nagios -HUP
 	RETVAL=$?
@@ -101,8 +124,7 @@ case "$1" in
 	stop
 	;;
   restart)
-	msg_reloading "Nagios"
-	checkconfig || exit && started
+	checkconfig
 	stop
 	start
 	;;
@@ -113,8 +135,7 @@ case "$1" in
   	reload
 	;;
   checkconfig|check|configtest)
-	/usr/sbin/nagios -v /etc/nagios/nagios.cfg
-	exit $?
+	checkconfig 1
 	;;
   status)
 	status nagios
