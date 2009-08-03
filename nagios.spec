@@ -40,7 +40,6 @@ BuildRequires:	rpmbuild(macros) >= 1.268
 BuildRequires:	sed >= 4.0
 BuildRequires:	tar >= 1:1.15.1
 Requires(post,preun):	/sbin/chkconfig
-Requires(triggerpostun):	sed >= 4.0
 Requires:	%{name}-common = %{version}-%{release}
 Requires:	/bin/mail
 Requires:	nagios-notify
@@ -347,7 +346,7 @@ chown root:http %{_sysconfdir}/cgi.cfg
 
 %triggerpostun -- nagios < 3.1.2-3
 # restore lost files
-for a in services.cfg serviceextinfo.cfg hosts.cfg hostgroups.cfg hostextinfo.cfg escalations.cfg checkcommands.cfg misccommands.cfg; do
+for a in dependencies.cfg services.cfg serviceextinfo.cfg hosts.cfg hostgroups.cfg hostextinfo.cfg escalations.cfg checkcommands.cfg misccommands.cfg; do
 	if [ -f %{_sysconfdir}/$a.rpmsave -a ! -f %{_sysconfdir}/$a ]; then
 		mv -f %{_sysconfdir}/$a{.rpmsave,}
 	fi
