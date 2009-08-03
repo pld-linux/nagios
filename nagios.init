@@ -79,7 +79,7 @@ start() {
 
 	# we're safe to use -x as we did verify config prior startup
 	# precached object file also is created in configtest.
-	daemon /usr/sbin/nagios ${precached_object_file:+-u} -d $cfg_file
+	daemon /usr/sbin/nagios ${precached_object_file:+-u} -x -d $cfg_file
 	RETVAL=$?
 	if [ $RETVAL -eq 0 ]; then
 		touch /var/lock/subsys/nagios
