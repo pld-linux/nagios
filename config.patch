@@ -36,3 +36,90 @@
  
 -
 +# vim:ts=8:sw=8:syn=cfg
+--- nagios-3.1.2/sample-config/resource.cfg.in	2009-08-03 18:41:56.770015075 +0300
++++ svn/nagios-config/trunk/resource.cfg	2009-08-03 18:42:15.413396493 +0300
+@@ -1,8 +1,6 @@
+ ###########################################################################
+ #
+-# RESOURCE.CFG - Sample Resource File for Nagios @VERSION@
+-#
+-# Last Modified: 09-10-2003
++# RESOURCE.CFG - Resource File for Nagios
+ #
+ # You can define $USERx$ macros in this file, which can in turn be used
+ # in command definitions in your host config file(s).  $USERx$ macros are
+--- nagios-3.1.2/sample-config/nagios.cfg.in~	2009-08-03 18:45:46.405840760 +0300
++++ nagios-3.1.2/sample-config/nagios.cfg.in	2009-08-03 18:45:46.405840760 +0300
+@@ -1,13 +1,11 @@
+ ##############################################################################
+ #
+-# NAGIOS.CFG - Sample Main Config File for Nagios @VERSION@
++# NAGIOS.CFG - Main Config File for Nagios
+ #
+ # Read the documentation for more information on this configuration
+ # file.  I've provided some comments here, but things may not be so
+ # clear without further explanation.
+ #
+-# Last Modified: 12-14-2008
+-#
+ ##############################################################################
+ 
+ 
+@@ -16,7 +14,7 @@
+ # for historical purposes.  This should be the first option specified
+ # in the config file!!!
+ 
+-log_file=@localstatedir@/nagios.log
++log_file=/var/log/nagios/nagios.log
+ 
+ 
+ 
+@@ -49,6 +47,10 @@
+ # extension) in a particular directory by using the cfg_dir
+ # directive as shown below:
+ 
++cfg_dir=/etc/nagios/plugins
++cfg_dir=/etc/nagios/local
++#cfg_dir=etc/nagios/objects
++
+ #cfg_dir=@sysconfdir@/servers
+ #cfg_dir=@sysconfdir@/printers
+ #cfg_dir=@sysconfdir@/switches
+@@ -264,7 +266,7 @@
+ # This is the directory where archived (rotated) log files should be
+ # placed (assuming you've chosen to do log rotation).
+ 
+-log_archive_path=@localstatedir@/archives
++log_archive_path=/var/log/nagios/archives
+ 
+ 
+ 
+@@ -850,8 +852,8 @@
+ # Performance data is only written to these files if the
+ # enable_performance_data option (above) is set to 1.
+ 
+-#host_perfdata_file=/tmp/host-perfdata
+-#service_perfdata_file=/tmp/service-perfdata
++#host_perfdata_file=@localstatedir@/host-perfdata
++#service_perfdata_file=@localstatedir@/service-perfdata
+ 
+ 
+ 
+@@ -1065,7 +1067,7 @@
+ #	strict-iso8601	(YYYY-MM-DDTHH:MM:SS)
+ #
+ 
+-date_format=us
++date_format=iso8601
+ 
+ 
+ 
+@@ -1306,7 +1308,7 @@
+ # DEBUG FILE
+ # This option determines where Nagios should write debugging information.
+ 
+-debug_file=@localstatedir@/nagios.debug
++debug_file=/var/log/nagios/nagios.debug
+ 
+ 
+ 

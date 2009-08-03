@@ -27,7 +27,7 @@ Patch1:		%{name}-iconv-in-libc.patch
 Patch2:		%{name}-webapps.patch
 Patch3:		%{name}-cgi-http_charset.patch
 Patch4:		%{name}-cmd-typo.patch
-Patch5:		cgi.cfg.patch
+Patch5:		config.patch
 URL:		http://www.nagios.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -198,7 +198,7 @@ sed -e 's,%{_prefix}/lib/,%{_libdir}/,' %{SOURCE6} > lighttpd.conf
 	s,/usr/local/nagios/share,@datadir@,g
 	# we want all authorized users have default access
 	s,=nagiosadmin,=*,g
-' sample-config/cgi.cfg.in
+' sample-config/*.cfg.in
 
 %build
 cp -f /usr/share/automake/config.sub .
@@ -245,7 +245,8 @@ install %{SOURCE4} $RPM_BUILD_ROOT%{_datadir}
 
 # install templated configuration files
 tar jxf %{SOURCE5} --strip-components=1 -C $RPM_BUILD_ROOT%{_sysconfdir}
-sed -i -e 's,%{_prefix}/lib/,%{_libdir}/,' $RPM_BUILD_ROOT%{_sysconfdir}/resource.cfg
+cp -a sample-config/resource.cfg $RPM_BUILD_ROOT%{_sysconfdir}
+cp -a sample-config/nagios.cfg $RPM_BUILD_ROOT%{_sysconfdir}
 
 # webserver files
 install apache.conf $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/apache.conf
