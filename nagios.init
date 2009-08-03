@@ -25,10 +25,14 @@ else
 	exit 0
 fi
 
+cfg_file=/etc/nagios/nagios.cfg
+
+# check for precache
+precached_object_file=$(awk -F= '/^precached_object_file/{print $2}' $cfg_file)
+
 # configtest itself
 configtest() {
-	/usr/sbin/nagios -v /etc/nagios/nagios.cfg 2>&1
-	return $?
+	/usr/sbin/nagios ${precached_object_file:+-p} -v $cfg_file
 }
 
 # wrapper for configtest:
@@ -72,7 +76,10 @@ start() {
 
 	# remove stale cmd pipe (or nagios won't start if it exists)
 	rm -f /var/lib/nagios/rw/nagios.cmd
-	daemon /usr/sbin/nagios -d /etc/nagios/nagios.cfg </dev/null
+
+	# we're safe to use -x as we did verify config prior startup
+	# precached object file also is created in configtest.
+	daemon /usr/sbin/nagios ${precached_object_file:+-u} -d $cfg_file
 	RETVAL=$?
 	if [ $RETVAL -eq 0 ]; then
 		touch /var/lock/subsys/nagios
@@ -101,6 +108,7 @@ reload() {
 	checkconfig
 	msg_reloading "Nagios"
 
+	# NOTE: precached object file is created in configtest.
 	killproc nagios -HUP
 	RETVAL=$?
 }

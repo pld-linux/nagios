@@ -268,7 +268,7 @@ cp -a sample-config $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
 find $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version} -name '*.in' | xargs rm
 
 # Object data/cache files
-for i in {objects.cache,{comments,downtime,retention,status}.dat,nagios.tmp}; do
+for i in {objects.{cache,precache},{comments,downtime,retention,status}.dat,nagios.tmp}; do
 	> $RPM_BUILD_ROOT%{_localstatedir}/$i
 done
 > $RPM_BUILD_ROOT%{_localstatedir}/rw/nagios.cmd
@@ -277,7 +277,7 @@ done
 rm -rf $RPM_BUILD_ROOT
 
 %post
-for i in %{_localstatedir}/{objects.cache,{comments,downtime,retention,status}.dat}; do
+for i in %{_localstatedir}/{objects.{cache,precache},{comments,downtime,retention,status}.dat}; do
 	[ ! -f $i ] && touch $i
 	chown root:nagios $i
 	chmod 664 $i
@@ -373,6 +373,7 @@ done
 %attr(2770,root,nagios-data) %dir %{_localstatedir}/spool
 %attr(2770,root,nagios-data) %dir %{_localstatedir}/spool/checkresults
 %attr(664,root,nagios) %ghost %{_localstatedir}/objects.cache
+%attr(664,root,nagios) %ghost %{_localstatedir}/objects.precache
 %attr(664,root,nagios) %ghost %{_localstatedir}/*.dat
 %attr(664,root,nagios) %ghost %{_localstatedir}/%{name}.tmp
 
