@@ -27,6 +27,7 @@ Patch1:		%{name}-iconv-in-libc.patch
 Patch2:		%{name}-webapps.patch
 Patch3:		%{name}-cgi-http_charset.patch
 Patch4:		%{name}-cmd-typo.patch
+Patch5:		cgi.cfg.patch
 URL:		http://www.nagios.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -179,6 +180,7 @@ aplicativos para o Nagios.
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
+%patch5 -p1
 
 sed -i -e '
 	s,".*/var/rw/nagios.cmd,"%{_localstatedir}/rw/nagios.cmd,
@@ -187,6 +189,16 @@ sed -i -e '
 
 sed -e 's,%{_prefix}/lib/,%{_libdir}/,' %{SOURCE1} > apache.conf
 sed -e 's,%{_prefix}/lib/,%{_libdir}/,' %{SOURCE6} > lighttpd.conf
+
+# fixup cgi config
+%{__sed} -i -e '
+	# kill trailing spaces
+	s, \+$,,
+	# use real paths
+	s,/usr/local/nagios/share,@datadir@,g
+	# we want all authorized users have default access
+	s,=nagiosadmin,=*,g
+' sample-config/cgi.cfg.in
 
 %build
 cp -f /usr/share/automake/config.sub .
@@ -239,7 +251,8 @@ sed -i -e 's,%{_prefix}/lib/,%{_libdir}/,' $RPM_BUILD_ROOT%{_sysconfdir}/resourc
 install apache.conf $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/apache.conf
 install apache.conf $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/httpd.conf
 install lighttpd.conf $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/lighttpd.conf
-mv $RPM_BUILD_ROOT{%{_sysconfdir}/cgi.cfg,%{_webapps}/%{_webapp}}
+rm $RPM_BUILD_ROOT%{_sysconfdir}/cgi.cfg
+cp -a sample-config/cgi.cfg $RPM_BUILD_ROOT%{_webapps}/%{_webapp}
 > $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/passwd
 echo 'nagios:' > $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/group
 
