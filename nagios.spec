@@ -42,7 +42,7 @@ BuildRequires:	tar >= 1:1.15.1
 Requires(post,preun):	/sbin/chkconfig
 Requires:	%{name}-common = %{version}-%{release}
 Requires:	/bin/mail
-Requires:	nagios-notify
+Requires:	nagios-notify >= 0.13
 Requires:	rc-scripts
 Requires:	sh-utils
 Provides:	nagios-core
