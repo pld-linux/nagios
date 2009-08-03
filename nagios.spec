@@ -9,7 +9,7 @@ Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
 Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	3.1.2
-Release:	2
+Release:	3
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}.tar.gz
@@ -19,8 +19,8 @@ Source2:	%{name}.init
 Source3:	%{name}.sysconfig
 Source4:	http://www.nagios.org/images/favicon.ico
 # Source4-md5:	1c4201c7da53d6c7e48251d3a9680449
-Source5:	%{name}-config-20071217.tar.bz2
-# Source5-md5:	c50e60b73f86b8bfbc36f486d583f67b
+Source5:	%{name}-config-20090803.tar.bz2
+# Source5-md5:	e4c42ebadecef32cfe14cc3085f5bae4
 Source6:	%{name}-lighttpd.conf
 Patch0:		%{name}-resources.patch
 Patch1:		%{name}-iconv-in-libc.patch
@@ -43,6 +43,7 @@ Requires(post,preun):	/sbin/chkconfig
 Requires(triggerpostun):	sed >= 4.0
 Requires:	%{name}-common = %{version}-%{release}
 Requires:	/bin/mail
+Requires:	nagios-notify
 Requires:	rc-scripts
 Requires:	sh-utils
 Provides:	nagios-core
@@ -143,8 +144,8 @@ Interfejs CGI dla Nagiosa.
 Summary:	Default Nagios theme
 Summary(pl.UTF-8):	Domyślny motyw Nagiosa
 Group:		Applications/WWW
-Requires:	webserver(php)
 Requires:	nagios-cgi = %{version}-%{release}
+Requires:	webserver(php)
 Provides:	nagios-theme
 Obsoletes:	nagios-theme
 
@@ -174,13 +175,18 @@ Este pacote contém arquivos de cabeçalho usados no desenvolvimento de
 aplicativos para o Nagios.
 
 %prep
-%setup -q
+%setup -q -a5
 %patch0 -p0
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
+
+find -name .cvsignore | xargs rm
+
+mv nagios-config-*/objects/*.cfg sample-config/template-object
+mv nagios-config-*/*.cfg sample-config
 
 sed -i -e '
 	s,".*/var/rw/nagios.cmd,"%{_localstatedir}/rw/nagios.cmd,
@@ -224,7 +230,7 @@ cp -f /usr/share/automake/config.sub .
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},%{_webapps}/%{_webapp}} \
 	$RPM_BUILD_ROOT{%{_var}/log/%{name}/archives,%{_localstatedir}/rw} \
-	$RPM_BUILD_ROOT%{_sysconfdir}/{plugins,local} \
+	$RPM_BUILD_ROOT%{_sysconfdir}/{plugins,objects} \
 	$RPM_BUILD_ROOT%{_libdir}/%{name}/{eventhandlers,plugins} \
 %if "%{_lib}" != "lib"
 	$RPM_BUILD_ROOT%{_prefix}/lib/%{name}/{eventhandlers,plugins} \
@@ -244,22 +250,23 @@ install %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/%{name}
 install %{SOURCE4} $RPM_BUILD_ROOT%{_datadir}
 
 # install templated configuration files
-tar jxf %{SOURCE5} --strip-components=1 -C $RPM_BUILD_ROOT%{_sysconfdir}
-cp -a sample-config/resource.cfg $RPM_BUILD_ROOT%{_sysconfdir}
-cp -a sample-config/nagios.cfg $RPM_BUILD_ROOT%{_sysconfdir}
+for a in nagios.cfg resource.cfg commands.cfg contactgroups.cfg contacts.cfg templates.cfg timeperiods.cfg; do
+	cp -a sample-config/$a $RPM_BUILD_ROOT%{_sysconfdir}
+done
 
 # webserver files
 install apache.conf $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/apache.conf
 install apache.conf $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/httpd.conf
 install lighttpd.conf $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/lighttpd.conf
-rm $RPM_BUILD_ROOT%{_sysconfdir}/cgi.cfg
 cp -a sample-config/cgi.cfg $RPM_BUILD_ROOT%{_webapps}/%{_webapp}
 > $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/passwd
 echo 'nagios:' > $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/group
 
-# install event handlers
+# install event handlers, sample config
 install -d $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
 cp -a contrib/eventhandlers $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
+cp -a sample-config $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
+find $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version} -name '*.in' | xargs rm
 
 # Object data/cache files
 for i in {objects.cache,{comments,downtime,retention,status}.dat,nagios.tmp}; do
@@ -338,106 +345,17 @@ fi
 %triggerpostun -- nagios-cgi < 2.0-0.b3.21
 chown root:http %{_sysconfdir}/cgi.cfg
 
-%triggerpostun -- nagios < 2.0-0.b3.21
-chown root:nagios %{_sysconfdir}/*.cfg
-chown root:nagios-data %{_sysconfdir}/nagios.cfg
-%addusertogroup nagios nagios-data
-
-# must unify nagios.cfg
-sed -i -e '
-s,^status_file=.*,status_file=%{_localstatedir}/status.dat,
-s,^comment_file=.*,comment_file=%{_localstatedir}/comments.dat,
-s,^downtime_file=.*,downtime_file=%{_localstatedir}/downtime.dat,
-s,^lock_file=.*,lock_file=%{_localstatedir}/nagios.pid,
-s,^temp_file=.*,temp_file=%{_localstatedir}/nagios.tmp,
-s,^state_retention_file=.*,state_retention_file=%{_localstatedir}/retention.dat,
-
-# option changes
-s,^log_passive_service_checks=,log_passive_checks=,
-s,^inter_check_delay_method=,service_inter_check_delay_method=,
-s,^use_agressive_host_checking=,use_aggressive_host_checking=,
-s,^freshness_check_interval=,service_freshness_check_interval=,
-
-' %{_sysconfdir}/nagios.cfg
-
-sed -i -e '
-s,\$DATETIME\$,$LONGDATETIME$,g
-s,Nagios/1.2,Nagios/%{version},g
-' %{_sysconfdir}/misccommands.cfg
-
-mv -f /var/log/nagios/status.log %{_localstatedir}/status.dat 2>/dev/null
-mv -f /var/log/nagios/comment.log %{_localstatedir}/comments.dat 2>/dev/null
-mv -f /var/log/nagios/downtime.log %{_localstatedir}/downtime.dat 2>/dev/null
-mv -f /var/run/nagios.pid %{_localstatedir}/nagios.pid 2>/dev/null
-mv -f /var/log/nagios/nagios.tmp %{_localstatedir}/nagios.tmp 2>/dev/null
-mv -f /var/log/nagios/status.sav %{_localstatedir}/retention.dat 2>/dev/null
-chown nagios:nagios %{_localstatedir}/nagios.pid 2>/dev/null
-chown nagios:nagios-data %{_localstatedir}/rw/nagios.cmd 2>/dev/null
-
-%service -q %{name} restart
-
-%banner -e %{name}-2.0 <<'EOF'
-Please read <http://nagios.sourceforge.net/docs/2_0/whatsnew.html>
-there are changes that no longer work in Nagios 2.0.
-
-You could also try use <http://oss.op5.se/nagios/object_config_fix.php.gz>
-to convert your config (yes i know it's too late to say it now, after
-the upgrade, but still :))
-EOF
-#'vim
-
-# webapps trigger
-%triggerpostun cgi -- %{name}-cgi < 2.0-0.b6.0.2
-for i in cgi.cfg group passwd; do
-	if [ -f /etc/nagios/$i.rpmsave ]; then
-		mv -f %{_webapps}/%{_webapp}/$i{,.rpmnew}
-		mv -f /etc/nagios/$i.rpmsave %{_webapps}/%{_webapp}/$i
+%triggerpostun -- nagios < 3.1.2-3
+# restore lost files
+for a in services.cfg serviceextinfo.cfg hosts.cfg hostgroups.cfg hostextinfo.cfg escalations.cfg checkcommands.cfg misccommands.cfg; do
+	if [ -f %{_sysconfdir}/$a.rpmsave -a ! -f %{_sysconfdir}/$a ]; then
+		mv -f %{_sysconfdir}/$a{.rpmsave,}
 	fi
 done
-
-# migrate from httpd (apache2) config dir
-if [ -f /etc/httpd/%{name}.conf.rpmsave ]; then
-	cp -f %{_webapps}/%{_webapp}/httpd.conf{,.rpmnew}
-	mv -f /etc/httpd/%{name}.conf.rpmsave %{_webapps}/%{_webapp}/httpd.conf
-fi
-
-# migrate from apache-config macros
-if [ -f /etc/%{name}/apache-nagios.conf.rpmsave ]; then
-	if [ -d /etc/apache/webapps.d ]; then
-		cp -f %{_webapps}/%{_webapp}/apache.conf{,.rpmnew}
-		cp -f /etc/%{name}/apache-nagios.conf.rpmsave %{_webapps}/%{_webapp}/apache.conf
-	fi
-
-	if [ -d /etc/httpd/webapps.d ]; then
-		cp -f %{_webapps}/%{_webapp}/httpd.conf{,.rpmnew}
-		cp -f /etc/%{name}/apache-nagios.conf.rpmsave %{_webapps}/%{_webapp}/httpd.conf
-	fi
-	rm -f /etc/%{name}/apache-nagios.conf.rpmsave
-fi
-
-# place new config location, as trigger puts config only on first install, do it here.
-if [ -L /etc/apache/conf.d/99_%{name}.conf ]; then
-	rm -f /etc/apache/conf.d/99_%{name}.conf
-	apache_reload=1
-fi
-if [ -L /etc/httpd/httpd.conf/99_%{name}.conf ]; then
-	rm -f /etc/httpd/httpd.conf/99_%{name}.conf
-	httpd_reload=1
-fi
-
-if [ "$apache_reload" ]; then
-	/usr/sbin/webapp register apache %{_webapp}
-	%service -q apache reload
-fi
-if [ "$httpd_reload" ]; then
-	/usr/sbin/webapp register httpd %{_webapp}
-	%service -q httpd reload
-fi
 
 %files
 %defattr(644,root,root,755)
 %doc Changelog README* UPGRADING INSTALLING LICENSE
-%doc sample-config/template-object/{localhost,commands}.cfg
 %attr(640,root,nagios-data) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/nagios.cfg
 %attr(640,root,nagios) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/[!n]*.cfg
 
@@ -465,7 +383,7 @@ fi
 %defattr(644,root,root,755)
 %attr(750,root,nagios-data) %dir %{_sysconfdir}
 %attr(2750,root,nagios) %dir %{_sysconfdir}/plugins
-%attr(2750,root,nagios) %dir %{_sysconfdir}/local
+%attr(2750,root,nagios) %dir %{_sysconfdir}/objects
 %dir %{_libdir}/%{name}
 %dir %{_libdir}/%{name}/plugins
 %dir %{_libdir}/%{name}/eventhandlers
