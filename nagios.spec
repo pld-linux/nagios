@@ -9,7 +9,7 @@ Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
 Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	3.1.2
-Release:	5
+Release:	6
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}.tar.gz
@@ -378,7 +378,7 @@ done
 %attr(664,root,nagios) %ghost %{_localstatedir}/%{name}.tmp
 
 %dir %{_var}/spool
-%dir %{_var}/spool/%{name}
+%attr(770,root,nagios) %dir %{_var}/spool/%{name}
 %attr(770,root,nagios) %dir %{_var}/spool/%{name}/checkresults
 
 %{_examplesdir}/%{name}-%{version}
