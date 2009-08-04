@@ -216,6 +216,7 @@ cp -f /usr/share/automake/config.sub .
 	--with-command-user=%{name} \
 	--with-command-grp=%{name} \
 	--with-lockfile=%{_localstatedir}/%{name}.pid \
+	--with-checkresult-dir=%{_var}/spool/nagios/checkresults \
 	--with-ping_command='/bin/ping -n %%s -c %%d' \
 	%{!?with_gd:--disable-statusmap --disable-trends} \
 	%{?with_tests:--enable-libtap} \
@@ -370,12 +371,14 @@ done
 %attr(770,root,nagios-data) %dir %{_localstatedir}
 %attr(2770,root,nagios-data) %dir %{_localstatedir}/rw
 %attr(660,nagios,nagios-data) %ghost %{_localstatedir}/rw/nagios.cmd
-%attr(2770,root,nagios-data) %dir %{_localstatedir}/spool
-%attr(2770,root,nagios-data) %dir %{_localstatedir}/spool/checkresults
 %attr(664,root,nagios) %ghost %{_localstatedir}/objects.cache
 %attr(664,root,nagios) %ghost %{_localstatedir}/objects.precache
 %attr(664,root,nagios) %ghost %{_localstatedir}/*.dat
 %attr(664,root,nagios) %ghost %{_localstatedir}/%{name}.tmp
+
+%dir %{_var}/spool
+%dir %{_var}/spool/nagios
+%attr(770,root,nagios) %dir %{_var}/spool/nagios/checkresults
 
 %{_examplesdir}/%{name}-%{version}
 
