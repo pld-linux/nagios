@@ -9,7 +9,7 @@ Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
 Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	3.1.2
-Release:	3
+Release:	4
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}.tar.gz
@@ -216,7 +216,7 @@ cp -f /usr/share/automake/config.sub .
 	--with-command-user=%{name} \
 	--with-command-grp=%{name} \
 	--with-lockfile=%{_localstatedir}/%{name}.pid \
-	--with-checkresult-dir=%{_var}/spool/nagios/checkresults \
+	--with-checkresult-dir=%{_var}/spool/%{name}/checkresults \
 	--with-ping_command='/bin/ping -n %%s -c %%d' \
 	%{!?with_gd:--disable-statusmap --disable-trends} \
 	%{?with_tests:--enable-libtap} \
@@ -345,13 +345,14 @@ fi
 %triggerpostun -- nagios-cgi < 2.0-0.b3.21
 chown root:http %{_sysconfdir}/cgi.cfg
 
-%triggerpostun -- nagios < 3.1.2-3
+%triggerpostun -- nagios < 3.1.2-4
 # restore lost files
 for a in dependencies.cfg services.cfg serviceextinfo.cfg hosts.cfg hostgroups.cfg hostextinfo.cfg escalations.cfg checkcommands.cfg misccommands.cfg; do
 	if [ -f %{_sysconfdir}/$a.rpmsave -a ! -f %{_sysconfdir}/$a ]; then
 		mv -f %{_sysconfdir}/$a{.rpmsave,}
 	fi
 done
+%{__sed} -i -e 's,^check_result_path=.*,check_result_path=%{_var}/spool/%{name}/checkresults,' %{_sysconfdir}/nagios.cfg
 
 %files
 %defattr(644,root,root,755)
@@ -365,7 +366,7 @@ done
 %attr(755,root,root) %{_bindir}/%{name}
 %attr(755,root,root) %{_bindir}/nagiostats
 
-%attr(770,root,nagios-data) %dir %{_var}/log/%{name}
+%attr(770,root,nagios-data) %dir %{_var}/log/%{nam}
 %attr(770,root,nagios-data) %dir %{_var}/log/%{name}/archives
 
 %attr(770,root,nagios-data) %dir %{_localstatedir}
@@ -377,8 +378,8 @@ done
 %attr(664,root,nagios) %ghost %{_localstatedir}/%{name}.tmp
 
 %dir %{_var}/spool
-%dir %{_var}/spool/nagios
-%attr(770,root,nagios) %dir %{_var}/spool/nagios/checkresults
+%dir %{_var}/spool/%{name}
+%attr(770,root,nagios) %dir %{_var}/spool/%{name}/checkresults
 
 %{_examplesdir}/%{name}-%{version}
 
