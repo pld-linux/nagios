@@ -9,7 +9,7 @@ Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
 Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	3.1.2
-Release:	6
+Release:	7
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}.tar.gz
@@ -107,7 +107,7 @@ Requires(pre):	/usr/sbin/groupmod
 Requires(pre):	/usr/sbin/useradd
 Requires(pre):	/usr/sbin/usermod
 Provides:	group(nagios)
-Provides:	group(nagios-data)
+Provides:	group(nagcmd)
 Provides:	user(nagios)
 
 %description common
@@ -294,21 +294,26 @@ if [ "$1" = "0" ] ; then
 fi
 
 %pre common
+# rename group netsaint -> nagios
 if [ "`getgid netsaint 2>/dev/null`" = "72" ]; then
 	/usr/sbin/groupmod -n nagios netsaint
 fi
-%groupadd -g 72 nagios
-%groupadd -g 147 -f nagios-data
-if [ -n "`id -u netsaint 2>/dev/null`" ] && [ "`id -u netsaint`" = "72" ]; then
-	/usr/sbin/usermod -d %{_libdir}/nagios -l nagios -c "Nagios Daemon" -G nagios-data netsaint
+# rename group nagios-data -> nagcmd
+if [ "`getgid nagios-data 2>/dev/null`" = "147" ]; then
+	/usr/sbin/groupmod -n nagcmd nagios-data
 fi
-%useradd -u 72 -d %{_libdir}/nagios -s /bin/false -c "Nagios Daemon" -g nagios -G nagios-data nagios
+%groupadd -g 72 nagios
+%groupadd -g 147 -f nagcmd
+if [ -n "`id -u netsaint 2>/dev/null`" ] && [ "`id -u netsaint`" = "72" ]; then
+	/usr/sbin/usermod -d %{_libdir}/nagios -l nagios -c "Nagios Daemon" -G nagcmd netsaint
+fi
+%useradd -u 72 -d %{_libdir}/nagios -s /bin/false -c "Nagios Daemon" -g nagios -G nagcmd nagios
 
 %postun common
 if [ "$1" = "0" ]; then
 	%userremove nagios
 	%groupremove nagios
-	%groupremove nagios-data
+	%groupremove nagcmd
 fi
 
 %post cgi
@@ -322,21 +327,21 @@ EOF
 fi
 
 %triggerin cgi -- apache1 < 1.3.37-3, apache1-base
-%addusertogroup http nagios-data
+%addusertogroup http nagcmd
 %webapp_register apache %{_webapp}
 
 %triggerun cgi -- apache1 < 1.3.37-3, apache1-base
 %webapp_unregister apache %{_webapp}
 
 %triggerin cgi -- apache < 2.2.0, apache-base
-%addusertogroup http nagios-data
+%addusertogroup http nagcmd
 %webapp_register httpd %{_webapp}
 
 %triggerun cgi -- apache < 2.2.0, apache-base
 %webapp_unregister httpd %{_webapp}
 
 %triggerin cgi -- lighttpd
-%addusertogroup lighttpd nagios-data
+%addusertogroup lighttpd nagcmd
 %webapp_register lighttpd %{_webapp}
 
 %triggerun cgi -- lighttpd
@@ -357,7 +362,7 @@ done
 %files
 %defattr(644,root,root,755)
 %doc Changelog README* UPGRADING INSTALLING LICENSE
-%attr(640,root,nagios-data) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/nagios.cfg
+%attr(640,root,nagcmd) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/nagios.cfg
 %attr(640,root,nagios) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/[!n]*.cfg
 
 %attr(754,root,root) /etc/rc.d/init.d/%{name}
@@ -366,12 +371,12 @@ done
 %attr(755,root,root) %{_bindir}/%{name}
 %attr(755,root,root) %{_bindir}/nagiostats
 
-%attr(770,root,nagios-data) %dir %{_var}/log/%{name}
-%attr(770,root,nagios-data) %dir %{_var}/log/%{name}/archives
+%attr(770,root,nagcmd) %dir %{_var}/log/%{name}
+%attr(770,root,nagcmd) %dir %{_var}/log/%{name}/archives
 
-%attr(770,root,nagios-data) %dir %{_localstatedir}
-%attr(2770,root,nagios-data) %dir %{_localstatedir}/rw
-%attr(660,nagios,nagios-data) %ghost %{_localstatedir}/rw/nagios.cmd
+%attr(770,root,nagcmd) %dir %{_localstatedir}
+%attr(2770,root,nagcmd) %dir %{_localstatedir}/rw
+%attr(660,nagios,nagcmd) %ghost %{_localstatedir}/rw/nagios.cmd
 %attr(664,root,nagios) %ghost %{_localstatedir}/objects.cache
 %attr(664,root,nagios) %ghost %{_localstatedir}/objects.precache
 %attr(664,root,nagios) %ghost %{_localstatedir}/*.dat
@@ -385,7 +390,7 @@ done
 
 %files common
 %defattr(644,root,root,755)
-%attr(750,root,nagios-data) %dir %{_sysconfdir}
+%attr(750,root,nagcmd) %dir %{_sysconfdir}
 %attr(2750,root,nagios) %dir %{_sysconfdir}/plugins
 %attr(2750,root,nagios) %dir %{_sysconfdir}/objects
 %dir %{_libdir}/%{name}
