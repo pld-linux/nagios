@@ -8,12 +8,12 @@ Summary:	Host/service/network monitoring program
 Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
 Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
-Version:	3.1.2
-Release:	7
+Version:	3.2.0
+Release:	1
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}.tar.gz
-# Source0-md5:	f3c60428cba14264c709749182b8d93e
+# Source0-md5:	3566167cc60ddeaad34e7d2e26ed4a58
 Source1:	%{name}-apache.conf
 Source2:	%{name}.init
 Source3:	%{name}.sysconfig
@@ -210,7 +210,7 @@ cp -f /usr/share/automake/config.sub .
 %{__aclocal}
 %{__autoconf}
 %configure \
-	--datarootdir=%{_datadir} \
+	CFLAGS="%{rpmcflags} %{rpmcppflags}" \
 	--with-nagios-user=%{name} \
 	--with-nagios-grp=%{name} \
 	--with-command-user=%{name} \
