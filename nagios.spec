@@ -19,8 +19,8 @@ Source2:	%{name}.init
 Source3:	%{name}.sysconfig
 Source4:	http://www.nagios.org/images/favicon.ico
 # Source4-md5:	1c4201c7da53d6c7e48251d3a9680449
-Source5:	%{name}-config-20090803.tar.bz2
-# Source5-md5:	e4c42ebadecef32cfe14cc3085f5bae4
+Source5:	%{name}-config-20090908.tar.bz2
+# Source5-md5:	0ddb5a424c5618278ac6103f914b1f26
 Source6:	%{name}-lighttpd.conf
 Patch0:		%{name}-resources.patch
 Patch1:		%{name}-iconv-in-libc.patch
