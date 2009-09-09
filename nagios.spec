@@ -41,10 +41,9 @@ BuildRequires:	sed >= 4.0
 BuildRequires:	tar >= 1:1.15.1
 Requires(post,preun):	/sbin/chkconfig
 Requires:	%{name}-common = %{version}-%{release}
-Requires:	/bin/mail
-Requires:	nagios-notify >= 0.13
 Requires:	rc-scripts
 Requires:	sh-utils
+Suggests:	nagios-notify >= 0.13
 Provides:	nagios-core
 Obsoletes:	netsaint
 Conflicts:	iputils-ping < 1:ss020124
@@ -106,8 +105,8 @@ Requires(pre):	/usr/sbin/groupadd
 Requires(pre):	/usr/sbin/groupmod
 Requires(pre):	/usr/sbin/useradd
 Requires(pre):	/usr/sbin/usermod
-Provides:	group(nagios)
 Provides:	group(nagcmd)
+Provides:	group(nagios)
 Provides:	user(nagios)
 
 %description common
