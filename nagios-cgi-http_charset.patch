@@ -371,7 +371,7 @@
  
 +/************************** HTTP CHARSET ****************************/
 +
-+#define DEFAULT_HTTP_CHARSET "iso8859-1"
++#define DEFAULT_HTTP_CHARSET "utf-8"
  
  
  
@@ -384,7 +384,7 @@
 +# HTTP CHARSET
 +# This defines charset that is sent with HTTP headers.
 +
-+http_charset=iso8859-1
++http_charset=utf-8
 +
  
  # CONTEXT-SENSITIVE HELP
