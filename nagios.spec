@@ -361,8 +361,7 @@ done
 %files
 %defattr(644,root,root,755)
 %doc Changelog README* UPGRADING INSTALLING LICENSE
-%attr(640,root,nagcmd) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/nagios.cfg
-%attr(640,root,nagios) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/[!n]*.cfg
+%attr(640,root,nagios) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/*.cfg
 
 %attr(754,root,root) /etc/rc.d/init.d/%{name}
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/%{name}
@@ -390,8 +389,8 @@ done
 %files common
 %defattr(644,root,root,755)
 %attr(750,root,nagcmd) %dir %{_sysconfdir}
-%attr(2750,root,nagios) %dir %{_sysconfdir}/plugins
-%attr(2750,root,nagios) %dir %{_sysconfdir}/objects
+%attr(750,root,nagios) %dir %{_sysconfdir}/plugins
+%attr(750,root,nagios) %dir %{_sysconfdir}/objects
 %dir %{_libdir}/%{name}
 %dir %{_libdir}/%{name}/plugins
 %dir %{_libdir}/%{name}/eventhandlers
