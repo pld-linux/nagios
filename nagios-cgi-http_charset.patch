@@ -21,8 +21,8 @@
  		return;
  	        }
  
---- nagios-3.0.3/cgi/cgiutils.c	2008-06-23 23:47:44.000000000 +0300
-+++ nagios-3.0.3-cgi/cgi/cgiutils.c	2008-10-11 12:34:44.472657400 +0300
+--- nagios-3.0.3-cgi/cgi/cgiutils.c	2008-10-11 12:34:44.472657400 +0300
++++ nagios-3.2.0/cgi/cgiutils.c	2009-09-11 16:14:43.130251761 +0300
 @@ -55,6 +55,7 @@
  char            *statuswrl_include=NULL;
  
@@ -51,6 +51,16 @@
  		else if(!strcmp(var,"notes_url_target"))
  			notes_url_target=strdup(val);
  
+@@ -1553,6 +1560,9 @@
+ 		else if(((char)input[x]==(char)' ') || ((char)input[x]==(char)'-') || ((char)input[x]==(char)'.') || ((char)input[x]==(char)'_') || ((char)input[x]==(char)':'))
+ 			encoded_html_string[y++]=input[x];
+ 
++		/* high bit chars don't get encoded, so we won't be breaking utf8 characters */
++		else if ((unsigned char)input[x] >= 0x7f)
++			encoded_html_string[y++]=input[x];
+ 		/* for simplicity, all other chars represented by their numeric value */
+ 		else{
+ 			encoded_html_string[y]='\x0';
 --- nagios-3.0.3/cgi/cmd.c	2008-05-19 21:42:26.000000000 +0300
 +++ nagios-3.0.3-cgi/cgi/cmd.c	2008-10-11 12:34:44.496658785 +0300
 @@ -39,6 +39,8 @@
