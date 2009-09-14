@@ -9,7 +9,7 @@ Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
 Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	3.2.0
-Release:	4
+Release:	5
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}.tar.gz
@@ -364,6 +364,7 @@ done
 %files
 %defattr(644,root,root,755)
 %doc Changelog README* UPGRADING INSTALLING LICENSE
+%attr(750,root,nagios) %dir %{_sysconfdir}/objects
 %attr(640,root,nagios) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/*.cfg
 
 %attr(754,root,root) /etc/rc.d/init.d/%{name}
@@ -393,7 +394,6 @@ done
 %defattr(644,root,root,755)
 %attr(750,root,nagcmd) %dir %{_sysconfdir}
 %attr(750,root,nagios) %dir %{_sysconfdir}/plugins
-%attr(750,root,nagios) %dir %{_sysconfdir}/objects
 %dir %{_libdir}/%{name}
 %dir %{_libdir}/%{name}/plugins
 %dir %{_libdir}/%{name}/eventhandlers
