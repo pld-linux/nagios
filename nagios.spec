@@ -9,7 +9,7 @@ Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
 Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	3.2.0
-Release:	5
+Release:	6
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}.tar.gz
@@ -38,7 +38,6 @@ BuildRequires:	libpng-devel
 %endif
 BuildRequires:	rpmbuild(macros) >= 1.268
 BuildRequires:	sed >= 4.0
-BuildRequires:	tar >= 1:1.15.1
 Requires(post,preun):	/sbin/chkconfig
 Requires:	%{name}-common = %{version}-%{release}
 Requires:	rc-scripts
@@ -181,7 +180,7 @@ aplicativos para o Nagios.
 %patch4 -p1
 %patch5 -p1
 
-find -name .cvsignore | xargs rm
+find -name .cvsignore -o -name .gitignore | xargs rm
 
 mv nagios-config-*/objects/*.cfg sample-config/template-object
 mv nagios-config-*/*.cfg sample-config
@@ -239,7 +238,7 @@ install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},%{_webapps}/%{_webapp}} 
 %endif
 
 install -d $RPM_BUILD_ROOT%{_includedir}/%{name}
-install include/*.h	$RPM_BUILD_ROOT%{_includedir}/%{name}
+cp -a include/*.h	$RPM_BUILD_ROOT%{_includedir}/%{name}
 
 %{__make} install-unstripped \
 	DESTDIR=$RPM_BUILD_ROOT \
@@ -247,9 +246,9 @@ install include/*.h	$RPM_BUILD_ROOT%{_includedir}/%{name}
 	INIT_OPTS="" \
 	COMMAND_OPTS=""
 
-install %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
-install %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/%{name}
-install %{SOURCE4} $RPM_BUILD_ROOT%{_datadir}
+install -p %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
+cp -a %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/%{name}
+cp -a %{SOURCE4} $RPM_BUILD_ROOT%{_datadir}
 
 # install templated configuration files
 for a in nagios.cfg resource.cfg commands.cfg contactgroups.cfg contacts.cfg templates.cfg timeperiods.cfg; do
@@ -257,9 +256,9 @@ for a in nagios.cfg resource.cfg commands.cfg contactgroups.cfg contacts.cfg tem
 done
 
 # webserver files
-install apache.conf $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/apache.conf
-install apache.conf $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/httpd.conf
-install lighttpd.conf $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/lighttpd.conf
+cp -a apache.conf $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/apache.conf
+cp -a apache.conf $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/httpd.conf
+cp -a lighttpd.conf $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/lighttpd.conf
 cp -a sample-config/cgi.cfg $RPM_BUILD_ROOT%{_webapps}/%{_webapp}
 > $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/passwd
 echo 'nagios:' > $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/group
