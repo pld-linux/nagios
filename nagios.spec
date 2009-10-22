@@ -17,11 +17,9 @@ Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}.tar.gz
 Source1:	%{name}-apache.conf
 Source2:	%{name}.init
 Source3:	%{name}.sysconfig
-Source4:	http://www.nagios.org/images/favicon.ico
-# Source4-md5:	1c4201c7da53d6c7e48251d3a9680449
-Source5:	%{name}-config-20090914.tar.bz2
-# Source5-md5:	605f1cd28c00db961dad6f529d849f16
-Source6:	%{name}-lighttpd.conf
+Source4:	%{name}-config-20090914.tar.bz2
+# Source4-md5:	605f1cd28c00db961dad6f529d849f16
+Source5:	%{name}-lighttpd.conf
 Patch0:		%{name}-resources.patch
 Patch1:		%{name}-iconv-in-libc.patch
 Patch2:		%{name}-webapps.patch
@@ -172,7 +170,7 @@ Este pacote contém arquivos de cabeçalho usados no desenvolvimento de
 aplicativos para o Nagios.
 
 %prep
-%setup -q -a5
+%setup -q -a4
 %patch0 -p0
 %patch1 -p1
 %patch2 -p1
@@ -194,7 +192,7 @@ sed -i -e '
 ' $(find contrib/eventhandlers -type f)
 
 sed -e 's,%{_prefix}/lib/,%{_libdir}/,' %{SOURCE1} > apache.conf
-sed -e 's,%{_prefix}/lib/,%{_libdir}/,' %{SOURCE6} > lighttpd.conf
+sed -e 's,%{_prefix}/lib/,%{_libdir}/,' %{SOURCE5} > lighttpd.conf
 
 # fixup cgi config
 %{__sed} -i -e '
@@ -248,7 +246,6 @@ cp -a include/*.h	$RPM_BUILD_ROOT%{_includedir}/%{name}
 
 install -p %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 cp -a %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/%{name}
-cp -a %{SOURCE4} $RPM_BUILD_ROOT%{_datadir}
 
 # install templated configuration files
 for a in nagios.cfg resource.cfg commands.cfg contactgroups.cfg contacts.cfg templates.cfg timeperiods.cfg; do
@@ -419,18 +416,19 @@ done
 %dir %{_datadir}/includes
 %dir %{_datadir}/images
 %dir %{_datadir}/stylesheets
-%{_datadir}/favicon.ico
 %{_datadir}/robots.txt
 %{_datadir}/contexthelp
 %{_datadir}/docs
 %{_datadir}/media
 %{_datadir}/ssi
+%{_datadir}/images/favicon.ico
 
 %files theme-default
 %defattr(644,root,root,755)
 %{_datadir}/*.php
 %{_datadir}/includes/*
 %{_datadir}/images/*
+%exclude %{_datadir}/images/favicon.ico
 %{_datadir}/stylesheets/*
 
 %files devel
