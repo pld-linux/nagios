@@ -1,5 +1,5 @@
---- nagios-3.2.0/cgi/statusmap.c	2009-10-22 17:06:10.117113115 +0300
-+++ nagios-3.2.0.googlemap/cgi/statusmap.c	2009-10-22 17:05:32.644615709 +0300
+--- nagios-3.2.0.googlemap/cgi/statusmap.c	2009-10-22 17:05:32.644615709 +0300
++++ nagios-3.2.0/cgi/statusmap.c	2009-10-22 18:02:00.526776437 +0300
 @@ -27,6 +27,10 @@
   *
   *****************************************************************************/
@@ -51,7 +51,22 @@
  void draw_hosts(void);
  void draw_host_text(char *,int,int);
  void draw_text(char *,int,int,int);
-@@ -345,9 +367,14 @@
+@@ -288,12 +310,11 @@
+ 	/* initialize macros */
+ 	init_macros();
+ 
+-
+-	document_header(TRUE);
+-
+ 	/* get authentication information */
+ 	get_authentication_information(&current_authdata);
+ 
++	document_header(TRUE);
++
+ 	/* display the network map... */
+ 	display_map();
+ 
+@@ -345,9 +366,14 @@
  
  		/* write JavaScript code for popup window */
  		write_popup_code();
@@ -66,7 +81,7 @@
  		printf("<body CLASS='statusmap' name='mappage' id='mappage'>\n");
  
  		/* include user SSI header */
-@@ -703,7 +730,7 @@
+@@ -703,7 +729,7 @@
  		/* right hand column of top row */
  		printf("<td align=right valign=top>\n");
  
@@ -75,7 +90,7 @@
  		printf("<table border=0 CLASS='optBox'>\n");
  		printf("<tr><td valign=top>\n");
  		printf("<input type='hidden' name='host' value='%s'>\n",escape_string(host_name));
-@@ -725,6 +752,7 @@
+@@ -725,6 +751,7 @@
  		printf("<option value=%d %s>Circular\n",LAYOUT_CIRCULAR,(layout_method==LAYOUT_CIRCULAR)?"selected":"");
  		printf("<option value=%d %s>Circular (Marked Up)\n",LAYOUT_CIRCULAR_MARKUP,(layout_method==LAYOUT_CIRCULAR_MARKUP)?"selected":"");
  		printf("<option value=%d %s>Circular (Balloon)\n",LAYOUT_CIRCULAR_BALLOON,(layout_method==LAYOUT_CIRCULAR_BALLOON)?"selected":"");
@@ -83,7 +98,7 @@
  		printf("</select>\n");
  		printf("</td>\n");
  		printf("<td CLASS='optBoxItem'>\n");
-@@ -821,6 +849,11 @@
+@@ -821,6 +848,11 @@
  	/* display page header */
  	display_page_header();
  
@@ -95,7 +110,7 @@
  	initialize_graphics();
  	draw_background_image();
  	draw_background_extras();
-@@ -876,6 +909,13 @@
+@@ -876,6 +908,13 @@
    
  
  	/******************************/
@@ -109,7 +124,7 @@
  	/***** MANUAL LAYOUT MODE *****/
  	/******************************/
  
-@@ -1563,10 +1603,19 @@
+@@ -1563,10 +1602,19 @@
  	return;
          }
  
@@ -129,7 +144,7 @@
  	host *temp_host;
  	int x1, x2;
  	int y1, y2;
-@@ -1586,6 +1635,8 @@
+@@ -1586,6 +1634,8 @@
  	int translated_x;
  	int translated_y;
  
@@ -138,7 +153,7 @@
  	
  	/* user didn't supply any coordinates for hosts, so display a warning */
  	if(coordinates_were_specified==FALSE){
-@@ -2241,6 +2292,287 @@
+@@ -2241,6 +2291,287 @@
  /************************* MISC FUNCTIONS *************************/
  /******************************************************************/
  
