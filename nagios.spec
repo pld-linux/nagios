@@ -9,7 +9,7 @@ Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
 Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	3.2.0
-Release:	6
+Release:	7
 License:	GPL v2
 Group:		Networking
 Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}.tar.gz
@@ -20,12 +20,18 @@ Source3:	%{name}.sysconfig
 Source4:	%{name}-config-20090914.tar.bz2
 # Source4-md5:	605f1cd28c00db961dad6f529d849f16
 Source5:	%{name}-lighttpd.conf
+Source6:	http://www.google.com/mapfiles/shadow50.png
+# Source6-md5:	eff99f302f21b95a900d321743fce72b
+Source7:	http://www.google.com/mapfiles/marker.png
+# Source7-md5:	edefef4bdfc29e1c953694651f05b466
+Source8:	googlemap.js
 Patch0:		%{name}-resources.patch
 Patch1:		%{name}-iconv-in-libc.patch
 Patch2:		%{name}-webapps.patch
 Patch3:		%{name}-cgi-http_charset.patch
 Patch4:		%{name}-cmd-typo.patch
 Patch5:		config.patch
+Patch6:		nagios-googlemap.patch
 URL:		http://www.nagios.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -177,6 +183,7 @@ aplicativos para o Nagios.
 %patch3 -p1
 %patch4 -p1
 %patch5 -p1
+%patch6 -p1
 
 find -name .cvsignore -o -name .gitignore | xargs rm
 
@@ -257,6 +264,9 @@ cp -a apache.conf $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/apache.conf
 cp -a apache.conf $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/httpd.conf
 cp -a lighttpd.conf $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/lighttpd.conf
 cp -a sample-config/cgi.cfg $RPM_BUILD_ROOT%{_webapps}/%{_webapp}
+cp -a %{SOURCE6} $RPM_BUILD_ROOT%{_datadir}/images
+cp -a %{SOURCE7} $RPM_BUILD_ROOT%{_datadir}/images
+cp -a %{SOURCE8} $RPM_BUILD_ROOT%{_datadir}/images
 > $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/passwd
 echo 'nagios:' > $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/group
 
@@ -422,6 +432,8 @@ done
 %{_datadir}/media
 %{_datadir}/ssi
 %{_datadir}/images/favicon.ico
+%{_datadir}/images/marker.png
+%{_datadir}/images/shadow50.png
 
 %files theme-default
 %defattr(644,root,root,755)
@@ -429,6 +441,8 @@ done
 %{_datadir}/includes/*
 %{_datadir}/images/*
 %exclude %{_datadir}/images/favicon.ico
+%exclude %{_datadir}/images/marker.png
+%exclude %{_datadir}/images/shadow50.png
 %{_datadir}/stylesheets/*
 
 %files devel

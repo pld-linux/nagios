@@ -1,5 +1,5 @@
---- nagios-3.2.0.googlemap/cgi/statusmap.c	2009-10-22 17:05:32.644615709 +0300
-+++ nagios-3.2.0/cgi/statusmap.c	2009-10-22 18:02:00.526776437 +0300
+--- nagios-3.2.0/cgi/statusmap.c	2009-10-22 18:19:21.913340828 +0300
++++ nagios-3.2.0.googlemap/cgi/statusmap.c	2009-10-22 18:19:06.830007817 +0300
 @@ -27,6 +27,10 @@
   *
   *****************************************************************************/
@@ -110,20 +110,6 @@
  	initialize_graphics();
  	draw_background_image();
  	draw_background_extras();
-@@ -876,6 +908,13 @@
-   
- 
- 	/******************************/
-+	/***** GOOGLEMAP LAYOUT MODE *****/
-+	/******************************/
-+	if(layout_method==LAYOUT_GOOGLEMAP){
-+			
-+	}
-+
-+	/******************************/
- 	/***** MANUAL LAYOUT MODE *****/
- 	/******************************/
- 
 @@ -1563,10 +1602,19 @@
  	return;
          }
@@ -148,12 +134,12 @@
  	int translated_x;
  	int translated_y;
  
-+	if (layout_method==LAYOUT_GOOGLEMAP)
++	if (layout_method == LAYOUT_GOOGLEMAP)
 +		return;
  	
  	/* user didn't supply any coordinates for hosts, so display a warning */
  	if(coordinates_were_specified==FALSE){
-@@ -2241,6 +2291,287 @@
+@@ -2241,6 +2291,197 @@
  /************************* MISC FUNCTIONS *************************/
  /******************************************************************/
  
@@ -294,112 +280,19 @@
 +	}
 +	fclose(fp);
 +
-+	printf("<script src='http://maps.google.com/maps?file=api&amp;v=2&key=%s&amp;sensor=false' type='text/javascript'></script>\n",gen_loc.key);
 +
-+	printf("<script type='text/javascript'>\n"
-+    	"//<![CDATA[ \n");
-+
-+	// printf("<script type=javascript src="webbserverfil" />);
-+
-+	printf("function setMapCookie(map) {"
-+		"document.cookie = 'googlemaplng='+map.getCenter().lng();\n"
-+		"document.cookie = 'googlemaplat='+map.getCenter().lat();\n"
-+		"var zoom = map.getZoom();\n"
-+		"document.cookie = 'googlemapzoom='+zoom;\n"
-+		"document.layoutform.scaling_factor.value=+zoom;\n"
-+	"}\n"
-+	
-+	"function readCookie(name) {\n"
-+		"var nameEQ = name + \"=\";\n"
-+		"var ca = document.cookie.split(';');\n"
-+		"for(var i=0;i < ca.length;i++)\n"
-+		"{\n"
-+			"var c = ca[i];\n"
-+			"while (c.charAt(0)==' ') c = c.substring(1,c.length);\n"
-+			"if (c.indexOf(nameEQ) == 0)\n"
-+			"{\n"
-+				"c=c.substring(nameEQ.length,c.length);\n"
-+				"while (c.substring(c.length-1, c.length) == ' ')\n"
-+					"c = c.substring(0,c.length-1);\n"
-+				"return c;\n"
-+			"}\n"
-+		"}\n"
-+		"return null;\n"
-+	"}\n"
-+
-+	"function createMarker(hostname, comment, lat, long, state) {\n"
-+	" var point = new GLatLng(lat,long);\n"
-+  	"var marker;\n"
-+	"if ( state==\"Up\" ) {\n"
-+		"var baseIcon = new GIcon();\n"
-+		"baseIcon.shadow = \"../images/shadow.png\";\n"
-+		"baseIcon.iconSize = new GSize(20, 34);\n"
-+		"baseIcon.shadowSize = new GSize(37, 34);\n"
-+		"baseIcon.iconAnchor = new GPoint(9, 34);\n"
-+		"baseIcon.infoWindowAnchor = new GPoint(9, 2);\n"
-+		"baseIcon.infoShadowAnchor = new GPoint(18, 25);\n"
-+		"var okicon = new GIcon(baseIcon);\n"
-+		"okicon.image = \"../images/green.png\";\n"
-+		"marker = new GMarker(point,okicon);\n"
-+	"} else {\n"
-+  		"marker = new GMarker(point);\n"
-+	"}\n"
-+		
-+	"GEvent.addListener(marker, \"click\", function() { \n"
-+			                         "marker.openInfoWindowHtml(\"<b>\"+hostname+\"</b><br>\"+comment+\"<br>State: \"+state+\"\");\n"
-+	"});\n"
-+	"return marker;\n"
-+	"}\n"
-+
-+	"function load() {\n"
-+    	"if (GBrowserIsCompatible()) {\n"
-+        	"var map = new GMap2(document.getElementById(\"map\"));\n"
-+		"map.addControl(new GSmallMapControl());\n"
-+		"map.addControl(new GMapTypeControl());\n"
-+		
-+		"GEvent.addListener(map, \"click\", function () {\n"
-+			"setMapCookie(map);\n"
-+		"});\n"
-+
-+		"GEvent.addListener(map, \"move\", function () {\n"
-+			"setMapCookie(map);\n"
-+		"});\n"
-+
-+		"GEvent.addListener(map, \"zoom\", function () {\n"
-+			"setMapCookie(map);\n"
-+		"});\n"
-+
-+ 		"var googlemaplat = readCookie('googlemaplat');\n"
-+        "var googlemaplng = readCookie('googlemaplng');\n"
-+
-+		"var centerPoint;\n"
-+		"if(  googlemaplng!=null && googlemaplat!=null ) \n"
-+			"centerPoint = new GLatLng(googlemaplat,googlemaplng);\n"
-+		"else\n");
-+			printf("centerPoint = new GLatLng(%s,%s);\n",gen_loc.latitude,gen_loc.longitude);
-+
-+		printf("var zoom = map.getZoom();\n"
-+		"document.layoutform.scaling_factor.value=+zoom;\n");
-+
-+
-+	if (user_supplied_scaling==TRUE)
-+	{
-+    		printf("map.setCenter(centerPoint, %2.1f);\n",user_scaling_factor);
-+		printf("document.layoutform.scaling_factor.value=%2.1f;\n",user_scaling_factor);
++	printf("<script type='text/javascript'>\n");
++	printf("gstatusmap = {\n");
++	printf("lat:%s,\n", gen_loc.latitude);
++	printf("lng:%s,\n", gen_loc.longitude);
++	if (user_supplied_scaling==TRUE) {
++		printf("scale: '%2.1f',\n", user_scaling_factor);
 +	} else {
-+		printf("var googlemapzoom = readCookie('googlemapzoom');\n"
-+		"if ( googlemapzoom != null ) \n"
-+		"{\n"
-+			"map.setCenter(centerPoint,parseInt(googlemapzoom));\n"
-+			"document.layoutform.scaling_factor.value=googlemapzoom;\n"
-+		"} else\n"
-+		"{\n");
-+    		printf("map.setCenter(centerPoint, %s);\n",gen_loc.zoom);
-+			printf("document.layoutform.scaling_factor.value=%s;\n",gen_loc.zoom);
-+		printf("}\n");
++		printf("scale: '%2.1f',\n", gen_loc.zoom);
 +		user_scaling_factor = atof(gen_loc.zoom);
 +	}
-+			
++	printf("markers: [\n");
++
 +	loc = loc_list;
 +	while (loc) {
 +		// check if allowed to show hostname first
@@ -421,22 +314,25 @@
 +			free(ptr);
 +
 +	
-+			printf("map.addOverlay(createMarker('%s','",loc->name);
++			printf("['%s','",loc->name);
 +			ptr = loc->note;
 +			while ((ch = *ptr++)) {
 +				if (ch == '\'') printf("\\'");
 +				else printf("%c", ch);
 +			}
-+			printf("',%s,%s,'%s'))\n",loc->latitude,loc->longitude,stateinfo);
++			printf("',%s,%s,'%s'],\n",loc->latitude,loc->longitude,stateinfo);
 +
 +			loc = loc->next;
 +		}
 +	}
-+			
-+	printf("}\n"
-+	"}\n"
-+  	"//]]>\n"
-+  	"</script>\n");
++
++	printf("0], \n");
++	printf("images_url: '%s'\n", url_images_path);
++	printf("};\n");
++	printf("</script>\n");
++
++	printf("<script src='http://maps.google.com/maps?file=api&amp;v=2&key=%s&amp;sensor=false' type='text/javascript'></script>\n",gen_loc.key);
++	printf("<script src='%sgooglemap.js' type='text/javascript'></script>\n", url_images_path);
 +}
  
  /* write JavaScript code an layer for popup window */
