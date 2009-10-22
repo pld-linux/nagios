@@ -1,5 +1,5 @@
---- nagios-3.2.0/cgi/statusmap.c	2009-10-22 14:54:22.000000000 +0300
-+++ nagios-3.2.0/cgi/statusmap.c	2009-10-22 16:11:22.450924994 +0300
+--- nagios-3.2.0/cgi/statusmap.c	2009-10-22 17:06:10.117113115 +0300
++++ nagios-3.2.0.googlemap/cgi/statusmap.c	2009-10-22 17:05:32.644615709 +0300
 @@ -27,6 +27,10 @@
   *
   *****************************************************************************/
@@ -11,13 +11,12 @@
  #include "../include/config.h"
  #include "../include/common.h"
  #include "../include/objects.h"
-@@ -88,13 +92,29 @@
+@@ -93,13 +97,27 @@
  #define LAYOUT_CIRCULAR                 4
  #define LAYOUT_CIRCULAR_MARKUP          5
  #define LAYOUT_CIRCULAR_BALLOON         6
+-
 +#define LAYOUT_GOOGLEMAP				7
- 
-+/*#define DEBUG 1*/
  
  typedef struct layer_struct{
  	char *layer_name;
@@ -41,7 +40,7 @@
  
  void document_header(int);
  void document_footer(void);
-@@ -112,6 +132,10 @@
+@@ -117,6 +135,10 @@
  void draw_background_image(void);
  void draw_background_extras(void);
  void draw_host_links(void);
@@ -52,23 +51,22 @@
  void draw_hosts(void);
  void draw_host_text(char *,int,int);
  void draw_text(char *,int,int,int);
-@@ -333,9 +357,14 @@
+@@ -345,9 +367,14 @@
+ 
  		/* write JavaScript code for popup window */
  		write_popup_code();
-+		if ( layout_method == LAYOUT_GOOGLEMAP ) 
++		if (layout_method == LAYOUT_GOOGLEMAP)
 +			write_google_head_code();
  
  		printf("</head>\n");
  		
--		printf("<body CLASS='statusmap' name='mappage' id='mappage'>\n");
-+		if ( layout_method == LAYOUT_GOOGLEMAP ) { 
++		if (layout_method == LAYOUT_GOOGLEMAP) {
 +			printf("<body onload='load()' onunload='GUnload()' CLASS='statusmap' name='mappage' id='mappage'>\n");
 +		} else 
-+			printf("<body CLASS='statusmap' name='mappage' id='mappage'>\n");
+ 		printf("<body CLASS='statusmap' name='mappage' id='mappage'>\n");
  
  		/* include user SSI header */
- 		include_ssi_files(STATUSMAP_CGI,SSI_HEADER);
-@@ -703,7 +732,7 @@
+@@ -703,7 +730,7 @@
  		/* right hand column of top row */
  		printf("<td align=right valign=top>\n");
  
@@ -77,7 +75,7 @@
  		printf("<table border=0 CLASS='optBox'>\n");
  		printf("<tr><td valign=top>\n");
  		printf("<input type='hidden' name='host' value='%s'>\n",escape_string(host_name));
-@@ -717,6 +746,7 @@
+@@ -725,6 +752,7 @@
  		printf("<option value=%d %s>Circular\n",LAYOUT_CIRCULAR,(layout_method==LAYOUT_CIRCULAR)?"selected":"");
  		printf("<option value=%d %s>Circular (Marked Up)\n",LAYOUT_CIRCULAR_MARKUP,(layout_method==LAYOUT_CIRCULAR_MARKUP)?"selected":"");
  		printf("<option value=%d %s>Circular (Balloon)\n",LAYOUT_CIRCULAR_BALLOON,(layout_method==LAYOUT_CIRCULAR_BALLOON)?"selected":"");
@@ -85,7 +83,7 @@
  		printf("</select>\n");
  		printf("</td>\n");
  		printf("<td CLASS='optBoxItem'>\n");
-@@ -794,6 +824,11 @@
+@@ -821,6 +849,11 @@
  	/* display page header */
  	display_page_header();
  
@@ -97,7 +95,7 @@
  	initialize_graphics();
  	draw_background_image();
  	draw_background_extras();
-@@ -848,6 +883,13 @@
+@@ -876,6 +909,13 @@
    
  
  	/******************************/
@@ -111,7 +109,7 @@
  	/***** MANUAL LAYOUT MODE *****/
  	/******************************/
  
-@@ -1535,10 +1577,19 @@
+@@ -1563,10 +1603,19 @@
  	return;
          }
  
@@ -131,7 +129,7 @@
  	host *temp_host;
  	int x1, x2;
  	int y1, y2;
-@@ -1558,6 +1609,8 @@
+@@ -1586,6 +1635,8 @@
  	int translated_x;
  	int translated_y;
  
@@ -140,24 +138,10 @@
  	
  	/* user didn't supply any coordinates for hosts, so display a warning */
  	if(coordinates_were_specified==FALSE){
-@@ -2213,6 +2266,301 @@
+@@ -2241,6 +2292,287 @@
  /************************* MISC FUNCTIONS *************************/
  /******************************************************************/
  
-+int check_auth_location_host(char* name)
-+{
-+	int retVal=FALSE;
-+	host *this_host;
-+
-+	//printf("false=%d,true=%d\n",FALSE,TRUE);
-+	this_host=find_host(name);
-+	// printf("this_host=%s\n",this_host->name);
-+	// printf("current_auth=%s\n",&current_authdata);
-+	retVal=is_authorized_for_host(this_host,&current_authdata);
-+	// printf("is_auth=%d\n",retVal);
-+	return retVal;
-+}	
-+
 +char* get_status_code(char* name)
 +{
 +	char* retVal;
@@ -201,7 +185,7 @@
 +	char line[1024];	
 +	char key[1024];	
 +	char value[1024];	
-+	char buf[256]; 
++	char buf[256];
 +	char* filename;
 +	int state = 0;
 +	int counter = 0;
@@ -280,7 +264,7 @@
 +			if ( state == 1 ) {
 +				if ( strcmp(key,"host_name") == 0) {
 +					loc->name=strdup(value);
-+				} 
++				}
 +				if ( strcmp(key,"notes") == 0) {
 +					loc->note = strdup(value);
 +				}
@@ -383,7 +367,7 @@
 +		"document.layoutform.scaling_factor.value=+zoom;\n");
 +
 +
-+	if ( user_supplied_scaling==TRUE ) 
++	if (user_supplied_scaling==TRUE)
 +	{
 +    		printf("map.setCenter(centerPoint, %2.1f);\n",user_scaling_factor);
 +		printf("document.layoutform.scaling_factor.value=%2.1f;\n",user_scaling_factor);
