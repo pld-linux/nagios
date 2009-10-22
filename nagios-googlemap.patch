@@ -1,0 +1,444 @@
+--- nagios-3.2.0/cgi/statusmap.c	2009-10-22 14:54:22.000000000 +0300
++++ nagios-3.2.0/cgi/statusmap.c	2009-10-22 16:11:22.450924994 +0300
+@@ -27,6 +27,10 @@
+  *
+  *****************************************************************************/
+ 
++#include <stdio.h>
++#include <stdlib.h>
++#include <string.h>
++
+ #include "../include/config.h"
+ #include "../include/common.h"
+ #include "../include/objects.h"
+@@ -88,13 +92,29 @@
+ #define LAYOUT_CIRCULAR                 4
+ #define LAYOUT_CIRCULAR_MARKUP          5
+ #define LAYOUT_CIRCULAR_BALLOON         6
++#define LAYOUT_GOOGLEMAP				7
+ 
++/*#define DEBUG 1*/
+ 
+ typedef struct layer_struct{
+ 	char *layer_name;
+ 	struct layer_struct *next;
+         }layer;
+ 
++typedef struct location_t {
++	char* name;
++	char* note;
++	char* latitude;
++	char* longitude;
++	struct location_t* next;
++} location_t;
++
++typedef struct general_location_t {
++	char* key;
++	char* zoom;
++	char* latitude;
++	char* longitude;
++} general_location_t;
+ 
+ void document_header(int);
+ void document_footer(void);
+@@ -112,6 +132,10 @@
+ void draw_background_image(void);
+ void draw_background_extras(void);
+ void draw_host_links(void);
++
++void google_map(void);
++void write_google_head_code(void);
++
+ void draw_hosts(void);
+ void draw_host_text(char *,int,int);
+ void draw_text(char *,int,int,int);
+@@ -333,9 +357,14 @@
+ 		/* write JavaScript code for popup window */
+ 		write_popup_code();
++		if ( layout_method == LAYOUT_GOOGLEMAP ) 
++			write_google_head_code();
+ 
+ 		printf("</head>\n");
+ 		
+-		printf("<body CLASS='statusmap' name='mappage' id='mappage'>\n");
++		if ( layout_method == LAYOUT_GOOGLEMAP ) { 
++			printf("<body onload='load()' onunload='GUnload()' CLASS='statusmap' name='mappage' id='mappage'>\n");
++		} else 
++			printf("<body CLASS='statusmap' name='mappage' id='mappage'>\n");
+ 
+ 		/* include user SSI header */
+ 		include_ssi_files(STATUSMAP_CGI,SSI_HEADER);
+@@ -703,7 +732,7 @@
+ 		/* right hand column of top row */
+ 		printf("<td align=right valign=top>\n");
+ 
+-		printf("<form method=\"POST\" action=\"%s\">\n",STATUSMAP_CGI);
++		printf("<form name=\"layoutform\" method=\"POST\" action=\"%s\">\n",STATUSMAP_CGI);
+ 		printf("<table border=0 CLASS='optBox'>\n");
+ 		printf("<tr><td valign=top>\n");
+ 		printf("<input type='hidden' name='host' value='%s'>\n",escape_string(host_name));
+@@ -717,6 +746,7 @@
+ 		printf("<option value=%d %s>Circular\n",LAYOUT_CIRCULAR,(layout_method==LAYOUT_CIRCULAR)?"selected":"");
+ 		printf("<option value=%d %s>Circular (Marked Up)\n",LAYOUT_CIRCULAR_MARKUP,(layout_method==LAYOUT_CIRCULAR_MARKUP)?"selected":"");
+ 		printf("<option value=%d %s>Circular (Balloon)\n",LAYOUT_CIRCULAR_BALLOON,(layout_method==LAYOUT_CIRCULAR_BALLOON)?"selected":"");
++		printf("<option value=%d %s>Googlemap\n",LAYOUT_GOOGLEMAP,(layout_method==LAYOUT_GOOGLEMAP)?"selected":"");
+ 		printf("</select>\n");
+ 		printf("</td>\n");
+ 		printf("<td CLASS='optBoxItem'>\n");
+@@ -794,6 +824,11 @@
+ 	/* display page header */
+ 	display_page_header();
+ 
++	if (layout_method==LAYOUT_GOOGLEMAP){
++		google_map();
++		return;
++	}
++
+ 	initialize_graphics();
+ 	draw_background_image();
+ 	draw_background_extras();
+@@ -848,6 +883,13 @@
+   
+ 
+ 	/******************************/
++	/***** GOOGLEMAP LAYOUT MODE *****/
++	/******************************/
++	if(layout_method==LAYOUT_GOOGLEMAP){
++			
++	}
++
++	/******************************/
+ 	/***** MANUAL LAYOUT MODE *****/
+ 	/******************************/
+ 
+@@ -1535,10 +1577,19 @@
+ 	return;
+         }
+ 
++/* create the googlemap */
++void google_map(void){
++	printf("<!-- Produced by Infoflex Connect AB (http://www.infoflexconnect.se), Fredrik Nilsson and Rujinschi Remus. -->\n");
++	printf("<P><DIV ALIGN=center>");
++	printf("<div id='map' style='width: 800px; height: 500px'></div>");
++	printf("</DIV></P>");
++	printf("<!-- Produced by Infoflex Connect AB (http://www.infoflexconnect.se), Fredrik Nilsson and Rujinschi Remus. -->\n");
+ 
++}
+ 
+ /* draws hosts */
+ void draw_hosts(void){
++	
+ 	host *temp_host;
+ 	int x1, x2;
+ 	int y1, y2;
+@@ -1558,6 +1609,8 @@
+ 	int translated_x;
+ 	int translated_y;
+ 
++	if (layout_method==LAYOUT_GOOGLEMAP)
++		return;
+ 	
+ 	/* user didn't supply any coordinates for hosts, so display a warning */
+ 	if(coordinates_were_specified==FALSE){
+@@ -2213,6 +2266,301 @@
+ /************************* MISC FUNCTIONS *************************/
+ /******************************************************************/
+ 
++int check_auth_location_host(char* name)
++{
++	int retVal=FALSE;
++	host *this_host;
++
++	//printf("false=%d,true=%d\n",FALSE,TRUE);
++	this_host=find_host(name);
++	// printf("this_host=%s\n",this_host->name);
++	// printf("current_auth=%s\n",&current_authdata);
++	retVal=is_authorized_for_host(this_host,&current_authdata);
++	// printf("is_auth=%d\n",retVal);
++	return retVal;
++}	
++
++char* get_status_code(char* name)
++{
++	char* retVal;
++	hoststatus *temp_status;
++	temp_status=find_hoststatus(name);
++
++	/* strip nasty stuff from plugin output */
++	sanitize_plugin_output(temp_status->plugin_output);
++	
++	retVal=malloc(1000);
++	retVal[0]=0;
++	if(temp_status->status==HOST_DOWN){
++		strcat(retVal,"Down");
++		if(temp_status->problem_has_been_acknowledged==TRUE)
++			strcat(retVal," (Acknowledged)");
++		strcat(retVal, "");
++	        }
++
++	else if(temp_status->status==HOST_UNREACHABLE){
++		strcat(retVal, "Unreachable");
++		if(temp_status->problem_has_been_acknowledged==TRUE)
++			strcat(retVal, " (Acknowledged)");
++		strcat(retVal, "");
++	        }
++
++	else if(temp_status->status==HOST_UP)
++		strcat(retVal, "Up");
++
++	else if(temp_status->status==HOST_PENDING)
++		strcat(retVal, "Pending");
++	return retVal;
++}
++
++void write_google_head_code(void)
++{
++	char ch;
++	char* ptr;
++	int rc;
++	FILE *fp;
++	char stateinfo[1024];	
++	char line[1024];	
++	char key[1024];	
++	char value[1024];	
++	char buf[256]; 
++	char* filename;
++	int state = 0;
++	int counter = 0;
++	general_location_t gen_loc;
++	location_t* loc;
++	location_t* loc_list=NULL;
++
++
++/***************************************
++ * parse location.cfg
++ **************************************/
++
++	filename = "/etc/webapps/nagios/location.cfg";
++	if((fp=fopen(filename, "r"))==NULL) {
++		char* err_mess = "The file: location.cfg does not exist or could not be read";	
++		printf("<p>");
++		printf("<font color=\"red\">%s</font>\r\n",err_mess);
++		printf("</p>");
++		return;
++	}
++
++	while(fgets(buf, sizeof(buf), fp)!=NULL) {
++		if ( (state == 1) && (buf[0] == '}')) {
++			// we have reached a definition end
++			state = 0;
++			counter++;
++			if (loc_list) {
++				loc->next = loc_list;
++				loc_list = loc;
++			} else {
++				loc_list = loc;
++			}
++			loc = NULL;
++			continue;
++		}	
++		if ( (state==2) && (buf[0] == '}')) {
++			state=0;
++		}
++		key[0] = value[0] = 0;
++		if (isspace(buf[0]))
++			rc = sscanf(buf, "%*[ \t]%[^ \t]%*[ \t]%[^\n]", key, value);
++		else
++			rc = sscanf(buf, "%[^ \t]%*[ \t]%[^\n]", key, value);
++
++		if ( (rc == 2)) {
++			if ( (state == 0) &&  (strcmp(key,"define")==0) ) {
++				// we have a start of a new definition
++
++				// check if it is the default definition
++				if ( (strncmp(value,"default ",8)==0) ||
++						(strncmp(value,"default{",8)==0)) {
++					state=2;
++					continue;
++				}
++				state = 1;
++				// declare a new location
++				loc = calloc(1,sizeof(*loc));
++				continue;
++			}
++			// state 2 == default definition
++			if ( state == 2 ) {
++				if ( strcmp(key,"key") == 0) {
++					gen_loc.key=strdup(value);
++				}
++				if ( strcmp(key,"zoom") == 0) {
++					gen_loc.zoom=strdup(value);
++				}
++				if ( strcmp(key,"lat") == 0) {
++					gen_loc.latitude=strdup(value);
++				}
++				if ( strcmp(key,"long") == 0) {
++					gen_loc.longitude=strdup(value);
++				}
++			}
++			// state 1 == location definition
++			if ( state == 1 ) {
++				if ( strcmp(key,"host_name") == 0) {
++					loc->name=strdup(value);
++				} 
++				if ( strcmp(key,"notes") == 0) {
++					loc->note = strdup(value);
++				}
++				if ( strcmp(key,"lat") == 0) {
++					loc->latitude = strdup(value);
++				}
++				if ( strcmp(key,"long") == 0) {
++					loc->longitude = strdup(value);
++				}
++			}
++		}
++	}
++	fclose(fp);
++
++	printf("<script src='http://maps.google.com/maps?file=api&amp;v=2&key=%s&amp;sensor=false' type='text/javascript'></script>\n",gen_loc.key);
++
++	printf("<script type='text/javascript'>\n"
++    	"//<![CDATA[ \n");
++
++	// printf("<script type=javascript src="webbserverfil" />);
++
++	printf("function setMapCookie(map) {"
++		"document.cookie = 'googlemaplng='+map.getCenter().lng();\n"
++		"document.cookie = 'googlemaplat='+map.getCenter().lat();\n"
++		"var zoom = map.getZoom();\n"
++		"document.cookie = 'googlemapzoom='+zoom;\n"
++		"document.layoutform.scaling_factor.value=+zoom;\n"
++	"}\n"
++	
++	"function readCookie(name) {\n"
++		"var nameEQ = name + \"=\";\n"
++		"var ca = document.cookie.split(';');\n"
++		"for(var i=0;i < ca.length;i++)\n"
++		"{\n"
++			"var c = ca[i];\n"
++			"while (c.charAt(0)==' ') c = c.substring(1,c.length);\n"
++			"if (c.indexOf(nameEQ) == 0)\n"
++			"{\n"
++				"c=c.substring(nameEQ.length,c.length);\n"
++				"while (c.substring(c.length-1, c.length) == ' ')\n"
++					"c = c.substring(0,c.length-1);\n"
++				"return c;\n"
++			"}\n"
++		"}\n"
++		"return null;\n"
++	"}\n"
++
++	"function createMarker(hostname, comment, lat, long, state) {\n"
++	" var point = new GLatLng(lat,long);\n"
++  	"var marker;\n"
++	"if ( state==\"Up\" ) {\n"
++		"var baseIcon = new GIcon();\n"
++		"baseIcon.shadow = \"../images/shadow.png\";\n"
++		"baseIcon.iconSize = new GSize(20, 34);\n"
++		"baseIcon.shadowSize = new GSize(37, 34);\n"
++		"baseIcon.iconAnchor = new GPoint(9, 34);\n"
++		"baseIcon.infoWindowAnchor = new GPoint(9, 2);\n"
++		"baseIcon.infoShadowAnchor = new GPoint(18, 25);\n"
++		"var okicon = new GIcon(baseIcon);\n"
++		"okicon.image = \"../images/green.png\";\n"
++		"marker = new GMarker(point,okicon);\n"
++	"} else {\n"
++  		"marker = new GMarker(point);\n"
++	"}\n"
++		
++	"GEvent.addListener(marker, \"click\", function() { \n"
++			                         "marker.openInfoWindowHtml(\"<b>\"+hostname+\"</b><br>\"+comment+\"<br>State: \"+state+\"\");\n"
++	"});\n"
++	"return marker;\n"
++	"}\n"
++
++	"function load() {\n"
++    	"if (GBrowserIsCompatible()) {\n"
++        	"var map = new GMap2(document.getElementById(\"map\"));\n"
++		"map.addControl(new GSmallMapControl());\n"
++		"map.addControl(new GMapTypeControl());\n"
++		
++		"GEvent.addListener(map, \"click\", function () {\n"
++			"setMapCookie(map);\n"
++		"});\n"
++
++		"GEvent.addListener(map, \"move\", function () {\n"
++			"setMapCookie(map);\n"
++		"});\n"
++
++		"GEvent.addListener(map, \"zoom\", function () {\n"
++			"setMapCookie(map);\n"
++		"});\n"
++
++ 		"var googlemaplat = readCookie('googlemaplat');\n"
++        "var googlemaplng = readCookie('googlemaplng');\n"
++
++		"var centerPoint;\n"
++		"if(  googlemaplng!=null && googlemaplat!=null ) \n"
++			"centerPoint = new GLatLng(googlemaplat,googlemaplng);\n"
++		"else\n");
++			printf("centerPoint = new GLatLng(%s,%s);\n",gen_loc.latitude,gen_loc.longitude);
++
++		printf("var zoom = map.getZoom();\n"
++		"document.layoutform.scaling_factor.value=+zoom;\n");
++
++
++	if ( user_supplied_scaling==TRUE ) 
++	{
++    		printf("map.setCenter(centerPoint, %2.1f);\n",user_scaling_factor);
++		printf("document.layoutform.scaling_factor.value=%2.1f;\n",user_scaling_factor);
++	} else {
++		printf("var googlemapzoom = readCookie('googlemapzoom');\n"
++		"if ( googlemapzoom != null ) \n"
++		"{\n"
++			"map.setCenter(centerPoint,parseInt(googlemapzoom));\n"
++			"document.layoutform.scaling_factor.value=googlemapzoom;\n"
++		"} else\n"
++		"{\n");
++    		printf("map.setCenter(centerPoint, %s);\n",gen_loc.zoom);
++			printf("document.layoutform.scaling_factor.value=%s;\n",gen_loc.zoom);
++		printf("}\n");
++		user_scaling_factor = atof(gen_loc.zoom);
++	}
++			
++	loc = loc_list;
++	while (loc) {
++		// check if allowed to show hostname first
++		host* temp_host=find_host(loc->name);
++		int in_layer_list=FALSE;
++		in_layer_list=is_host_in_layer_list(temp_host);
++
++		if ( !is_authorized_for_host(temp_host,&current_authdata) && !is_host_in_layer_list(temp_host)) {
++			loc = loc->next;	
++			continue;
++		} else {
++			if((in_layer_list==TRUE && exclude_layers==TRUE) || (in_layer_list==FALSE && exclude_layers==FALSE))
++			{
++				loc = loc->next;	
++				continue;
++			}
++			ptr = get_status_code(loc->name);	
++			strcpy(stateinfo,ptr);
++			free(ptr);
++
++	
++			printf("map.addOverlay(createMarker('%s','",loc->name);
++			ptr = loc->note;
++			while ((ch = *ptr++)) {
++				if (ch == '\'') printf("\\'");
++				else printf("%c", ch);
++			}
++			printf("',%s,%s,'%s'))\n",loc->latitude,loc->longitude,stateinfo);
++
++			loc = loc->next;
++		}
++	}
++			
++	printf("}\n"
++	"}\n"
++  	"//]]>\n"
++  	"</script>\n");
++}
+ 
+ /* write JavaScript code an layer for popup window */
+ void write_popup_code(void){
