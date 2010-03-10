@@ -13,7 +13,7 @@ Release:	1
 License:	GPL v2
 Group:		Networking
 Source0:	http://downloads.sourceforge.net/nagios/%{name}-%{version}.tar.gz
-# Source0-md5:	3566167cc60ddeaad34e7d2e26ed4a58
+# Source0-md5:	d4655ee8c95c9679fd4fd53dac34bbe3
 Source1:	%{name}-apache.conf
 Source2:	%{name}.init
 Source3:	%{name}.sysconfig
@@ -125,7 +125,7 @@ Wspólne pliki wymagane zarówno przez nagiosa jak i nrpe.
 Summary:	CGI webinterface for Nagios
 Summary(pl.UTF-8):	Interfejs WWW/CGI dla Nagiosa
 Group:		Applications/WWW
-# for dirs... and accessing local logs.
+# for dirs... and accessing local logs, nagios config
 Requires:	%{name} = %{version}-%{release}
 Requires:	%{name}-imagepaks
 Requires:	%{name}-theme
@@ -137,12 +137,21 @@ Requires:	webserver(alias)
 Requires:	webserver(auth)
 Requires:	webserver(cgi)
 Requires:	webserver(indexfile)
+Suggests:	%{name}-doc
 
 %description cgi
 CGI webinterface for Nagios.
 
 %description cgi -l pl.UTF-8
 Interfejs CGI dla Nagiosa.
+
+%package doc
+Summary:	HTML Documentation for Nagios
+Group:		Documentation
+# does not require base
+
+%description doc
+HTML Documentation for Nagios.
 
 %package theme-default
 Summary:	Default Nagios theme
@@ -285,6 +294,9 @@ for i in {objects.{cache,precache},{comments,downtime,retention,status}.dat,nagi
 done
 > $RPM_BUILD_ROOT%{_localstatedir}/rw/nagios.cmd
 
+install -d $RPM_BUILD_ROOT%{_docdir}/%{name}
+mv $RPM_BUILD_ROOT{%{_datadir}/docs/*,%{_docdir}/%{name}}
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -422,6 +434,10 @@ done
 %dir %{_prefix}/lib/%{name}/eventhandlers
 %endif
 
+%files doc
+%defattr(644,root,root,755)
+%{_docdir}/%{name}
+
 %files cgi
 %defattr(644,root,root,755)
 %dir %attr(750,root,http) %{_webapps}/%{_webapp}
@@ -440,7 +456,6 @@ done
 %dir %{_datadir}/stylesheets
 %{_datadir}/robots.txt
 %{_datadir}/contexthelp
-%{_datadir}/docs
 %{_datadir}/media
 %{_datadir}/ssi
 %{_datadir}/images/favicon.ico
