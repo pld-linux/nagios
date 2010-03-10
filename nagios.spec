@@ -12,8 +12,8 @@ Version:	3.2.1
 Release:	1
 License:	GPL v2
 Group:		Networking
-Source0:	http://dl.sourceforge.net/nagios/%{name}-%{version}.tar.gz
-# Source0-md5:	d4655ee8c95c9679fd4fd53dac34bbe3
+Source0:	http://downloads.sourceforge.net/nagios/%{name}-%{version}.tar.gz
+# Source0-md5:	3566167cc60ddeaad34e7d2e26ed4a58
 Source1:	%{name}-apache.conf
 Source2:	%{name}.init
 Source3:	%{name}.sysconfig
@@ -31,7 +31,7 @@ Patch2:		%{name}-webapps.patch
 Patch3:		%{name}-cgi-http_charset.patch
 Patch4:		%{name}-cmd-typo.patch
 Patch5:		config.patch
-Patch6:		nagios-googlemap.patch
+Patch6:		%{name}-googlemap.patch
 URL:		http://www.nagios.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -47,6 +47,9 @@ Requires:	%{name}-common = %{version}-%{release}
 Requires:	rc-scripts
 Requires:	sh-utils
 Suggests:	nagios-notify >= 0.13
+Suggests:	nagios-plugin-check_load
+Suggests:	nagios-plugin-check_ping
+Suggests:	nagios-plugins
 Provides:	nagios-core
 Obsoletes:	netsaint
 Conflicts:	iputils-ping < 1:ss020124
@@ -303,16 +306,16 @@ fi
 
 %pre common
 # rename group netsaint -> nagios
-if [ "`getgid netsaint 2>/dev/null`" = "72" ]; then
+if [ "$(getgid netsaint 2>/dev/null)" = "72" ]; then
 	/usr/sbin/groupmod -n nagios netsaint
 fi
 # rename group nagios-data -> nagcmd
-if [ "`getgid nagios-data 2>/dev/null`" = "147" ]; then
+if [ "$(getgid nagios-data 2>/dev/null)" = "147" ]; then
 	/usr/sbin/groupmod -n nagcmd nagios-data
 fi
 %groupadd -g 72 nagios
 %groupadd -g 147 -f nagcmd
-if [ -n "`id -u netsaint 2>/dev/null`" ] && [ "`id -u netsaint`" = "72" ]; then
+if [ -n "$(id -u netsaint 2>/dev/null)" ] && [ "$(id -u netsaint)" = "72" ]; then
 	/usr/sbin/usermod -d %{_libdir}/nagios -l nagios -c "Nagios Daemon" -G nagcmd netsaint
 fi
 %useradd -u 72 -d %{_libdir}/nagios -s /bin/false -c "Nagios Daemon" -g nagios -G nagcmd nagios
@@ -371,7 +374,16 @@ done
 %defattr(644,root,root,755)
 %doc Changelog README* UPGRADING INSTALLING LICENSE
 %attr(750,root,nagios) %dir %{_sysconfdir}/objects
-%attr(640,root,nagios) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/*.cfg
+
+# leave main nagios config readable for -cgi.
+%attr(640,root,nagcmd) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/nagios.cfg
+
+%attr(640,root,nagios) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/commands.cfg
+%attr(640,root,nagios) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/contactgroups.cfg
+%attr(640,root,nagios) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/contacts.cfg
+%attr(640,root,nagios) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/resource.cfg
+%attr(640,root,nagios) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/templates.cfg
+%attr(640,root,nagios) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/timeperiods.cfg
 
 %attr(754,root,root) /etc/rc.d/init.d/%{name}
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/%{name}
