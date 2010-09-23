@@ -1,15 +1,17 @@
+# TODO
+# - /var/log/nagios/archives -> /var/log/archive/nagios
 #
 # Conditional build:
 %bcond_without	gd	# without statusmap and trends, which require gd library
 # reeenable when http://tracker.nagios.org/view.php?id=51 is fixed
 %bcond_with	tests
-#
+
 Summary:	Host/service/network monitoring program
 Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
 Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	3.2.2
-Release:	1
+Release:	2
 License:	GPL v2+
 Group:		Networking
 Source0:	http://downloads.sourceforge.net/nagios/%{name}-%{version}.tar.gz
