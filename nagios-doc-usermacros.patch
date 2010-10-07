@@ -1,0 +1,32 @@
+
+Bring doc up to date:
+
+include/macros.h: 
+#define MAX_COMMAND_ARGUMENTS           32  /* maximum number of $ARGx$ macros */
+#define MAX_USER_MACROS             256 /* maximum number of $USERx$ macros */
+
+---
+Signed-Off-By: Elan Ruusamäe <glen@delfi.ee>
+
+--- nagios-3.2.3/html/docs/macrolist.html~	2010-08-28 18:20:57.000000000 +0300
++++ nagios-3.2.3/html/docs/macrolist.html	2010-10-07 16:31:08.073321978 +0300
+@@ -3444,7 +3444,7 @@
+ 
+ <td class="MacroName"><a name="user">$USERn$</a></td>
+ 
+-<td class="MacroDescription">The <i>n</i>th user-definable macro. User macros can be defined in one or more <a href="configmain.html#resource_file">resource files</a>. Nagios supports up to 256 user macros ($USER1$ through $USER32$).</td>
++<td class="MacroDescription">The <i>n</i>th user-definable macro. User macros can be defined in one or more <a href="configmain.html#resource_file">resource files</a>. Nagios supports up to 256 user macros ($USER1$ through $USER256$).</td>
+ 
+ </tr>
+ 
+--- nagios-3.2.3/sample-config/resource.cfg.in	2003-09-12 02:57:51.000000000 +0300
++++ nagios-3.2.3/sample-config/resource.cfg.in	2010-10-07 16:33:41.616639353 +0300
+@@ -15,7 +15,7 @@
+ # The CGIs will not attempt to read the contents of resource files, so
+ # you can set restrictive permissions (600 or 660) on them.
+ #
+-# Nagios supports up to 32 $USERx$ macros ($USER1$ through $USER32$)
++# Nagios supports up to 256 $USERx$ macros ($USER1$ through $USER256$)
+ #
+ # Resource files may also be used to store configuration directives for
+ # external data sources like MySQL...
