@@ -293,7 +293,7 @@ cp -a sample-config $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
 find $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version} -name '*.in' | xargs rm
 
 # Object data/cache files
-for i in {objects.{cache,precache},{comments,downtime,retention,status}.dat,nagios.tmp}; do
+for i in {objects.{cache,precache},{retention,status}.dat,nagios.tmp}; do
 	> $RPM_BUILD_ROOT%{_localstatedir}/$i
 done
 > $RPM_BUILD_ROOT%{_localstatedir}/rw/nagios.cmd
@@ -305,7 +305,7 @@ mv $RPM_BUILD_ROOT{%{_datadir}/docs/*,%{_docdir}/%{name}}
 rm -rf $RPM_BUILD_ROOT
 
 %post
-for i in %{_localstatedir}/{objects.{cache,precache},{comments,downtime,retention,status}.dat}; do
+for i in %{_localstatedir}/{objects.{cache,precache},{retention,status}.dat}; do
 	[ ! -f $i ] && touch $i
 	chown root:nagios $i
 	chmod 664 $i
