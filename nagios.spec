@@ -11,7 +11,7 @@ Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
 Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	3.2.3
-Release:	3
+Release:	4
 License:	GPL v2+
 Group:		Networking
 Source0:	http://downloads.sourceforge.net/nagios/%{name}-%{version}.tar.gz
@@ -34,7 +34,8 @@ Patch3:		%{name}-cgi-http_charset.patch
 Patch4:		%{name}-cmd-typo.patch
 Patch5:		config.patch
 Patch6:		%{name}-googlemap.patch
-Patch7:		nagios-doc-usermacros.patch
+Patch7:		%{name}-doc-usermacros.patch
+Patch8:		archivelog-timeformat.patch
 URL:		http://www.nagios.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -200,6 +201,7 @@ aplicativos para o Nagios.
 %patch5 -p1
 %patch6 -p1
 %patch7 -p1
+%patch8 -p1
 
 find -name .cvsignore -o -name .gitignore | xargs rm
 
@@ -226,6 +228,11 @@ sed -e 's,%{_prefix}/lib/,%{_libdir}/,' %{SOURCE5} > lighttpd.conf
 	# we want all authorized users have default access
 	s,=nagiosadmin,=*,g
 ' sample-config/*.cfg.in
+
+# fixup paths in doc
+%{__sed} -i -e '
+	s,/usr/local/nagios/var/archives/,/var/log/nagios/archives/,
+' html/docs/configmain.html
 
 %build
 cp -f /usr/share/automake/config.sub .
