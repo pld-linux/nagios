@@ -60,9 +60,8 @@ Conflicts:	iputils-ping < 1:ss020124
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_sysconfdir	/etc/%{name}
-%define		_bindir		%{_prefix}/sbin
-%define		_sbindir	%{_libdir}/%{name}/cgi
-%define		_datadir	%{_prefix}/share/%{name}
+%define		cgidir		%{_libdir}/%{name}/cgi
+%define		htmldir		%{_prefix}/share/%{name}
 %define		_localstatedir	/var/lib/%{name}
 %define		_webapps	/etc/webapps
 %define		_webapp		%{name}
@@ -240,6 +239,9 @@ cp -f /usr/share/automake/config.sub .
 %{__autoconf}
 %configure \
 	CFLAGS="%{rpmcflags} %{rpmcppflags}" \
+	--bindir=%{_sbindir} \
+	--sbindir=%{cgidir} \
+	--datadir=%{htmldir} \
 	--with-nagios-user=%{name} \
 	--with-nagios-grp=%{name} \
 	--with-command-user=%{name} \
@@ -287,9 +289,9 @@ cp -a apache.conf $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/apache.conf
 cp -a apache.conf $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/httpd.conf
 cp -a lighttpd.conf $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/lighttpd.conf
 cp -a sample-config/cgi.cfg $RPM_BUILD_ROOT%{_webapps}/%{_webapp}
-cp -a %{SOURCE6} $RPM_BUILD_ROOT%{_datadir}/images
-cp -a %{SOURCE7} $RPM_BUILD_ROOT%{_datadir}/images
-cp -a %{SOURCE8} $RPM_BUILD_ROOT%{_datadir}/images
+cp -a %{SOURCE6} $RPM_BUILD_ROOT%{htmldir}/images
+cp -a %{SOURCE7} $RPM_BUILD_ROOT%{htmldir}/images
+cp -a %{SOURCE8} $RPM_BUILD_ROOT%{htmldir}/images
 > $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/passwd
 echo 'nagios:' > $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/group
 
@@ -306,7 +308,7 @@ done
 > $RPM_BUILD_ROOT%{_localstatedir}/rw/%{name}.cmd
 
 install -d $RPM_BUILD_ROOT%{_docdir}/%{name}
-mv $RPM_BUILD_ROOT{%{_datadir}/docs/*,%{_docdir}/%{name}}
+mv $RPM_BUILD_ROOT{%{htmldir}/docs/*,%{_docdir}/%{name}}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -411,8 +413,8 @@ done
 %attr(754,root,root) /etc/rc.d/init.d/%{name}
 %config(noreplace) %verify(not md5 mtime size) /etc/sysconfig/%{name}
 
-%attr(755,root,root) %{_bindir}/%{name}
-%attr(755,root,root) %{_bindir}/nagiostats
+%attr(755,root,root) %{_sbindir}/%{name}
+%attr(755,root,root) %{_sbindir}/nagiostats
 
 %attr(770,root,nagcmd) %dir %{_var}/log/%{name}
 %attr(770,root,nagcmd) %dir %{_var}/log/%{name}/archives
@@ -458,30 +460,30 @@ done
 %attr(640,root,http) %config(noreplace) %verify(not md5 mtime size) %{_webapps}/%{_webapp}/cgi.cfg
 %attr(640,root,http) %config(noreplace) %verify(not md5 mtime size) %{_webapps}/%{_webapp}/passwd
 %attr(640,root,http) %config(noreplace) %verify(not md5 mtime size) %{_webapps}/%{_webapp}/group
-%dir %{_sbindir}
-%attr(755,root,root) %{_sbindir}/*.cgi
+%dir %{cgidir}
+%attr(755,root,root) %{cgidir}/*.cgi
 
-%dir %{_datadir}
-%dir %{_datadir}/includes
-%dir %{_datadir}/images
-%dir %{_datadir}/stylesheets
-%{_datadir}/robots.txt
-%{_datadir}/contexthelp
-%{_datadir}/media
-%{_datadir}/ssi
-%{_datadir}/images/favicon.ico
-%{_datadir}/images/marker.png
-%{_datadir}/images/shadow50.png
+%dir %{htmldir}
+%dir %{htmldir}/includes
+%dir %{htmldir}/images
+%dir %{htmldir}/stylesheets
+%{htmldir}/robots.txt
+%{htmldir}/contexthelp
+%{htmldir}/media
+%{htmldir}/ssi
+%{htmldir}/images/favicon.ico
+%{htmldir}/images/marker.png
+%{htmldir}/images/shadow50.png
 
 %files theme-default
 %defattr(644,root,root,755)
-%{_datadir}/*.php
-%{_datadir}/includes/*
-%{_datadir}/images/*
-%exclude %{_datadir}/images/favicon.ico
-%exclude %{_datadir}/images/marker.png
-%exclude %{_datadir}/images/shadow50.png
-%{_datadir}/stylesheets/*
+%{htmldir}/*.php
+%{htmldir}/includes/*
+%{htmldir}/images/*
+%exclude %{htmldir}/images/favicon.ico
+%exclude %{htmldir}/images/marker.png
+%exclude %{htmldir}/images/shadow50.png
+%{htmldir}/stylesheets/*
 
 %files devel
 %defattr(644,root,root,755)
