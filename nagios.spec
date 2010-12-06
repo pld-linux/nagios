@@ -302,7 +302,7 @@ cp -a sample-config $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
 find $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version} -name '*.in' | xargs rm
 
 # Object data/cache files
-for i in {objects.{cache,precache},{retention,status}.dat,%{name}.tmp}; do
+for i in {objects.{cache,precache},{retention,status}.dat,%{name}.{tmp,pid}}; do
 	> $RPM_BUILD_ROOT%{_localstatedir}/$i
 done
 > $RPM_BUILD_ROOT%{_localstatedir}/rw/%{name}.cmd
@@ -426,6 +426,7 @@ done
 %attr(664,root,nagios) %ghost %{_localstatedir}/objects.precache
 %attr(664,root,nagios) %ghost %{_localstatedir}/*.dat
 %attr(664,root,nagios) %ghost %{_localstatedir}/%{name}.tmp
+%attr(664,root,nagios) %ghost %{_localstatedir}/%{name}.pid
 
 %attr(770,root,nagios) %dir %{_var}/spool/%{name}/checkresults
 
