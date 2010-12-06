@@ -161,7 +161,7 @@ HTML Documentation for Nagios.
 Summary:	Default Nagios theme
 Summary(pl.UTF-8):	Domyślny motyw Nagiosa
 Group:		Applications/WWW
-Requires:	nagios-cgi = %{version}-%{release}
+Requires:	%{name}-cgi = %{version}-%{release}
 Requires:	webserver(php)
 Provides:	nagios-theme
 Obsoletes:	nagios-theme
@@ -212,7 +212,7 @@ mv nagios-config-*/*.cfg sample-config
 find '(' -name '*~' -o -name '*.orig' ')' -print0 | xargs -0 -r -l512 rm -f
 
 sed -i -e '
-	s,".*/var/rw/nagios.cmd,"%{_localstatedir}/rw/nagios.cmd,
+	s,".*/var/rw/%{name}.cmd,"%{_localstatedir}/rw/%{name}.cmd,
 	s,".*/libexec/eventhandlers,"%{_libdir}/%{name}/eventhandlers,
 ' $(find contrib/eventhandlers -type f)
 
@@ -224,14 +224,14 @@ sed -e 's,%{_prefix}/lib/,%{_libdir}/,' %{SOURCE5} > lighttpd.conf
 	# kill trailing spaces
 	s, \+$,,
 	# use real paths
-	s,/usr/local/nagios/share,@datadir@,g
+	s,/usr/local/%{name}/share,@datadir@,g
 	# we want all authorized users have default access
 	s,=nagiosadmin,=*,g
 ' sample-config/*.cfg.in
 
 # fixup paths in doc
 %{__sed} -i -e '
-	s,/usr/local/nagios/var/archives/,/var/log/nagios/archives/,
+	s,/usr/local/%{name}/var/archives/,/var/log/%{name}/archives/,
 ' html/docs/configmain.html
 
 %build
@@ -278,7 +278,7 @@ install -p %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 cp -a %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/%{name}
 
 # install templated configuration files
-for a in nagios.cfg resource.cfg commands.cfg contactgroups.cfg contacts.cfg templates.cfg timeperiods.cfg; do
+for a in %{name}.cfg resource.cfg commands.cfg contactgroups.cfg contacts.cfg templates.cfg timeperiods.cfg; do
 	cp -a sample-config/$a $RPM_BUILD_ROOT%{_sysconfdir}
 done
 
@@ -300,10 +300,10 @@ cp -a sample-config $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
 find $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version} -name '*.in' | xargs rm
 
 # Object data/cache files
-for i in {objects.{cache,precache},{retention,status}.dat,nagios.tmp}; do
+for i in {objects.{cache,precache},{retention,status}.dat,%{name}.tmp}; do
 	> $RPM_BUILD_ROOT%{_localstatedir}/$i
 done
-> $RPM_BUILD_ROOT%{_localstatedir}/rw/nagios.cmd
+> $RPM_BUILD_ROOT%{_localstatedir}/rw/%{name}.cmd
 
 install -d $RPM_BUILD_ROOT%{_docdir}/%{name}
 mv $RPM_BUILD_ROOT{%{_datadir}/docs/*,%{_docdir}/%{name}}
@@ -339,9 +339,9 @@ fi
 %groupadd -g 72 nagios
 %groupadd -g 147 -f nagcmd
 if [ -n "$(id -u netsaint 2>/dev/null)" ] && [ "$(id -u netsaint)" = "72" ]; then
-	/usr/sbin/usermod -d %{_libdir}/nagios -l nagios -c "Nagios Daemon" -G nagcmd netsaint
+	/usr/sbin/usermod -d %{_libdir}/%{name} -l nagios -c "Nagios Daemon" -G nagcmd netsaint
 fi
-%useradd -u 72 -d %{_libdir}/nagios -s /bin/false -c "Nagios Daemon" -g nagios -G nagcmd nagios
+%useradd -u 72 -d %{_libdir}/%{name} -s /bin/false -c "Nagios Daemon" -g nagios -G nagcmd nagios
 
 %postun common
 if [ "$1" = "0" ]; then
@@ -391,7 +391,7 @@ for a in dependencies.cfg services.cfg serviceextinfo.cfg hosts.cfg hostgroups.c
 		mv -f %{_sysconfdir}/$a{.rpmsave,}
 	fi
 done
-%{__sed} -i -e 's,^check_result_path=.*,check_result_path=%{_var}/spool/%{name}/checkresults,' %{_sysconfdir}/nagios.cfg
+%{__sed} -i -e 's,^check_result_path=.*,check_result_path=%{_var}/spool/%{name}/checkresults,' %{_sysconfdir}/%{name}.cfg
 
 %files
 %defattr(644,root,root,755)
@@ -399,7 +399,7 @@ done
 %attr(750,root,nagios) %dir %{_sysconfdir}/objects
 
 # leave main nagios config readable for -cgi.
-%attr(640,root,nagcmd) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/nagios.cfg
+%attr(640,root,nagcmd) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}.cfg
 
 %attr(640,root,nagios) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/commands.cfg
 %attr(640,root,nagios) %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/contactgroups.cfg
@@ -419,7 +419,7 @@ done
 
 %attr(770,root,nagcmd) %dir %{_localstatedir}
 %attr(2770,root,nagcmd) %dir %{_localstatedir}/rw
-%attr(660,nagios,nagcmd) %ghost %{_localstatedir}/rw/nagios.cmd
+%attr(660,nagios,nagcmd) %ghost %{_localstatedir}/rw/%{name}.cmd
 %attr(664,root,nagios) %ghost %{_localstatedir}/objects.cache
 %attr(664,root,nagios) %ghost %{_localstatedir}/objects.precache
 %attr(664,root,nagios) %ghost %{_localstatedir}/*.dat
