@@ -1,0 +1,38 @@
+--- nagios-3.1.2/sample-config/cgi.cfg.in	2009-08-03 18:30:03.896753761 +0300
++++ svn/nagios-config/trunk/cgi.cfg	2009-08-03 18:25:38.142614386 +0300
+@@ -1,8 +1,6 @@
+ #################################################################
+ #
+-# CGI.CFG - Sample CGI Configuration File for Nagios @VERSION@
+-#
+-# Last Modified: 06-17-2009
++# CGI.CFG - CGI Configuration File for Nagios
+ #
+ #################################################################
+ 
+@@ -46,9 +45,9 @@
+ # This option determines whether or not a context-sensitive
+ # help icon will be displayed for most of the CGIs.
+ # Values: 0 = disables context-sensitive help
+ #         1 = enables context-sensitive help
+ 
+-show_context_help=0
++show_context_help=1
+ 
+ 
+ 
+@@ -269,7 +233,7 @@
+ # OS and distribution, so you may have to tweak this to
+ # work on your system.
+ 
+-ping_syntax=/bin/ping -n -U -c 5 $HOSTADDRESS$
++ping_syntax=/usr/bin/ping -n -U -c 5 $HOSTADDRESS$
+ 
+ 
+ 
+@@ -359,4 +323,4 @@
+ #splunk_url=http://127.0.0.1:8000/
+ 
+ 
+-
++# vim:ts=8:sw=8:syn=cfg
