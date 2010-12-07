@@ -11,7 +11,7 @@ Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
 Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	3.2.3
-Release:	4
+Release:	5
 License:	GPL v2+
 Group:		Networking
 Source0:	http://downloads.sourceforge.net/nagios/%{name}-%{version}.tar.gz
@@ -262,7 +262,7 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},%{_webapps}/%{_webapp}} \
 	$RPM_BUILD_ROOT{%{_var}/log/%{name}/archives,%{_localstatedir}/rw} \
 	$RPM_BUILD_ROOT%{_sysconfdir}/{plugins,objects} \
-	$RPM_BUILD_ROOT%{_libdir}/%{name}/{eventhandlers,plugins} \
+	$RPM_BUILD_ROOT%{_libdir}/%{name}/{eventhandlers,plugins,brokers} \
 %if "%{_lib}" != "lib"
 	$RPM_BUILD_ROOT%{_prefix}/lib/%{name}/{eventhandlers,plugins} \
 %endif
@@ -415,6 +415,7 @@ done
 
 %attr(755,root,root) %{_sbindir}/%{name}
 %attr(755,root,root) %{_sbindir}/nagiostats
+%dir %{_libdir}/%{name}/brokers
 
 %attr(770,root,nagcmd) %dir %{_var}/log/%{name}
 %attr(770,root,nagcmd) %dir %{_var}/log/%{name}/archives
