@@ -36,6 +36,7 @@ Patch5:		config.patch
 Patch6:		%{name}-googlemap.patch
 Patch7:		%{name}-doc-usermacros.patch
 Patch8:		archivelog-timeformat.patch
+Patch9:		%{name}-html-Makefile.in.patch
 URL:		http://www.nagios.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -205,6 +206,7 @@ aplicativos para o Nagios.
 %patch6 -p1
 %patch7 -p1
 %patch8 -p1
+%patch9 -p1
 
 find -name .cvsignore -o -name .gitignore | xargs rm
 
