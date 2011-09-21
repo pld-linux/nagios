@@ -10,12 +10,12 @@ Summary:	Host/service/network monitoring program
 Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
 Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
-Version:	3.2.3
-Release:	5
+Version:	3.3.1
+Release:	0.1
 License:	GPL v2+
 Group:		Networking
 Source0:	http://downloads.sourceforge.net/nagios/%{name}-%{version}.tar.gz
-# Source0-md5:	fe1be46e6976a52acdb021a782b5d04b
+# Source0-md5:	c935354ce0d78a63bfabc3055fa77ad5
 Source1:	%{name}-apache.conf
 Source2:	%{name}.init
 Source3:	%{name}.sysconfig
@@ -191,12 +191,16 @@ Este pacote contém arquivos de cabeçalho usados no desenvolvimento de
 aplicativos para o Nagios.
 
 %prep
-%setup -q -a4
+%setup -q -a4 -n %{name}
+%undos cgi/*.c
+%undos include/*.h
+%undos base/*
 %patch0 -p0
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
-%patch4 -p1
+#fixed 
+#%patch4 -p1
 %patch5 -p1
 %patch6 -p1
 %patch7 -p1
@@ -229,9 +233,9 @@ sed -e 's,%{_prefix}/lib/,%{_libdir}/,' %{SOURCE5} > lighttpd.conf
 ' sample-config/*.cfg.in
 
 # fixup paths in doc
-%{__sed} -i -e '
-	s,/usr/local/%{name}/var/archives/,/var/log/%{name}/archives/,
-' html/docs/configmain.html
+#%{__sed} -i -e '
+#	s,/usr/local/%{name}/var/archives/,/var/log/%{name}/archives/,
+#' html/docs/configmain.html
 
 %build
 cp -f /usr/share/automake/config.sub .
