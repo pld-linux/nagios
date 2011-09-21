@@ -18,10 +18,10 @@
 -
 +#define LAYOUT_GOOGLEMAP				7
  
- typedef struct layer_struct{
+ typedef struct layer_struct {
  	char *layer_name;
  	struct layer_struct *next;
-         }layer;
+ 	} layer;
  
 +typedef struct location_t {
 +	char* name;
@@ -74,7 +74,7 @@
 +			write_google_head_code();
  
  		printf("</head>\n");
- 		
+ 
 +		if (layout_method == LAYOUT_GOOGLEMAP) {
 +			printf("<body onload='load()' onunload='GUnload()' CLASS='statusmap' name='mappage' id='mappage'>\n");
 +		} else 
@@ -85,16 +85,16 @@
  		/* right hand column of top row */
  		printf("<td align=right valign=top>\n");
  
--		printf("<form method=\"POST\" action=\"%s\">\n",STATUSMAP_CGI);
+-		printf("<form method=\"POST\" action=\"%s\">\n", STATUSMAP_CGI);
 +		printf("<form name=\"layoutform\" method=\"POST\" action=\"%s\">\n",STATUSMAP_CGI);
  		printf("<table border=0 CLASS='optBox'>\n");
  		printf("<tr><td valign=top>\n");
  		printf("<input type='hidden' name='host' value='%s'>\n",escape_string(host_name));
 @@ -725,6 +751,7 @@
- 		printf("<option value=%d %s>Circular\n",LAYOUT_CIRCULAR,(layout_method==LAYOUT_CIRCULAR)?"selected":"");
- 		printf("<option value=%d %s>Circular (Marked Up)\n",LAYOUT_CIRCULAR_MARKUP,(layout_method==LAYOUT_CIRCULAR_MARKUP)?"selected":"");
- 		printf("<option value=%d %s>Circular (Balloon)\n",LAYOUT_CIRCULAR_BALLOON,(layout_method==LAYOUT_CIRCULAR_BALLOON)?"selected":"");
-+		printf("<option value=%d %s>Googlemap\n",LAYOUT_GOOGLEMAP,(layout_method==LAYOUT_GOOGLEMAP)?"selected":"");
+ 		printf("<option value=%d %s>Circular\n", LAYOUT_CIRCULAR, (layout_method == LAYOUT_CIRCULAR) ? "selected" : "");
+ 		printf("<option value=%d %s>Circular (Marked Up)\n", LAYOUT_CIRCULAR_MARKUP, (layout_method == LAYOUT_CIRCULAR_MARKUP) ? "selected" : "");
+ 		printf("<option value=%d %s>Circular (Balloon)\n", LAYOUT_CIRCULAR_BALLOON, (layout_method == LAYOUT_CIRCULAR_BALLOON) ? "selected" : "");
++		printf("<option value=%d %s>Googlemap\n", LAYOUT_GOOGLEMAP, (layout_method == LAYOUT_GOOGLEMAP) ? "selected" : "");
  		printf("</select>\n");
  		printf("</td>\n");
  		printf("<td CLASS='optBoxItem'>\n");
@@ -112,7 +112,7 @@
  	draw_background_extras();
 @@ -1563,10 +1602,19 @@
  	return;
-         }
+ 	}
  
 +/* create the googlemap */
 +void google_map(void){
@@ -125,7 +125,7 @@
 +}
  
  /* draws hosts */
- void draw_hosts(void){
+ void draw_hosts(void) {
 +	
  	host *temp_host;
  	int x1, x2;
@@ -136,9 +136,9 @@
  
 +	if (layout_method == LAYOUT_GOOGLEMAP)
 +		return;
- 	
+ 
  	/* user didn't supply any coordinates for hosts, so display a warning */
- 	if(coordinates_were_specified==FALSE){
+ 	if(coordinates_were_specified == FALSE) {
 @@ -2241,6 +2291,197 @@
  /************************* MISC FUNCTIONS *************************/
  /******************************************************************/

@@ -10,12 +10,12 @@
  extern hostgroup *hostgroup_list;
  extern servicegroup *servicegroup_list;
 @@ -1079,9 +1081,9 @@
- 	printf("Expires: %s\r\n",date_time);
+ 	printf("Expires: %s\r\n", date_time);
  
- 	if(output_format==HTML_OUTPUT)
+ 	if(output_format == HTML_OUTPUT)
 -		printf("Content-type: text/html\r\n\r\n");
 +		printf("Content-type: text/html; charset=\"%s\"\r\n\r\n", http_charset);
- 	else{
+ 	else {
 -		printf("Content-type: text/plain\r\n\r\n");
 +		printf("Content-type: text/plain; charset=\"%s\"\r\n\r\n", http_charset);
  		return;
@@ -24,32 +24,32 @@
 --- nagios-3.2.0/cgi/cgiutils.c	2009-09-11 16:14:43.130251761 +0300
 +++ nagios-3.2.0/cgi/cgiutils.c	2009-09-15 14:46:13.332409409 +0300
 @@ -55,6 +55,7 @@
- char            *statuswrl_include=NULL;
+ char            *statuswrl_include = NULL;
  
- char            *illegal_output_chars=NULL;
-+char            *http_charset=NULL;
+ char            *illegal_output_chars = NULL;
++char            *http_charset = NULL;
  
- char            *notes_url_target=NULL;
- char            *action_url_target=NULL;
+ char            *notes_url_target = NULL;
+ char            *action_url_target = NULL;
 @@ -188,6 +189,9 @@
- 	host_unreachable_sound=NULL;
- 	normal_sound=NULL;
+ 	host_unreachable_sound = NULL;
+ 	normal_sound = NULL;
  
 +	my_free(http_charset);
 +	http_charset = strdup(DEFAULT_HTTP_CHARSET);
 +
- 	statusmap_background_image=NULL;
- 	statuswrl_include=NULL;
+ 	statusmap_background_image = NULL;
+ 	color_transparency_index_r = 255;;
  
 @@ -391,6 +395,9 @@
- 		else if(!strcmp(var,"illegal_macro_output_chars"))
- 			illegal_output_chars=strdup(val);
+ 		else if(!strcmp(var, "illegal_macro_output_chars"))
+ 			illegal_output_chars = strdup(val);
  
-+		else if(!strcmp(var,"http_charset"))
-+			http_charset=strdup(val);
++		else if(!strcmp(var, "http_charset"))
++			http_charset = strdup(val);
 +
- 		else if(!strcmp(var,"notes_url_target"))
- 			notes_url_target=strdup(val);
+ 		else if(!strcmp(var, "notes_url_target"))
+ 			notes_url_target = strdup(val);
  
 @@ -1478,6 +1485,9 @@
  				}
@@ -60,17 +60,7 @@
 +			encoded_html_string[y++]=input[x];
  		/* for simplicity, all other chars represented by their numeric value */
  		else{
- 			if(escape_html_tags==FALSE)
-@@ -1553,6 +1563,9 @@
- 		else if(((char)input[x]==(char)' ') || ((char)input[x]==(char)'-') || ((char)input[x]==(char)'.') || ((char)input[x]==(char)'_') || ((char)input[x]==(char)':'))
- 			encoded_html_string[y++]=input[x];
- 
-+		/* high bit chars don't get encoded, so we won't be breaking utf8 characters */
-+		else if ((unsigned char)input[x] >= 0x7f)
-+			encoded_html_string[y++]=input[x];
- 		/* for simplicity, all other chars represented by their numeric value */
- 		else{
- 			encoded_html_string[y]='\x0';
+ 			if(escape_html_tags == FALSE)
 --- nagios-3.0.3/cgi/cmd.c	2008-05-19 21:42:26.000000000 +0300
 +++ nagios-3.0.3-cgi/cgi/cmd.c	2008-10-11 12:34:44.496658785 +0300
 @@ -39,6 +39,8 @@
@@ -113,8 +103,8 @@
  extern hostgroup *hostgroup_list;
 @@ -293,7 +295,7 @@
  	printf("Pragma: no-cache\r\n");
- 	printf("Last-Modified: %s\r\n",date_time);
- 	printf("Expires: %s\r\n",date_time);
+ 	printf("Last-Modified: %s\r\n", date_time);
+ 	printf("Expires: %s\r\n", date_time);
 -	printf("Content-type: text/html\r\n\r\n");
 +	printf("Content-type: text/html; charset=\"%s\"\r\n\r\n", http_charset);
  
@@ -332,12 +322,12 @@
  extern hostgroup *hostgroup_list;
  extern service *service_list;
 @@ -698,9 +700,9 @@
- 	printf("Expires: %s\r\n",date_time);
+ 	printf("Expires: %s\r\n", date_time);
  
- 	if(output_format==HTML_OUTPUT)
+ 	if(output_format == HTML_OUTPUT)
 -		printf("Content-type: text/html\r\n\r\n");
 +		printf("Content-type: text/html; charset=\"%s\"\r\n\r\n", http_charset);
- 	else{
+ 	else {
 -		printf("Content-type: text/plain\r\n\r\n");
 +		printf("Content-type: text/plain; charset=\"%s\"\r\n\r\n", http_charset);
  		return;
@@ -383,8 +373,8 @@
  
  		if(embedded==TRUE)
  			return;
---- nagios-3.0.3/include/cgiutils.h.in	2007-11-11 01:34:26.000000000 +0200
-+++ nagios-3.0.3-cgi/include/cgiutils.h.in	2008-10-11 12:34:44.468657170 +0300
+--- nagios-3.0.3/include/cgiutils.h	2007-11-11 01:34:26.000000000 +0200
++++ nagios-3.0.3-cgi/include/cgiutils.h	2008-10-11 12:34:44.468657170 +0300
 @@ -422,6 +422,9 @@
  #define LIFO_ERROR_FILE		2
  #define LIFO_ERROR_DATA		3
