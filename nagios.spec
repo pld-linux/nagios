@@ -149,6 +149,17 @@ CGI webinterface for Nagios.
 %description cgi -l pl.UTF-8
 Interfejs CGI dla Nagiosa.
 
+%package mrtggraphs
+Summary:	MRTG Graphs: Nagios Statistics
+Group:		Applications/Networking
+Requires:	%{name} = %{version}-%{release}
+Provides:	mrtg-start
+
+%description mrtggraphs
+This pacakge graphs several Nagios statistics which can be useful for
+debugging and trending purposes. The nagiostats binary is used to
+generate the data.
+
 %package doc
 Summary:	HTML Documentation for Nagios
 Group:		Documentation
@@ -274,7 +285,7 @@ install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},%{_webapps}/%{_webapp}} 
 %endif
 
 install -d $RPM_BUILD_ROOT%{_includedir}/%{name}
-cp -a include/*.h	$RPM_BUILD_ROOT%{_includedir}/%{name}
+cp -p include/*.h	$RPM_BUILD_ROOT%{_includedir}/%{name}
 
 %{__make} install-unstripped \
 	DESTDIR=$RPM_BUILD_ROOT \
@@ -306,6 +317,10 @@ install -d $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
 cp -a contrib/eventhandlers $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
 cp -a sample-config $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version}
 find $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version} -name '*.in' | xargs rm
+
+# mrtg script
+install -d $RPM_BUILD_ROOT/etc/mrtg/conf.d
+cp -a sample-config/mrtg.cfg $RPM_BUILD_ROOT/etc/mrtg/conf.d/%{name}.cfg
 
 # Object data/cache files
 for i in {objects.{cache,precache},{retention,status}.dat,%{name}.{tmp,pid}}; do
@@ -454,6 +469,10 @@ done
 %endif
 
 %attr(770,root,nagios) %dir %{_var}/spool/%{name}
+
+%files mrtggraphs
+%defattr(644,root,root,755)
+%config(noreplace) %verify(not md5 mtime size) /etc/mrtg/conf.d/%{name}.cfg
 
 %files doc
 %defattr(644,root,root,755)
