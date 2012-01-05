@@ -3,6 +3,7 @@
 #
 # Conditional build:
 %bcond_without	gd	# without statusmap and trends, which require gd library
+%bcond_without	epn	# without Embedded Perl
 # reeenable when http://tracker.nagios.org/view.php?id=51 is fixed
 %bcond_with	tests
 
@@ -203,15 +204,17 @@ Este pacote contém arquivos de cabeçalho usados no desenvolvimento de
 aplicativos para o Nagios.
 
 %prep
-%setup -q -a4 -n %{name}
+%setup -qc -a4
+mv %{name}/* .
 %undos cgi/*.c
 %undos include/*.h
 %undos base/*
+%undos p1.pl
 %patch0 -p0
 %patch1 -p1
 %patch2 -p1
 %patch3 -p1
-#fixed 
+#fixed
 #%patch4 -p1
 %patch5 -p1
 %patch6 -p1
@@ -231,6 +234,10 @@ sed -i -e '
 	s,".*/var/rw/%{name}.cmd,"%{_localstatedir}/rw/%{name}.cmd,
 	s,".*/libexec/eventhandlers,"%{_libdir}/%{name}/eventhandlers,
 ' $(find contrib/eventhandlers -type f)
+
+%{__sed} -i -e '
+	s,/usr/local/nagios/var/,/var/log/%{name}/,g
+' p1.pl
 
 sed -e 's,%{_prefix}/lib/,%{_libdir}/,' %{SOURCE1} > apache.conf
 sed -e 's,%{_prefix}/lib/,%{_libdir}/,' %{SOURCE5} > lighttpd.conf
@@ -267,10 +274,15 @@ cp -f /usr/share/automake/config.sub .
 	--with-checkresult-dir=%{_var}/spool/%{name}/checkresults \
 	--with-ping_command='/bin/ping -n %%s -c %%d' \
 	%{!?with_gd:--disable-statusmap --disable-trends} \
+	%{?with_epn:--enable-embedded-perl --with-perlcache} \
 	%{?with_tests:--enable-libtap} \
 	--enable-event-broker
 
 %{__make} all
+
+%if %{with epn}
+%{__make} -C contrib mini_epn
+%endif
 
 %{?with_tests:%{__make} test}
 
@@ -293,22 +305,27 @@ cp -p include/*.h	$RPM_BUILD_ROOT%{_includedir}/%{name}
 	INIT_OPTS="" \
 	COMMAND_OPTS=""
 
+%if %{with epn}
+mv $RPM_BUILD_ROOT{%{_sbindir},%{_libdir}/%{name}}/p1.pl
+install -p contrib/mini_epn $RPM_BUILD_ROOT%{_bindir}
+%endif
+
 install -p %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
-cp -a %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/%{name}
+cp -p %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/%{name}
 
 # install templated configuration files
 for a in %{name}.cfg resource.cfg commands.cfg contactgroups.cfg contacts.cfg templates.cfg timeperiods.cfg; do
-	cp -a sample-config/$a $RPM_BUILD_ROOT%{_sysconfdir}
+	cp -p sample-config/$a $RPM_BUILD_ROOT%{_sysconfdir}
 done
 
 # webserver files
-cp -a apache.conf $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/apache.conf
-cp -a apache.conf $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/httpd.conf
-cp -a lighttpd.conf $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/lighttpd.conf
-cp -a sample-config/cgi.cfg $RPM_BUILD_ROOT%{_webapps}/%{_webapp}
-cp -a %{SOURCE6} $RPM_BUILD_ROOT%{htmldir}/images
-cp -a %{SOURCE7} $RPM_BUILD_ROOT%{htmldir}/images
-cp -a %{SOURCE8} $RPM_BUILD_ROOT%{htmldir}/images
+cp -p apache.conf $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/apache.conf
+cp -p apache.conf $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/httpd.conf
+cp -p lighttpd.conf $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/lighttpd.conf
+cp -p sample-config/cgi.cfg $RPM_BUILD_ROOT%{_webapps}/%{_webapp}
+cp -p %{SOURCE6} $RPM_BUILD_ROOT%{htmldir}/images
+cp -p %{SOURCE7} $RPM_BUILD_ROOT%{htmldir}/images
+cp -p %{SOURCE8} $RPM_BUILD_ROOT%{htmldir}/images
 > $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/passwd
 echo 'nagios:' > $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/group
 
@@ -453,6 +470,12 @@ done
 %attr(770,root,nagios) %dir %{_var}/spool/%{name}/checkresults
 
 %{_examplesdir}/%{name}-%{version}
+
+# epn
+%if %{with epn}
+%attr(755,root,root) %{_libdir}/%{name}/p1.pl
+%attr(755,root,root) %{_bindir}/mini_epn
+%endif
 
 %files common
 %defattr(644,root,root,755)
