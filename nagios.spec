@@ -307,6 +307,7 @@ cp -p include/*.h	$RPM_BUILD_ROOT%{_includedir}/%{name}
 
 %if %{with epn}
 mv $RPM_BUILD_ROOT{%{_sbindir},%{_libdir}/%{name}}/p1.pl
+install -d $RPM_BUILD_ROOT%{_bindir}
 install -p contrib/mini_epn $RPM_BUILD_ROOT%{_bindir}
 %endif
 
