@@ -12,7 +12,7 @@ Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
 Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	3.3.1
-Release:	1
+Release:	2
 License:	GPL v2+
 Group:		Networking
 Source0:	http://downloads.sourceforge.net/nagios/%{name}-%{version}.tar.gz
@@ -169,20 +169,28 @@ Group:		Documentation
 %description doc
 HTML Documentation for Nagios.
 
-%package theme-default
-Summary:	Default Nagios theme
-Summary(pl.UTF-8):	Domyślny motyw Nagiosa
+%package theme-classicui
+Summary:	ClassicUI Nagios theme
 Group:		Applications/WWW
 Requires:	%{name}-cgi = %{version}-%{release}
 Requires:	webserver(php)
 Provides:	nagios-theme
 Obsoletes:	nagios-theme
 
-%description theme-default
+%description theme-classicui
 Original theme from Nagios.
 
-%description theme-default -l pl.UTF-8
+%description theme-classicui -l pl.UTF-8
 Oryginalny motyw z Nagiosa.
+
+%package theme-default
+Summary:	Virtual package to handle Nagios theme migration
+Group:		Applications/WWW
+Requires:	nagios-theme
+Obsoletes:	nagios-theme-default < 3.3.1-1.4
+
+%description theme-default
+Virtual package to handle Nagios theme migration
 
 %package devel
 Summary:	Include files that Nagios-related applications may compile against
@@ -526,7 +534,7 @@ done
 %{htmldir}/images/marker.png
 %{htmldir}/images/shadow50.png
 
-%files theme-default
+%files theme-classicui
 %defattr(644,root,root,755)
 %{htmldir}/*.php
 %{htmldir}/includes/*
@@ -535,6 +543,9 @@ done
 %exclude %{htmldir}/images/marker.png
 %exclude %{htmldir}/images/shadow50.png
 %{htmldir}/stylesheets/*
+
+%files theme-default
+%defattr(644,root,root,755)
 
 %files devel
 %defattr(644,root,root,755)

@@ -185,3 +185,25 @@
  
  
  
+--- nagios-3.3.1/Makefile.in~	2011-07-26 05:02:18.000000000 +0300
++++ nagios-3.3.1/Makefile.in	2012-01-06 17:31:31.482147956 +0200
+@@ -226,7 +226,7 @@
+ 	cd $(SRC_BASE) && $(MAKE) $@
+ 	cd $(SRC_CGI) && $(MAKE) $@
+ 	cd $(SRC_HTM) && $(MAKE) $@
+-	$(MAKE) install-exfoliation	
++	$(MAKE) install-classicui
+ 	$(MAKE) install-basic
+ 
+ install-basic:
+--- nagios-3.3.1/html/config.inc.php.in~	2008-12-14 20:00:46.000000000 +0200
++++ nagios-3.3.1/html/config.inc.php.in	2012-01-06 17:33:57.734940302 +0200
+@@ -2,7 +2,7 @@
+ //
+ 
+ 
+-$cfg['cgi_config_file']='@sysconfdir@/cgi.cfg';  // location of the CGI config file
++$cfg['cgi_config_file']='/etc/webapps/nagios/cgi.cfg';  // location of the CGI config file
+ 
+ $cfg['cgi_base_url']='@cgiurl@';
+ 
