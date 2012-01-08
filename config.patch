@@ -48,8 +48,8 @@
  #
  # You can define $USERx$ macros in this file, which can in turn be used
  # in command definitions in your host config file(s).  $USERx$ macros are
---- nagios-3.1.2/sample-config/nagios.cfg.in	2009-08-05 00:05:06.623070929 +0300
-+++ nagios-3.1.2/sample-config/nagios.cfg.in	2009-08-05 00:11:30.769380130 +0300
+--- nagios-3.1.2/sample-config/nagios.cfg.in	2009-08-05 00:11:30.769380130 +0300
++++ nagios-3.3.1/sample-config/nagios.cfg.in	2012-01-08 02:18:19.519567499 +0200
 @@ -1,13 +1,11 @@
  ##############################################################################
  #
@@ -173,6 +173,15 @@
  
 -date_format=us
 +date_format=iso8601
+ 
+ 
+ 
+@@ -1114,7 +1107,7 @@
+ # embedded Perl interpreter) is located.  If you didn't compile
+ # Nagios with embedded Perl support, this option has no effect.
+ 
+-p1_file=@bindir@/p1.pl
++p1_file=@libexecdir@/nagios/p1.pl
  
  
  
