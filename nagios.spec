@@ -41,13 +41,17 @@ Patch9:		%{name}-html-Makefile.in.patch
 URL:		http://www.nagios.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
+BuildRequires:	rpmbuild(macros) >= 1.268
+BuildRequires:	sed >= 4.0
 %if %{with gd}
 BuildRequires:	gd-devel
 BuildRequires:	libjpeg-devel
 BuildRequires:	libpng-devel
 %endif
-BuildRequires:	rpmbuild(macros) >= 1.268
-BuildRequires:	sed >= 4.0
+%if %{with tests}
+BuildRequires:	perl-HTML-Lint
+BuildRequires:	perl-Test-WWW-Mechanize-CGI
+%endif
 Requires(post,preun):	/sbin/chkconfig
 Requires:	%{name}-common = %{version}-%{release}
 Requires:	rc-scripts
@@ -265,10 +269,19 @@ sed -e 's,%{_prefix}/lib/,%{_libdir}/,' %{SOURCE5} > lighttpd.conf
 #	s,/usr/local/%{name}/var/archives/,/var/log/%{name}/archives/,
 #' html/docs/configmain.html
 
+#rm t/611cgistatus-hosturgencies.t
+
 %build
 cp -f /usr/share/automake/config.sub .
 %{__aclocal}
 %{__autoconf}
+%if %{with tests}
+cd tap
+%{__libtoolize}
+%{__aclocal}
+%{__autoconf}
+cd ..
+%endif
 %configure \
 	CFLAGS="%{rpmcflags} %{rpmcppflags}" \
 	--bindir=%{_sbindir} \
