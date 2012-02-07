@@ -3,7 +3,7 @@
 #
 # Conditional build:
 %bcond_without	gd	# without statusmap and trends, which require gd library
-%bcond_without	epn	# without Embedded Perl
+%bcond_with	epn	# with Embedded Perl
 # reeenable when http://tracker.nagios.org/view.php?id=51 is fixed
 %bcond_with	tests
 
