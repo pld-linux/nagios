@@ -216,7 +216,8 @@ Este pacote contém arquivos de cabeçalho usados no desenvolvimento de
 aplicativos para o Nagios.
 
 %prep
-%setup -q -a4 -n %{name}
+%setup -qc -a4
+mv %{name}/* .
 %undos cgi/*.c
 %undos include/*.h
 %undos base/*
@@ -244,6 +245,10 @@ sed -i -e '
 	s,".*/var/rw/%{name}.cmd,"%{_localstatedir}/rw/%{name}.cmd,
 	s,".*/libexec/eventhandlers,"%{_libdir}/%{name}/eventhandlers,
 ' $(find contrib/eventhandlers -type f)
+
+%{__sed} -i -e '
+	s,/usr/local/nagios/var/,/var/log/%{name}/,g
+' p1.pl
 
 sed -e 's,%{_prefix}/lib/,%{_libdir}/,' %{SOURCE1} > apache.conf
 sed -e 's,%{_prefix}/lib/,%{_libdir}/,' %{SOURCE5} > lighttpd.conf
@@ -289,10 +294,15 @@ cd ..
 	--with-checkresult-dir=%{_var}/spool/%{name}/checkresults \
 	--with-ping_command='/bin/ping -n %%s -c %%d' \
 	%{!?with_gd:--disable-statusmap --disable-trends} \
+	%{?with_epn:--enable-embedded-perl --with-perlcache} \
 	%{?with_tests:--enable-libtap} \
 	--enable-event-broker
 
 %{__make} all
+
+%if %{with epn}
+%{__make} -C contrib mini_epn
+%endif
 
 %{?with_tests:%{__make} test}
 
@@ -314,6 +324,12 @@ cp -p include/*.h	$RPM_BUILD_ROOT%{_includedir}/%{name}
 	INSTALL_OPTS="" \
 	INIT_OPTS="" \
 	COMMAND_OPTS=""
+
+%if %{with epn}
+mv $RPM_BUILD_ROOT{%{_sbindir},%{_libdir}/%{name}}/p1.pl
+install -d $RPM_BUILD_ROOT%{_bindir}
+install -p contrib/mini_epn $RPM_BUILD_ROOT%{_bindir}
+%endif
 
 install -p %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 cp -p %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/%{name}
@@ -475,6 +491,12 @@ done
 %attr(770,root,nagcmd) %dir %{_var}/spool/%{name}/checkresults
 
 %{_examplesdir}/%{name}-%{version}
+
+# epn
+%if %{with epn}
+%attr(755,root,root) %{_libdir}/%{name}/p1.pl
+%attr(755,root,root) %{_bindir}/mini_epn
+%endif
 
 %files common
 %defattr(644,root,root,755)
