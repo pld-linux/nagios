@@ -216,7 +216,7 @@ Este pacote contém arquivos de cabeçalho usados no desenvolvimento de
 aplicativos para o Nagios.
 
 %prep
-%setup -qc -a4 -n%{name}
+%setup -q -a4 -n %{name}
 %undos cgi/*.c
 %undos include/*.h
 %undos base/*
