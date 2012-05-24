@@ -191,6 +191,9 @@ Oryginalny motyw z Nagiosa.
 Summary:	Virtual package to handle Nagios theme migration
 Group:		Applications/WWW
 Requires:	nagios-theme
+Suggests:	nagios-theme-classicui
+Suggests:	nagios-theme-exfoliation
+Suggests:	nagios-theme-nuvola
 Obsoletes:	nagios-theme-default < 3.3.1-1.4
 
 %description theme-default
