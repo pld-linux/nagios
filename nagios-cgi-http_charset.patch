@@ -1,5 +1,5 @@
---- nagios-3.0.3/cgi/avail.c	2008-06-23 23:47:42.000000000 +0300
-+++ nagios-3.0.3-cgi/cgi/avail.c	2008-10-11 12:34:44.496658785 +0300
+--- nagios-3.4.1/cgi/avail.c~	2012-05-24 17:08:24.000000000 +0300
++++ nagios-3.4.1/cgi/avail.c	2012-05-24 17:09:10.130997383 +0300
 @@ -37,6 +37,8 @@
  extern char url_images_path[MAX_FILENAME_LENGTH];
  extern char url_stylesheets_path[MAX_FILENAME_LENGTH];
@@ -9,17 +9,17 @@
  extern host      *host_list;
  extern hostgroup *hostgroup_list;
  extern servicegroup *servicegroup_list;
-@@ -1079,9 +1081,9 @@
+@@ -1080,9 +1080,9 @@
  	printf("Expires: %s\r\n", date_time);
  
  	if(output_format == HTML_OUTPUT)
 -		printf("Content-type: text/html\r\n\r\n");
 +		printf("Content-type: text/html; charset=\"%s\"\r\n\r\n", http_charset);
  	else {
--		printf("Content-type: text/plain\r\n\r\n");
-+		printf("Content-type: text/plain; charset=\"%s\"\r\n\r\n", http_charset);
+-		printf("Content-type: text/csv\r\n\r\n");
++		printf("Content-type: text/csv; charset=\"%s\"\r\n\r\n", http_charset);
  		return;
- 	        }
+ 		}
  
 --- nagios-3.2.0/cgi/cgiutils.c	2009-09-11 16:14:43.130251761 +0300
 +++ nagios-3.2.0/cgi/cgiutils.c	2009-09-15 14:46:13.332409409 +0300

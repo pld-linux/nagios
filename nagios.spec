@@ -1,5 +1,8 @@
 # TODO
 # - /var/log/nagios/archives -> /var/log/archive/nagios
+# - system php-magpierss
+# - system jquery
+# - don't fetch rss if update fetching is disabled (privacy!)
 #
 # Conditional build:
 %bcond_without	gd	# without statusmap and trends, which require gd library
@@ -11,12 +14,12 @@ Summary:	Host/service/network monitoring program
 Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
 Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
-Version:	3.3.1
-Release:	5
+Version:	3.4.1
+Release:	0.8
 License:	GPL v2+
 Group:		Networking
 Source0:	http://downloads.sourceforge.net/nagios/%{name}-%{version}.tar.gz
-# Source0-md5:	c935354ce0d78a63bfabc3055fa77ad5
+# Source0-md5:	2fa8acfb2a92b1bf8d173a855832de1f
 Source1:	%{name}-apache.conf
 Source2:	%{name}.init
 Source3:	%{name}.sysconfig
@@ -37,7 +40,6 @@ Patch5:		config.patch
 Patch6:		%{name}-googlemap.patch
 Patch7:		%{name}-doc-usermacros.patch
 Patch8:		archivelog-timeformat.patch
-Patch9:		%{name}-html-Makefile.in.patch
 URL:		http://www.nagios.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -234,7 +236,6 @@ mv %{name}/* .
 %patch6 -p1
 %patch7 -p1
 %patch8 -p1
-%patch9 -p1
 
 find -name .cvsignore -o -name .gitignore | xargs rm
 
