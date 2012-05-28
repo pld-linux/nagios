@@ -1,7 +1,5 @@
 # TODO
 # - /var/log/nagios/archives -> /var/log/archive/nagios
-# - system jquery
-# - don't fetch rss if update fetching is disabled (privacy!)
 #
 # Conditional build:
 %bcond_without	gd	# without statusmap and trends, which require gd library
@@ -41,6 +39,7 @@ Patch7:		%{name}-doc-usermacros.patch
 Patch8:		archivelog-timeformat.patch
 Patch9:		system-magpierss.patch
 Patch10:	system-jquery.patch
+Patch11:	do-not-fetch-rss.patch
 URL:		http://www.nagios.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -143,7 +142,6 @@ Requires:	%{name}-imagepaks
 Requires:	%{name}-theme
 Requires:	group(http)
 Requires:	jquery
-Requires:	php-magpierss >= 0.72
 Requires:	webapps
 Requires:	webserver
 Requires:	webserver(access)
@@ -152,6 +150,7 @@ Requires:	webserver(auth)
 Requires:	webserver(cgi)
 Requires:	webserver(indexfile)
 Suggests:	%{name}-doc
+Suggests:	php-magpierss >= 0.72
 
 %description cgi
 CGI webinterface for Nagios.
@@ -241,6 +240,7 @@ mv %{name}/* .
 %patch8 -p1
 %patch9 -p1
 %patch10 -p1
+%patch11 -p1
 
 find -name .cvsignore -o -name .gitignore | xargs rm
 

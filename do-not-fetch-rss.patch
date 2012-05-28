@@ -1,0 +1,36 @@
+do not fetch rss automatically, respect some privacy!
+
+use update_checks_enabled option to tune the default (altho new option would be
+more reasonable)
+
+--- nagios/html/main.php~	2012-05-29 00:04:23.000000000 +0300
++++ nagios/html/main.php	2012-05-29 00:08:36.419474072 +0300
+@@ -15,12 +15,19 @@
+ <script type="text/javascript" src="/js/jquery/jquery.js"></script>
+ 
+ <script type='text/javascript'>
++<?php
++	$updateinfo=get_update_information();
++	if ($updateinfo['update_checks_enabled']!==false):
++?>
+ 
+ 	//rss fetch by ajax to reduce page load time
+ 	$(document).ready(function() {		
+ 		 $('#splashbox2-contents').load('rss-corefeed.php');				
+ 		 $('#splashbox4-contents').load('rss-newsfeed.php');	
+ 	}); 
++<?php
++	endif;
++?>
+ 
+ </script>
+ 
+@@ -47,7 +54,7 @@
+ 
+ <div id="updateversioninfo">
+ <?php
+-	$updateinfo=get_update_information();
++	//$updateinfo=get_update_information();
+ 	//print_r($updateinfo);
+ 	//$updateinfo['update_checks_enabled']=false;
+ 	//$updateinfo['update_available']=true;
