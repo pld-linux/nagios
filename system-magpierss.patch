@@ -1,0 +1,45 @@
+--- nagios-3.4.1/html/rss-corefeed.php~	2012-05-28 23:27:38.000000000 +0300
++++ nagios-3.4.1/html/rss-corefeed.php	2012-05-28 23:49:41.701706368 +0300
+@@ -1,11 +1,11 @@
+ <?php
+ 
+ // RSS reader
+-define('MAGPIE_DIR', './includes/rss/');
++define('MAGPIE_DIR', '/usr/share/php/magpierss/');
+ define('MAGPIE_CACHE_ON', 0);
+ define('MAGPIE_CACHE_AGE', 0);
+ define('MAGPIE_CACHE_DIR', '/tmp/magpie_cache');
+-require_once(MAGPIE_DIR.'rss_fetch.inc');
++require_once(MAGPIE_DIR . 'rss_fetch.inc');
+ 
+ 
+ //build splash divs to ajax load 
+--- nagios-3.4.1/html/rss-newsfeed.php~	2012-05-28 23:27:38.000000000 +0300
++++ nagios-3.4.1/html/rss-newsfeed.php	2012-05-28 23:49:56.285653400 +0300
+@@ -1,11 +1,11 @@
+ <?php 
+ 
+ // RSS reader
+-define('MAGPIE_DIR', './includes/rss/');
++define('MAGPIE_DIR', '/usr/share/php/magpierss/');
+ define('MAGPIE_CACHE_ON', 0);
+ define('MAGPIE_CACHE_AGE', 0);
+ define('MAGPIE_CACHE_DIR', '/tmp/magpie_cache');
+-require_once(MAGPIE_DIR.'rss_fetch.inc');
++require_once(MAGPIE_DIR . 'rss_fetch.inc');
+ 
+ 
+ //build splash divs to ajax load 
+--- nagios-3.4.1/html/Makefile.in~	2012-02-13 22:40:42.000000000 +0200
++++ nagios-3.4.1/html/Makefile.in	2012-05-28 23:52:30.828823727 +0300
+@@ -79,10 +79,6 @@
+ 	do $(INSTALL) -m 664 $(INSTALL_OPTS) $$file $(DESTDIR)$(HTMLDIR)/images/logos; done
+ 	for file in includes/*.*; \
+ 	do $(INSTALL) -m 664 $(INSTALL_OPTS) $$file $(DESTDIR)$(HTMLDIR)/includes; done
+-	for file in includes/rss/*.*; \
+-	do $(INSTALL) -m 664 $(INSTALL_OPTS) $$file $(DESTDIR)$(HTMLDIR)/includes/rss; done
+-	for file in includes/rss/extlib/*.*; \
+-	do $(INSTALL) -m 664 $(INSTALL_OPTS) $$file $(DESTDIR)$(HTMLDIR)/includes/rss/extlib; done
+ 
+ install-unstripped:
+ 	$(MAKE) install

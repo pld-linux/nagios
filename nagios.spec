@@ -1,6 +1,5 @@
 # TODO
 # - /var/log/nagios/archives -> /var/log/archive/nagios
-# - system php-magpierss
 # - system jquery
 # - don't fetch rss if update fetching is disabled (privacy!)
 #
@@ -40,6 +39,7 @@ Patch5:		config.patch
 Patch6:		%{name}-googlemap.patch
 Patch7:		%{name}-doc-usermacros.patch
 Patch8:		archivelog-timeformat.patch
+Patch9:		system-magpierss.patch
 URL:		http://www.nagios.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -141,6 +141,7 @@ Requires:	%{name} = %{version}-%{release}
 Requires:	%{name}-imagepaks
 Requires:	%{name}-theme
 Requires:	group(http)
+Requires:	php-magpierss >= 0.72
 Requires:	webapps
 Requires:	webserver
 Requires:	webserver(access)
@@ -236,6 +237,7 @@ mv %{name}/* .
 %patch6 -p1
 %patch7 -p1
 %patch8 -p1
+%patch9 -p1
 
 find -name .cvsignore -o -name .gitignore | xargs rm
 
