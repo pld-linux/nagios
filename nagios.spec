@@ -40,6 +40,7 @@ Patch6:		%{name}-googlemap.patch
 Patch7:		%{name}-doc-usermacros.patch
 Patch8:		archivelog-timeformat.patch
 Patch9:		system-magpierss.patch
+Patch10:	system-jquery.patch
 URL:		http://www.nagios.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -141,6 +142,7 @@ Requires:	%{name} = %{version}-%{release}
 Requires:	%{name}-imagepaks
 Requires:	%{name}-theme
 Requires:	group(http)
+Requires:	jquery
 Requires:	php-magpierss >= 0.72
 Requires:	webapps
 Requires:	webserver
@@ -238,6 +240,7 @@ mv %{name}/* .
 %patch7 -p1
 %patch8 -p1
 %patch9 -p1
+%patch10 -p1
 
 find -name .cvsignore -o -name .gitignore | xargs rm
 

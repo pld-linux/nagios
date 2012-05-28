@@ -1,0 +1,44 @@
+--- nagios-3.4.1/html/main.php~	2012-05-12 03:00:53.000000000 +0300
++++ nagios-3.4.1/html/main.php	2012-05-28 23:55:54.310721306 +0300
+@@ -12,7 +12,7 @@
+ <meta name="ROBOTS" content="NOINDEX, NOFOLLOW" />
+ <title>Nagios Core</title>
+ <link rel='stylesheet' type='text/css' href='stylesheets/common.css' />
+-<script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
++<script type="text/javascript" src="/js/jquery/jquery.js"></script>
+ 
+ <script type='text/javascript'>
+ 
+--- nagios-3.4.1/include/cgiutils.h~	2012-05-24 17:15:30.000000000 +0300
++++ nagios-3.4.1/include/cgiutils.h	2012-05-28 23:56:18.921757228 +0300
+@@ -80,7 +80,7 @@
+ #define SUMMARY_CSS             "summary.css"
+ 
+ 	/********************************* JAVASCRIPT INCLUDES **********************/
+-#define JQUERY_JS		"jquery-1.7.1.min.js"	
++#define JQUERY_JS		"/js/jquery/jquery.js"
+ 
+ 	/********************************* ICONS ************************************/
+ 
+--- nagios-3.4.1/cgi/status.c~	2012-05-24 17:15:30.000000000 +0300
++++ nagios-3.4.1/cgi/status.c	2012-05-28 23:57:04.933694000 +0300
+@@ -558,7 +558,7 @@
+ 		}
+ 	
+ 	/* added jquery library 1/31/2012 */	
+-	printf("<script type='text/javascript' src='%s%s'></script>\n",url_js_path, JQUERY_JS); 
++	printf("<script type='text/javascript' src='%s'></script>\n", JQUERY_JS); 
+ 	/* JS function to append content to elements on page */ 
+ 	printf("<script type='text/javascript'>\n"); 
+ 	printf("$(document).ready(function() { $('#top_page_numbers').append($('#bottom_page_numbers').html() ); });");	
+--- nagios-3.4.1/html/Makefile.in~	2012-05-28 23:52:30.000000000 +0300
++++ nagios-3.4.1/html/Makefile.in	2012-05-28 23:59:43.973722231 +0300
+@@ -61,8 +61,6 @@
+ 	do $(INSTALL) -m 664 $(INSTALL_OPTS) $$file $(DESTDIR)$(HTMLDIR)/stylesheets; done
+ 	for file in contexthelp/*.html; \
+ 	do $(INSTALL) -m 664 $(INSTALL_OPTS) $$file $(DESTDIR)$(HTMLDIR)/contexthelp; done
+-	for file in js/*.js; \
+-	do $(INSTALL) -m 664 $(INSTALL_OPTS) $$file $(DESTDIR)$(HTMLDIR)/js; done
+ #	for file in docs/*.html; \
+ #	do $(INSTALL) -m 664 $(INSTALL_OPTS) $$file $(DESTDIR)$(HTMLDIR)/docs; done
+ #	for file in docs/images/*.*; \
