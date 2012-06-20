@@ -28,6 +28,7 @@ Source6:	http://www.google.com/mapfiles/shadow50.png
 Source7:	http://www.google.com/mapfiles/marker.png
 # Source7-md5:	edefef4bdfc29e1c953694651f05b466
 Source8:	googlemap.js
+Source9:	nagioswall.php
 Patch0:		%{name}-resources.patch
 Patch1:		%{name}-iconv-in-libc.patch
 Patch2:		%{name}-webapps.patch
@@ -356,6 +357,7 @@ cp -p sample-config/cgi.cfg $RPM_BUILD_ROOT%{_webapps}/%{_webapp}
 cp -p %{SOURCE6} $RPM_BUILD_ROOT%{htmldir}/images
 cp -p %{SOURCE7} $RPM_BUILD_ROOT%{htmldir}/images
 cp -p %{SOURCE8} $RPM_BUILD_ROOT%{htmldir}/images
+cp -p %{SOURCE9} $RPM_BUILD_ROOT%{htmldir}
 > $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/passwd
 echo 'nagios:' > $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/group
 
@@ -554,6 +556,7 @@ done
 %{htmldir}/images/favicon.ico
 %{htmldir}/images/marker.png
 %{htmldir}/images/shadow50.png
+%{htmldir}/nagioswall.php
 
 %files theme-classicui
 %defattr(644,root,root,755)
