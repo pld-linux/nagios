@@ -1,3 +1,10 @@
+applied in icinga :)
+https://git.icinga.org/?p=icinga-core.git;a=commit;h=82c07167e482d0936f18f2763a342b78af0b618e
+https://dev.icinga.org/issues/1002
+
+but not in nagios :(
+http://tracker.nagios.org/view.php?id=182
+
 --- nagios-3.4.1/cgi/avail.c~	2012-05-24 17:08:24.000000000 +0300
 +++ nagios-3.4.1/cgi/avail.c	2012-05-24 17:09:10.130997383 +0300
 @@ -37,6 +37,8 @@
