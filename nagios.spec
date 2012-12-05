@@ -28,7 +28,7 @@ Source6:	http://www.google.com/mapfiles/shadow50.png
 Source7:	http://www.google.com/mapfiles/marker.png
 # Source7-md5:	edefef4bdfc29e1c953694651f05b466
 Source8:	googlemap.js
-Source9:	nagioswall.php
+Source9:	%{name}wall.php
 Patch0:		%{name}-resources.patch
 Patch1:		%{name}-iconv-in-libc.patch
 Patch2:		%{name}-webapps.patch
@@ -57,7 +57,7 @@ BuildRequires:	perl-Test-WWW-Mechanize-CGI
 %endif
 Requires(post,preun):	/sbin/chkconfig
 Requires:	%{name}-common = %{version}-%{release}
-Requires:	rc-scripts
+Requires:	rc-scripts >= 0.4.5.5
 Requires:	sh-utils
 Suggests:	nagios-notify >= 0.13
 Suggests:	nagios-plugin-check_load

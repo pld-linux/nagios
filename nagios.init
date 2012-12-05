@@ -30,6 +30,10 @@ cfg_file=/etc/nagios/nagios.cfg
 # check for precache
 precached_object_file=$(awk -F= '/^precached_object_file/{print $2}' $cfg_file)
 
+# nagios pid file
+pid_file=$(awk -F= '/^lock_file/{print $2}' $cfg_file)
+pid_file=${pid_file:-/var/lib/nagios/nagios.pid}
+
 # configtest itself
 configtest() {
 	/usr/sbin/nagios ${precached_object_file:+-p} -v $cfg_file
@@ -94,7 +98,7 @@ stop() {
 	fi
 
 	msg_stopping "Nagios"
-	killproc nagios -TERM
+	killproc --pidfile $pid_file nagios
 	rm -f /var/lock/subsys/nagios > /dev/null 2>&1
 }
 
@@ -109,7 +113,7 @@ reload() {
 	msg_reloading "Nagios"
 
 	# NOTE: precached object file is created in configtest.
-	killproc nagios -HUP
+	killproc --pidfile $pid_file nagios -HUP
 	RETVAL=$?
 }
 
@@ -149,7 +153,7 @@ case "$1" in
 	checkconfig 1
 	;;
   status)
-	status nagios
+	status --pidfile $pid_file nagios
 	RETVAL=$?
 	;;
 *)
