@@ -24,13 +24,13 @@
 +++ nagios-3.4.1/cgi/status.c	2012-05-28 23:57:04.933694000 +0300
 @@ -558,7 +558,7 @@
  		}
- 	
- 	/* added jquery library 1/31/2012 */	
--	printf("<script type='text/javascript' src='%s%s'></script>\n",url_js_path, JQUERY_JS); 
-+	printf("<script type='text/javascript' src='%s'></script>\n", JQUERY_JS); 
- 	/* JS function to append content to elements on page */ 
- 	printf("<script type='text/javascript'>\n"); 
- 	printf("$(document).ready(function() { $('#top_page_numbers').append($('#bottom_page_numbers').html() ); });");	
+ 
+ 	/* added jquery library 1/31/2012 */
+-	printf("<script type='text/javascript' src='%s%s'></script>\n", url_js_path, JQUERY_JS);
++	printf("<script type='text/javascript' src='%s'></script>\n", JQUERY_JS);
+ 	/* JS function to append content to elements on page */
+ 	printf("<script type='text/javascript'>\n");
+ 	printf("$(document).ready(function() { $('#top_page_numbers').append($('#bottom_page_numbers').html() ); });");
 --- nagios-3.4.1/html/Makefile.in~	2012-05-28 23:52:30.000000000 +0300
 +++ nagios-3.4.1/html/Makefile.in	2012-05-28 23:59:43.973722231 +0300
 @@ -61,8 +61,6 @@

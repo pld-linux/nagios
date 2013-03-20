@@ -58,16 +58,6 @@ http://tracker.nagios.org/view.php?id=182
  		else if(!strcmp(var, "notes_url_target"))
  			notes_url_target = strdup(val);
  
-@@ -1478,6 +1485,9 @@
- 				}
- 		        }
- 
-+		/* high bit chars don't get encoded, so we won't be breaking utf8 characters */
-+		else if ((unsigned char)input[x] >= 0x7f)
-+			encoded_html_string[y++]=input[x];
- 		/* for simplicity, all other chars represented by their numeric value */
- 		else{
- 			if(escape_html_tags == FALSE)
 --- nagios-3.0.3/cgi/cmd.c	2008-05-19 21:42:26.000000000 +0300
 +++ nagios-3.0.3-cgi/cgi/cmd.c	2008-10-11 12:34:44.496658785 +0300
 @@ -39,6 +39,8 @@
