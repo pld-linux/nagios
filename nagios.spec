@@ -12,7 +12,7 @@ Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
 Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	3.5.0
-Release:	1
+Release:	2
 License:	GPL v2+
 Group:		Networking
 Source0:	http://downloads.sourceforge.net/nagios/nagios-3.x/%{name}-%{version}/%{name}-%{version}.tar.gz
@@ -29,6 +29,7 @@ Source7:	http://www.google.com/mapfiles/marker.png
 # Source7-md5:	edefef4bdfc29e1c953694651f05b466
 Source8:	googlemap.js
 Source9:	%{name}wall.php
+Source10:	%{name}-httpd.conf
 Patch0:		%{name}-resources.patch
 Patch1:		%{name}-iconv-in-libc.patch
 Patch2:		%{name}-webapps.patch
@@ -152,6 +153,7 @@ Requires:	webserver(cgi)
 Requires:	webserver(indexfile)
 Suggests:	%{name}-doc
 Suggests:	php-magpierss >= 0.72
+Conflicts:	apache-base < 2.4.0-1
 
 %description cgi
 CGI webinterface for Nagios.
@@ -261,6 +263,7 @@ sed -i -e '
 ' p1.pl
 
 sed -e 's,%{_prefix}/lib/,%{_libdir}/,' %{SOURCE1} > apache.conf
+sed -e 's,%{_prefix}/lib/,%{_libdir}/,' %{SOURCE10} > httpd.conf
 sed -e 's,%{_prefix}/lib/,%{_libdir}/,' %{SOURCE5} > lighttpd.conf
 
 # fixup cgi config
@@ -351,7 +354,7 @@ done
 
 # webserver files
 cp -p apache.conf $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/apache.conf
-cp -p apache.conf $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/httpd.conf
+cp -p httpd.conf $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/httpd.conf
 cp -p lighttpd.conf $RPM_BUILD_ROOT%{_webapps}/%{_webapp}/lighttpd.conf
 cp -p sample-config/cgi.cfg $RPM_BUILD_ROOT%{_webapps}/%{_webapp}
 cp -p %{SOURCE6} $RPM_BUILD_ROOT%{htmldir}/images
@@ -439,11 +442,11 @@ fi
 %triggerun cgi -- apache1 < 1.3.37-3, apache1-base
 %webapp_unregister apache %{_webapp}
 
-%triggerin cgi -- apache < 2.2.0, apache-base
+%triggerin cgi -- apache-base
 %addusertogroup http nagcmd
 %webapp_register httpd %{_webapp}
 
-%triggerun cgi -- apache < 2.2.0, apache-base
+%triggerun cgi -- apache-base
 %webapp_unregister httpd %{_webapp}
 
 %triggerin cgi -- lighttpd
