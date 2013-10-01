@@ -11,32 +11,32 @@
  #include "../include/config.h"
  #include "../include/common.h"
  #include "../include/objects.h"
-@@ -93,13 +97,27 @@
+@@ -92,6 +92,7 @@ extern int default_statusmap_layout_meth
  #define LAYOUT_CIRCULAR                 4
  #define LAYOUT_CIRCULAR_MARKUP          5
  #define LAYOUT_CIRCULAR_BALLOON         6
--
-+#define LAYOUT_GOOGLEMAP				7
++#define LAYOUT_GOOGLEMAP                7
  
- typedef struct layer_struct {
- 	char *layer_name;
- 	struct layer_struct *next;
- 	} layer;
  
-+typedef struct location_t {
+ struct layer {
+@@ -99,6 +100,20 @@ struct layer {
+ 	struct layer *next;
+ };
+ 
++struct location_t {
 +	char* name;
 +	char* note;
 +	char* latitude;
 +	char* longitude;
 +	struct location_t* next;
-+} location_t;
++};
 +
-+typedef struct general_location_t {
++struct general_location_t {
 +	char* key;
 +	char* zoom;
 +	char* latitude;
 +	char* longitude;
-+} general_location_t;
++};
  
  void document_header(int);
  void document_footer(void);
@@ -190,9 +190,9 @@
 +	char* filename;
 +	int state = 0;
 +	int counter = 0;
-+	general_location_t gen_loc;
-+	location_t* loc;
-+	location_t* loc_list=NULL;
++	struct general_location_t gen_loc;
++	struct location_t* loc;
++	struct location_t* loc_list=NULL;
 +
 +
 +/***************************************

@@ -11,12 +11,12 @@ Summary:	Host/service/network monitoring program
 Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
 Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
-Version:	3.5.1
+Version:	4.0.0
 Release:	1
 License:	GPL v2+
 Group:		Networking
-Source0:	http://downloads.sourceforge.net/nagios/nagios-3.x/%{name}-%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	9947ed3d220b4da86710884260d42856
+Source0:	http://downloads.sourceforge.net/nagios/nagios-4.x/%{name}-%{version}/%{name}-%{version}.tar.gz
+# Source0-md5:	bfe64774766e32b6f6130493c52ed7f6
 Source1:	%{name}-apache.conf
 Source2:	%{name}.init
 Source3:	%{name}.sysconfig
@@ -258,10 +258,6 @@ sed -i -e '
 	s,".*/libexec/eventhandlers,"%{_libdir}/%{name}/eventhandlers,
 ' $(find contrib/eventhandlers -type f)
 
-%{__sed} -i -e '
-	s,/usr/local/nagios/var/,/var/log/%{name}/,g
-' p1.pl
-
 sed -e 's,%{_prefix}/lib/,%{_libdir}/,' %{SOURCE1} > apache.conf
 sed -e 's,%{_prefix}/lib/,%{_libdir}/,' %{SOURCE10} > httpd.conf
 sed -e 's,%{_prefix}/lib/,%{_libdir}/,' %{SOURCE5} > lighttpd.conf
@@ -339,7 +335,6 @@ cp -p include/*.h	$RPM_BUILD_ROOT%{_includedir}/%{name}
 	COMMAND_OPTS=""
 
 %if %{with epn}
-mv $RPM_BUILD_ROOT{%{_sbindir},%{_libdir}/%{name}}/p1.pl
 install -d $RPM_BUILD_ROOT%{_bindir}
 install -p contrib/mini_epn $RPM_BUILD_ROOT%{_bindir}
 %endif
@@ -508,7 +503,6 @@ done
 
 # epn
 %if %{with epn}
-%attr(755,root,root) %{_libdir}/%{name}/p1.pl
 %attr(755,root,root) %{_bindir}/mini_epn
 %endif
 

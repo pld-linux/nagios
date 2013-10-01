@@ -11,23 +11,23 @@
  
 --- nagios-3.4.1/include/cgiutils.h~	2012-05-24 17:15:30.000000000 +0300
 +++ nagios-3.4.1/include/cgiutils.h	2012-05-28 23:56:18.921757228 +0300
-@@ -80,7 +80,7 @@
+@@ -77,7 +77,7 @@
  #define SUMMARY_CSS             "summary.css"
  
  	/********************************* JAVASCRIPT INCLUDES **********************/
--#define JQUERY_JS		"jquery-1.7.1.min.js"	
+-#define JQUERY_JS		"jquery-1.7.1.min.js"
 +#define JQUERY_JS		"/js/jquery/jquery.js"
  
  	/********************************* ICONS ************************************/
  
 --- nagios-3.4.1/cgi/status.c~	2012-05-24 17:15:30.000000000 +0300
 +++ nagios-3.4.1/cgi/status.c	2012-05-28 23:57:04.933694000 +0300
-@@ -558,7 +558,7 @@
+@@ -525,7 +525,7 @@
  		}
  
  	/* added jquery library 1/31/2012 */
--	printf("<script type='text/javascript' src='%s%s'></script>\n", url_js_path, JQUERY_JS);
-+	printf("<script type='text/javascript' src='%s'></script>\n", JQUERY_JS);
+-	printf("<script type='text/javascript' src='%s%s'></script>\n",url_js_path, JQUERY_JS);
++	printf("<script type='text/javascript' src='%s'></script>\n",JQUERY_JS);
  	/* JS function to append content to elements on page */
  	printf("<script type='text/javascript'>\n");
  	printf("$(document).ready(function() { $('#top_page_numbers').append($('#bottom_page_numbers').html() ); });");

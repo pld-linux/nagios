@@ -1,18 +1,39 @@
---- nagios-3.1.2/sample-config/cgi.cfg.in	2009-08-03 18:30:03.896753761 +0300
-+++ svn/nagios-config/trunk/cgi.cfg	2009-08-03 18:25:38.142614386 +0300
-@@ -1,8 +1,6 @@
+diff -ur nagios.org/html/config.inc.php.in nagios/html/config.inc.php.in
+--- nagios.org/html/config.inc.php.in	2013-09-20 21:01:20.000000000 +0200
++++ nagios/html/config.inc.php.in	2013-10-01 21:51:45.176497587 +0200
+@@ -2,7 +2,7 @@
+ //
+ 
+ 
+-$cfg['cgi_config_file']='@sysconfdir@/cgi.cfg';  // location of the CGI config file
++$cfg['cgi_config_file']='/etc/webapps/nagios/cgi.cfg';  // location of the CGI config file
+ 
+ $cfg['cgi_base_url']='@cgiurl@';
+ 
+diff -ur nagios.org/Makefile.in nagios/Makefile.in
+--- nagios.org/Makefile.in	2013-09-20 21:01:20.000000000 +0200
++++ nagios/Makefile.in	2013-10-01 21:51:45.176497587 +0200
+@@ -241,7 +241,7 @@
+ 	cd $(SRC_BASE) && $(MAKE) $@
+ 	cd $(SRC_CGI) && $(MAKE) $@
+ 	cd $(SRC_HTM) && $(MAKE) $@
+-	$(MAKE) install-exfoliation	
++	$(MAKE) install-classicui
+ 	$(MAKE) install-basic
+ 
+ install-basic:
+diff -ur nagios.org/sample-config/cgi.cfg.in nagios/sample-config/cgi.cfg.in
+--- nagios.org/sample-config/cgi.cfg.in	2013-09-20 21:01:20.000000000 +0200
++++ nagios/sample-config/cgi.cfg.in	2013-10-01 21:52:32.937634398 +0200
+@@ -1,6 +1,6 @@
  #################################################################
  #
 -# CGI.CFG - Sample CGI Configuration File for Nagios @VERSION@
--#
--# Last Modified: 06-17-2009
-+# CGI.CFG - CGI Configuration File for Nagios
++# CGI.CFG - Sample CGI Configuration File for Nagios
+ #
  #
  #################################################################
- 
-@@ -46,9 +45,9 @@
- # This option determines whether or not a context-sensitive
- # help icon will be displayed for most of the CGIs.
+@@ -42,7 +42,7 @@
  # Values: 0 = disables context-sensitive help
  #         1 = enables context-sensitive help
  
@@ -21,7 +42,7 @@
  
  
  
-@@ -269,7 +233,7 @@
+@@ -263,7 +263,7 @@
  # OS and distribution, so you may have to tweak this to
  # work on your system.
  
@@ -30,43 +51,25 @@
  
  
  
-@@ -359,4 +323,4 @@
- #splunk_url=http://127.0.0.1:8000/
+@@ -370,3 +370,5 @@
  
- 
--
+ navbar_search_for_addresses=1
+ navbar_search_for_aliases=1
++
 +# vim:ts=8:sw=8:ft=cfg
---- nagios-3.1.2/sample-config/resource.cfg.in	2009-08-03 18:41:56.770015075 +0300
-+++ svn/nagios-config/trunk/resource.cfg	2009-08-03 18:42:15.413396493 +0300
-@@ -1,8 +1,6 @@
- ###########################################################################
- #
--# RESOURCE.CFG - Sample Resource File for Nagios @VERSION@
--#
--# Last Modified: 09-10-2003
-+# RESOURCE.CFG - Resource File for Nagios
- #
- # You can define $USERx$ macros in this file, which can in turn be used
- # in command definitions in your host config file(s).  $USERx$ macros are
---- nagios-3.1.2/sample-config/nagios.cfg.in	2009-08-05 00:11:30.769380130 +0300
-+++ nagios-3.3.1/sample-config/nagios.cfg.in	2012-01-08 02:18:19.519567499 +0200
-@@ -1,13 +1,11 @@
+diff -ur nagios.org/sample-config/nagios.cfg.in nagios/sample-config/nagios.cfg.in
+--- nagios.org/sample-config/nagios.cfg.in	2013-09-20 21:01:20.000000000 +0200
++++ nagios/sample-config/nagios.cfg.in	2013-10-01 21:53:09.708504449 +0200
+@@ -1,6 +1,6 @@
  ##############################################################################
  #
 -# NAGIOS.CFG - Sample Main Config File for Nagios @VERSION@
-+# NAGIOS.CFG - Main Config File for Nagios
++# NAGIOS.CFG - Sample Main Config File for Nagios
  #
  # Read the documentation for more information on this configuration
  # file.  I've provided some comments here, but things may not be so
- # clear without further explanation.
- #
--# Last Modified: 12-14-2008
--#
- ##############################################################################
- 
- 
-@@ -16,7 +14,7 @@
- # for historical purposes.  This should be the first option specified
+@@ -15,7 +15,7 @@
+ # for historical purposes.  This should be the first option specified 
  # in the config file!!!
  
 -log_file=@localstatedir@/nagios.log
@@ -74,7 +77,7 @@
  
  
  
-@@ -27,13 +25,13 @@
+@@ -26,13 +26,13 @@
  # if you wish (as shown below), or keep them all in a single config file.
  
  # You can specify individual object config files as shown below:
@@ -93,7 +96,7 @@
  
  # Definitions for monitoring a Windows machine
  #cfg_file=@sysconfdir@/objects/windows.cfg
-@@ -48,13 +46,8 @@
+@@ -47,13 +47,8 @@
  # You can also tell Nagios to process all config files (with a .cfg
  # extension) in a particular directory by using the cfg_dir
  # directive as shown below:
@@ -109,8 +112,8 @@
  
  
  # OBJECT CACHE FILE
-@@ -264,7 +257,7 @@
- # This is the directory where archived (rotated) log files should be
+@@ -242,7 +237,7 @@
+ # This is the directory where archived (rotated) log files should be 
  # placed (assuming you've chosen to do log rotation).
  
 -log_archive_path=@localstatedir@/archives
@@ -118,7 +121,7 @@
  
  
  
-@@ -272,7 +265,7 @@
+@@ -250,7 +245,7 @@
  # If you want messages logged to the syslog facility, as well as the
  # Nagios log file set this option to 1.  If not, set it to 0.
  
@@ -127,8 +130,8 @@
  
  
  
-@@ -728,7 +721,7 @@
- # by Nagios Enterprises from the update check is processed in accordance
+@@ -707,7 +702,7 @@
+ # by Nagios Enterprises from the update check is processed in accordance 
  # with our privacy policy - see http://api.nagios.org for details.
  
 -check_for_updates=1
@@ -136,8 +139,8 @@
  
  
  
-@@ -740,7 +733,7 @@
- # this data to determine the number of users running specific version of
+@@ -719,7 +714,7 @@
+ # this data to determine the number of users running specific version of 
  # Nagios.  Enable this option if you do not want this information to be sent.
  
 -bare_update_check=0
@@ -145,18 +148,7 @@
  
  
  
-@@ -850,8 +843,8 @@
- # Performance data is only written to these files if the
- # enable_performance_data option (above) is set to 1.
- 
--#host_perfdata_file=/tmp/host-perfdata
--#service_perfdata_file=/tmp/service-perfdata
-+#host_perfdata_file=@localstatedir@/host-perfdata
-+#service_perfdata_file=@localstatedir@/service-perfdata
- 
- 
- 
-@@ -875,8 +868,8 @@
+@@ -854,8 +849,8 @@
  # pipe ("p") mode which avoid blocking at startup, otherwise you will
  # likely want the defult append ("a") mode.
  
@@ -167,7 +159,7 @@
  
  
  
-@@ -1065,7 +1058,7 @@
+@@ -1091,7 +1086,7 @@
  #	strict-iso8601	(YYYY-MM-DDTHH:MM:SS)
  #
  
@@ -176,16 +168,7 @@
  
  
  
-@@ -1114,7 +1107,7 @@
- # embedded Perl interpreter) is located.  If you didn't compile
- # Nagios with embedded Perl support, this option has no effect.
- 
--p1_file=@bindir@/p1.pl
-+p1_file=@libexecdir@/nagios/p1.pl
- 
- 
- 
-@@ -1306,7 +1299,7 @@
+@@ -1285,7 +1280,7 @@
  # DEBUG FILE
  # This option determines where Nagios should write debugging information.
  
@@ -194,25 +177,14 @@
  
  
  
---- nagios-3.3.1/Makefile.in~	2011-07-26 05:02:18.000000000 +0300
-+++ nagios-3.3.1/Makefile.in	2012-01-06 17:31:31.482147956 +0200
-@@ -226,7 +226,7 @@
- 	cd $(SRC_BASE) && $(MAKE) $@
- 	cd $(SRC_CGI) && $(MAKE) $@
- 	cd $(SRC_HTM) && $(MAKE) $@
--	$(MAKE) install-exfoliation	
-+	$(MAKE) install-classicui
- 	$(MAKE) install-basic
- 
- install-basic:
---- nagios-3.3.1/html/config.inc.php.in~	2008-12-14 20:00:46.000000000 +0200
-+++ nagios-3.3.1/html/config.inc.php.in	2012-01-06 17:33:57.734940302 +0200
-@@ -2,7 +2,7 @@
- //
- 
- 
--$cfg['cgi_config_file']='@sysconfdir@/cgi.cfg';  // location of the CGI config file
-+$cfg['cgi_config_file']='/etc/webapps/nagios/cgi.cfg';  // location of the CGI config file
- 
- $cfg['cgi_base_url']='@cgiurl@';
- 
+diff -ur nagios.org/sample-config/resource.cfg.in nagios/sample-config/resource.cfg.in
+--- nagios.org/sample-config/resource.cfg.in	2013-09-20 21:01:20.000000000 +0200
++++ nagios/sample-config/resource.cfg.in	2013-10-01 21:52:53.371451113 +0200
+@@ -1,6 +1,6 @@
+ ###########################################################################
+ #
+-# RESOURCE.CFG - Sample Resource File for Nagios @VERSION@
++# RESOURCE.CFG - Sample Resource File for Nagios
+ #
+ #
+ # You can define $USERx$ macros in this file, which can in turn be used
