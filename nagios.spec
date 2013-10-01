@@ -214,8 +214,10 @@ Group:		Development/Libraries
 # doesn't require base
 
 %description devel
-This package provides include files that Nagios-related applications
-may compile against.
+This package contains the header files, static libraries and
+development documentation for Nagios. If you are a NEB-module author
+or wish to write addons for Nagios using Nagios' own API's, you should
+install this package.
 
 %description devel -l pl.UTF-8
 Ten pakiet dostarcza pliki nagłówkowe, które mogą być wykorzystywane
@@ -325,7 +327,7 @@ install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},%{_webapps}/%{_webapp}} 
 	$RPM_BUILD_ROOT%{_prefix}/lib/%{name}/{eventhandlers,plugins} \
 %endif
 
-%{__make} install-unstripped install-headers \
+%{__make} install-unstripped install-devel \
 	DESTDIR=$RPM_BUILD_ROOT \
 	INSTALL_OPTS="" \
 	INIT_OPTS="" \
@@ -570,3 +572,5 @@ done
 %defattr(644,root,root,755)
 %dir %{_includedir}/%{name}
 %{_includedir}/%{name}/*.h
+%{_includedir}/%{name}/lib
+%{_libdir}/libnagios.a
