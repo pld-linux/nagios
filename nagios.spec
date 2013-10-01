@@ -325,10 +325,7 @@ install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},%{_webapps}/%{_webapp}} 
 	$RPM_BUILD_ROOT%{_prefix}/lib/%{name}/{eventhandlers,plugins} \
 %endif
 
-install -d $RPM_BUILD_ROOT%{_includedir}/%{name}
-cp -p include/*.h	$RPM_BUILD_ROOT%{_includedir}/%{name}
-
-%{__make} install-unstripped \
+%{__make} install-unstripped install-headers \
 	DESTDIR=$RPM_BUILD_ROOT \
 	INSTALL_OPTS="" \
 	INIT_OPTS="" \
