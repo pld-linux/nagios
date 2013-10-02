@@ -6,7 +6,7 @@
 # reeenable when http://tracker.nagios.org/view.php?id=51 is fixed
 %bcond_with	tests
 
-Summary:	Host/service/network monitoring program
+Summary:	Open Source host, service and network monitoring program
 Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
 Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
@@ -355,13 +355,14 @@ find $RPM_BUILD_ROOT%{_examplesdir}/%{name}-%{version} -name '*.in' | xargs rm
 
 # mrtg script
 install -d $RPM_BUILD_ROOT/etc/mrtg/conf.d
-cp -a sample-config/mrtg.cfg $RPM_BUILD_ROOT/etc/mrtg/conf.d/%{name}.cfg
+cp -p sample-config/mrtg.cfg $RPM_BUILD_ROOT/etc/mrtg/conf.d/%{name}.cfg
 
 # Object data/cache files
 for i in {objects.{cache,precache},{retention,status}.dat,%{name}.{tmp,pid}}; do
 	> $RPM_BUILD_ROOT%{_localstatedir}/$i
 done
 > $RPM_BUILD_ROOT%{_localstatedir}/rw/%{name}.cmd
+> $RPM_BUILD_ROOT%{_localstatedir}/rw/%{name}.qh
 
 install -d $RPM_BUILD_ROOT%{_docdir}/%{name}
 mv $RPM_BUILD_ROOT{%{htmldir}/docs/*,%{_docdir}/%{name}}
@@ -479,6 +480,7 @@ done
 %attr(770,root,nagcmd) %dir %{_localstatedir}
 %attr(2770,root,nagcmd) %dir %{_localstatedir}/rw
 %attr(660,nagios,nagcmd) %ghost %{_localstatedir}/rw/%{name}.cmd
+%attr(660,nagios,nagcmd) %ghost %{_localstatedir}/rw/%{name}.qh
 %attr(664,root,nagios) %ghost %{_localstatedir}/objects.cache
 %attr(664,root,nagios) %ghost %{_localstatedir}/objects.precache
 %attr(664,root,nagios) %ghost %{_localstatedir}/*.dat
