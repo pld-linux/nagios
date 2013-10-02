@@ -3,7 +3,6 @@
 #
 # Conditional build:
 %bcond_without	gd	# without statusmap and trends, which require gd library
-%bcond_with	epn	# with Embedded Perl
 # reeenable when http://tracker.nagios.org/view.php?id=51 is fixed
 %bcond_with	tests
 
@@ -305,15 +304,10 @@ cd ..
 	--with-checkresult-dir=%{_var}/spool/%{name}/checkresults \
 	--with-ping_command='/bin/ping -n %%s -c %%d' \
 	%{!?with_gd:--disable-statusmap --disable-trends} \
-	%{?with_epn:--enable-embedded-perl --with-perlcache} \
 	%{?with_tests:--enable-libtap} \
 	--enable-event-broker
 
 %{__make} all
-
-%if %{with epn}
-%{__make} -C contrib mini_epn
-%endif
 
 %{?with_tests:%{__make} test}
 
@@ -332,11 +326,6 @@ install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},%{_webapps}/%{_webapp}} 
 	INSTALL_OPTS="" \
 	INIT_OPTS="" \
 	COMMAND_OPTS=""
-
-%if %{with epn}
-install -d $RPM_BUILD_ROOT%{_bindir}
-install -p contrib/mini_epn $RPM_BUILD_ROOT%{_bindir}
-%endif
 
 install -p %{SOURCE2} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 cp -p %{SOURCE3} $RPM_BUILD_ROOT/etc/sysconfig/%{name}
@@ -499,11 +488,6 @@ done
 %attr(770,root,nagcmd) %dir %{_var}/spool/%{name}/checkresults
 
 %{_examplesdir}/%{name}-%{version}
-
-# epn
-%if %{with epn}
-%attr(755,root,root) %{_bindir}/mini_epn
-%endif
 
 %files common
 %defattr(644,root,root,755)
