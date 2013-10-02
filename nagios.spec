@@ -1,5 +1,6 @@
 # TODO
 # - /var/log/nagios/archives -> /var/log/archive/nagios
+# - bundled jquery in themes
 #
 # Conditional build:
 %bcond_without	gd	# without statusmap and trends, which require gd library
@@ -128,6 +129,9 @@ Requires(pre):	/usr/sbin/usermod
 Provides:	group(nagcmd)
 Provides:	group(nagios)
 Provides:	user(nagios)
+%if "%{_rpmversion}" >= "5"
+BuildArch:	noarch
+%endif
 
 %description common
 Common files needed by both nagios and nrpe.
@@ -167,6 +171,9 @@ Summary:	MRTG Graphs: Nagios Statistics
 Group:		Applications/Networking
 Requires:	%{name} = %{version}-%{release}
 Provides:	mrtg-start
+%if "%{_rpmversion}" >= "5"
+BuildArch:	noarch
+%endif
 
 %description mrtggraphs
 This pacakge graphs several Nagios statistics which can be useful for
@@ -191,6 +198,9 @@ Requires:	%{name}-cgi = %{version}-%{release}
 Requires:	webserver(php)
 Provides:	nagios-theme
 Obsoletes:	nagios-theme
+%if "%{_rpmversion}" >= "5"
+BuildArch:	noarch
+%endif
 
 %description theme-classicui
 Original theme from Nagios.
@@ -206,6 +216,9 @@ Suggests:	nagios-theme-classicui
 Suggests:	nagios-theme-exfoliation
 Suggests:	nagios-theme-nuvola
 Obsoletes:	nagios-theme-default < 3.3.1-1.4
+%if "%{_rpmversion}" >= "5"
+BuildArch:	noarch
+%endif
 
 %description theme-default
 Virtual package to handle Nagios theme migration
