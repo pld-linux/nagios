@@ -3,6 +3,7 @@
 #
 # Conditional build:
 %bcond_without	gd	# without statusmap and trends, which require gd library
+%bcond_without	doc	# don't build html docs
 # reeenable when http://tracker.nagios.org/view.php?id=51 is fixed
 %bcond_with	tests
 
@@ -44,6 +45,7 @@ Patch11:	do-not-fetch-rss.patch
 URL:		http://www.nagios.org/
 BuildRequires:	autoconf
 BuildRequires:	automake
+%{?with_doc:BuildRequires:	doxygen}
 BuildRequires:	rpmbuild(macros) >= 1.268
 BuildRequires:	sed >= 4.0
 %if %{with gd}
@@ -174,6 +176,9 @@ generate the data.
 %package doc
 Summary:	HTML Documentation for Nagios
 Group:		Documentation
+%if "%{_rpmversion}" >= "5"
+BuildArch:	noarch
+%endif
 # does not require base
 
 %description doc
@@ -273,11 +278,6 @@ sed -e 's,%{_prefix}/lib/,%{_libdir}/,' %{SOURCE5} > lighttpd.conf
 	s,=nagiosadmin,=*,g
 ' sample-config/*.cfg.in
 
-# fixup paths in doc
-#%{__sed} -i -e '
-#	s,/usr/local/%{name}/var/archives/,/var/log/%{name}/archives/,
-#' html/docs/configmain.html
-
 #rm t/611cgistatus-hosturgencies.t
 
 %build
@@ -308,6 +308,8 @@ cd ..
 	--enable-event-broker
 
 %{__make} all
+
+%{?with_doc:%{__make} dox}
 
 %{?with_tests:%{__make} test}
 
@@ -365,7 +367,7 @@ done
 > $RPM_BUILD_ROOT%{_localstatedir}/rw/%{name}.qh
 
 install -d $RPM_BUILD_ROOT%{_docdir}/%{name}
-mv $RPM_BUILD_ROOT{%{htmldir}/docs/*,%{_docdir}/%{name}}
+%{__cp} -a Documentation/html/* $RPM_BUILD_ROOT%{_docdir}/%{name}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
