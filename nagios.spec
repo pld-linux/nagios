@@ -12,12 +12,12 @@ Summary:	Open Source host, service and network monitoring program
 Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
 Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
-Version:	4.0.0
+Version:	4.0.1
 Release:	1
 License:	GPL v2+
 Group:		Networking
 Source0:	http://downloads.sourceforge.net/nagios/nagios-4.x/%{name}-%{version}/%{name}-%{version}.tar.gz
-# Source0-md5:	bfe64774766e32b6f6130493c52ed7f6
+# Source0-md5:	c41fcd11703a98d61fe54ea99697b8d3
 Source1:	%{name}-apache.conf
 Source2:	%{name}.init
 Source3:	%{name}.sysconfig
@@ -246,7 +246,7 @@ aplicativos para o Nagios.
 
 %prep
 %setup -qc -a4
-mv %{name}/* .
+mv %{name}-%{version}/* .
 %undos cgi/*.c
 %undos include/*.h
 %undos base/*
