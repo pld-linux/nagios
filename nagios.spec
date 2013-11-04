@@ -13,7 +13,7 @@ Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
 Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	4.0.1
-Release:	1
+Release:	2
 License:	GPL v2+
 Group:		Networking
 Source0:	http://downloads.sourceforge.net/nagios/nagios-4.x/%{name}-%{version}/%{name}-%{version}.tar.gz
@@ -129,9 +129,6 @@ Requires(pre):	/usr/sbin/usermod
 Provides:	group(nagcmd)
 Provides:	group(nagios)
 Provides:	user(nagios)
-%if "%{_rpmversion}" >= "5"
-BuildArch:	noarch
-%endif
 
 %description common
 Common files needed by both nagios and nrpe.
