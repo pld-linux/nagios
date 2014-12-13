@@ -1,14 +1,14 @@
 --- nagios-3.4.1/html/main.php~	2012-05-12 03:00:53.000000000 +0300
 +++ nagios-3.4.1/html/main.php	2012-05-28 23:55:54.310721306 +0300
-@@ -12,7 +12,7 @@
+@@ -13,7 +13,7 @@ $this_year = '2014';
  <meta name="ROBOTS" content="NOINDEX, NOFOLLOW" />
  <title>Nagios Core</title>
- <link rel='stylesheet' type='text/css' href='stylesheets/common.css' />
+ <link rel="stylesheet" type="text/css" href="stylesheets/common.css?<?php echo $this_version; ?>" />
 -<script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
 +<script type="text/javascript" src="/js/jquery/jquery.js"></script>
  
  <script type='text/javascript'>
- 
+ 	$(document).ready(function() {
 --- nagios-3.4.1/include/cgiutils.h~	2012-05-24 17:15:30.000000000 +0300
 +++ nagios-3.4.1/include/cgiutils.h	2012-05-28 23:56:18.921757228 +0300
 @@ -77,7 +77,7 @@

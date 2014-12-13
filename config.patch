@@ -13,11 +13,19 @@ diff -ur nagios.org/html/config.inc.php.in nagios/html/config.inc.php.in
 diff -ur nagios.org/Makefile.in nagios/Makefile.in
 --- nagios.org/Makefile.in	2013-09-20 21:01:20.000000000 +0200
 +++ nagios/Makefile.in	2013-10-01 21:51:45.176497587 +0200
-@@ -241,7 +241,7 @@
+@@ -234,14 +234,14 @@ install:
  	cd $(SRC_BASE) && $(MAKE) $@
  	cd $(SRC_CGI) && $(MAKE) $@
  	cd $(SRC_HTM) && $(MAKE) $@
--	$(MAKE) install-exfoliation	
+-	$(MAKE) install-exfoliation
++	$(MAKE) install-classicui
+ 	$(MAKE) install-basic
+ 
+ install-unstripped:
+ 	cd $(SRC_BASE) && $(MAKE) $@
+ 	cd $(SRC_CGI) && $(MAKE) $@
+ 	cd $(SRC_HTM) && $(MAKE) $@
+-	$(MAKE) install-exfoliation
 +	$(MAKE) install-classicui
  	$(MAKE) install-basic
  

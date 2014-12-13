@@ -9,10 +9,10 @@ http://tracker.nagios.org/view.php?id=182
 +++ nagios/common/shared.c	2013-10-01 22:02:51.624429871 +0200
 @@ -9,6 +9,7 @@
   */
- int date_format = DATE_FORMAT_US;
- int interval_length = DEFAULT_INTERVAL_LENGTH;
+ int date_format;
+ int interval_length;
 +char *http_charset = NULL;
- char *illegal_output_chars = NULL;
+ char *illegal_output_chars;
  char illegal_output_char_map[] = CHAR_MAP_INIT(0);
  time_t program_start = 0L;
 diff -ur nagios.org/cgi/avail.c nagios/cgi/avail.c
