@@ -21,7 +21,7 @@ Source0:	http://downloads.sourceforge.net/nagios/nagios-4.x/%{name}-%{version}/%
 Source1:	%{name}-apache.conf
 Source2:	%{name}.init
 Source3:	%{name}.sysconfig
-# http://git.pld-linux.org/cgi-bin/cgit.cgi/projects/nagios-config.git/
+# http://git.pld-linux.org/projects/nagios-config/
 Source4:	%{name}-config-20090914.tar.bz2
 # Source4-md5:	605f1cd28c00db961dad6f529d849f16
 Source5:	%{name}-lighttpd.conf
