@@ -27,6 +27,10 @@ fi
 
 cfg_file=/etc/nagios/nagios.cfg
 
+# value to use for $HOME
+# as pld initscript resets HOME=/tmp, plugins may inherit bad value
+nagios_home=/usr/lib/nagios
+
 # check for precache
 precached_object_file=$(awk -F= '/^precached_object_file/{print $2}' $cfg_file)
 
@@ -79,7 +83,7 @@ start() {
 
 	# we're safe to use -x as we did verify config prior startup
 	# precached object file also is created in configtest.
-	daemon /usr/sbin/nagios ${precached_object_file:+-u} -x -d $cfg_file
+	daemon env -i PATH="$PATH" HOME="$nagios_home" /usr/sbin/nagios ${precached_object_file:+-u} -x -d $cfg_file
 	RETVAL=$?
 	if [ $RETVAL -eq 0 ]; then
 		touch /var/lock/subsys/nagios
