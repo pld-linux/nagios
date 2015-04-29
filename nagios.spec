@@ -74,6 +74,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		_sysconfdir	/etc/%{name}
 %define		cgidir		%{_libdir}/%{name}/cgi
 %define		htmldir		%{_prefix}/share/%{name}
+%define		nagioshome	%{_libdir}/%{name}
 %define		_localstatedir	/var/lib/%{name}
 %define		_webapps	/etc/webapps
 %define		_webapp		%{name}
@@ -408,9 +409,9 @@ fi
 %groupadd -g 72 nagios
 %groupadd -g 147 -f nagcmd
 if [ -n "$(id -u netsaint 2>/dev/null)" ] && [ "$(id -u netsaint)" = "72" ]; then
-	/usr/sbin/usermod -d %{_libdir}/%{name} -l nagios -c "Nagios Daemon" -G nagcmd netsaint
+	/usr/sbin/usermod -d %{nagioshome} -l nagios -c "Nagios Daemon" -G nagcmd netsaint
 fi
-%useradd -u 72 -d %{_libdir}/%{name} -s /bin/false -c "Nagios Daemon" -g nagios -G nagcmd nagios
+%useradd -u 72 -d %{nagioshome} -s /bin/false -c "Nagios Daemon" -g nagios -G nagcmd nagios
 
 %postun common
 if [ "$1" = "0" ]; then
