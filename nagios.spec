@@ -376,7 +376,7 @@ done
 > $RPM_BUILD_ROOT%{_localstatedir}/rw/%{name}.qh
 
 install -d $RPM_BUILD_ROOT%{_docdir}/%{name}
-%{__cp} -a Documentation/html/* $RPM_BUILD_ROOT%{_docdir}/%{name}
+%{?with_doc:%{__cp} -a Documentation/html/* $RPM_BUILD_ROOT%{_docdir}/%{name}}
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -522,9 +522,11 @@ done
 %defattr(644,root,root,755)
 %config(noreplace) %verify(not md5 mtime size) /etc/mrtg/conf.d/%{name}.cfg
 
+%if %{with doc}
 %files doc
 %defattr(644,root,root,755)
 %{_docdir}/%{name}
+%endif
 
 %files cgi
 %defattr(644,root,root,755)
