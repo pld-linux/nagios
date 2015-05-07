@@ -29,7 +29,7 @@ cfg_file=/etc/nagios/nagios.cfg
 
 # value to use for $HOME
 # as pld initscript resets HOME=/tmp, plugins may inherit bad value
-nagios_home=/usr/lib/nagios
+nagios_home=/var/lib/nagios
 
 # check for precache
 precached_object_file=$(awk -F= '/^precached_object_file/{print $2}' $cfg_file)
