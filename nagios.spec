@@ -11,7 +11,7 @@ Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
 Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	3.2.3
-Release:	5
+Release:	6
 License:	GPL v2+
 Group:		Networking
 Source0:	http://downloads.sourceforge.net/nagios/%{name}-%{version}.tar.gz
@@ -63,6 +63,7 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %define		cgidir		%{_libdir}/%{name}/cgi
 %define		htmldir		%{_prefix}/share/%{name}
 %define		_localstatedir	/var/lib/%{name}
+%define		nagioshome	%{_localstatedir}
 %define		_webapps	/etc/webapps
 %define		_webapp		%{name}
 
@@ -343,7 +344,12 @@ fi
 if [ -n "$(id -u netsaint 2>/dev/null)" ] && [ "$(id -u netsaint)" = "72" ]; then
 	/usr/sbin/usermod -d %{_libdir}/%{name} -l nagios -c "Nagios Daemon" -G nagcmd netsaint
 fi
-%useradd -u 72 -d %{_libdir}/%{name} -s /bin/false -c "Nagios Daemon" -g nagios -G nagcmd nagios
+%useradd -u 72 -d %{nagioshome} -s /bin/false -c "Nagios Daemon" -g nagios -G nagcmd nagios
+# update nagios user home
+home=$(IFS=:; set -- $(getent passwd nagios); echo $6)
+if [ "$home" != %{nagioshome} ]; then
+	/usr/sbin/usermod -d %{nagioshome} nagios
+fi
 
 %postun common
 if [ "$1" = "0" ]; then
@@ -394,6 +400,14 @@ for a in dependencies.cfg services.cfg serviceextinfo.cfg hosts.cfg hostgroups.c
 	fi
 done
 %{__sed} -i -e 's,^check_result_path=.*,check_result_path=%{_var}/spool/%{name}/checkresults,' %{_sysconfdir}/%{name}.cfg
+
+
+%triggerpostun -- nagios-common < 3.2.3-6
+%banner -e %{name}-common <<EOF
+
+IMPORTANT: nagios user home changed to %{nagioshome}, you may need to move files from previous location %{_libdir}/%{name}.
+
+EOF
 
 %files
 %defattr(644,root,root,755)
