@@ -10,7 +10,6 @@ diff -ur nagios.org/html/config.inc.php.in nagios/html/config.inc.php.in
  
  $cfg['cgi_base_url']='@cgiurl@';
  
-diff -ur nagios.org/Makefile.in nagios/Makefile.in
 --- nagios.org/Makefile.in	2013-09-20 21:01:20.000000000 +0200
 +++ nagios/Makefile.in	2013-10-01 21:51:45.176497587 +0200
 @@ -234,14 +234,14 @@ install:
@@ -30,7 +29,6 @@ diff -ur nagios.org/Makefile.in nagios/Makefile.in
  	$(MAKE) install-basic
  
  install-basic:
-diff -ur nagios.org/sample-config/cgi.cfg.in nagios/sample-config/cgi.cfg.in
 --- nagios.org/sample-config/cgi.cfg.in	2013-09-20 21:01:20.000000000 +0200
 +++ nagios/sample-config/cgi.cfg.in	2013-10-01 21:52:32.937634398 +0200
 @@ -1,6 +1,6 @@
@@ -65,7 +63,6 @@ diff -ur nagios.org/sample-config/cgi.cfg.in nagios/sample-config/cgi.cfg.in
  navbar_search_for_aliases=1
 +
 +# vim:ts=8:sw=8:ft=cfg
-diff -ur nagios.org/sample-config/nagios.cfg.in nagios/sample-config/nagios.cfg.in
 --- nagios.org/sample-config/nagios.cfg.in	2013-09-20 21:01:20.000000000 +0200
 +++ nagios/sample-config/nagios.cfg.in	2013-10-01 21:53:09.708504449 +0200
 @@ -1,6 +1,6 @@
@@ -85,7 +82,7 @@ diff -ur nagios.org/sample-config/nagios.cfg.in nagios/sample-config/nagios.cfg.
  
  
  
-@@ -26,13 +26,13 @@
+@@ -26,13 +26,14 @@
  # if you wish (as shown below), or keep them all in a single config file.
  
  # You can specify individual object config files as shown below:
@@ -95,6 +92,7 @@ diff -ur nagios.org/sample-config/nagios.cfg.in nagios/sample-config/nagios.cfg.
 -cfg_file=@sysconfdir@/objects/templates.cfg
 +cfg_file=@sysconfdir@/commands.cfg
 +cfg_file=@sysconfdir@/contacts.cfg
++cfg_file=@sysconfdir@/contactgroups.cfg
 +cfg_file=@sysconfdir@/timeperiods.cfg
 +cfg_file=@sysconfdir@/templates.cfg
  
@@ -104,7 +102,7 @@ diff -ur nagios.org/sample-config/nagios.cfg.in nagios/sample-config/nagios.cfg.
  
  # Definitions for monitoring a Windows machine
  #cfg_file=@sysconfdir@/objects/windows.cfg
-@@ -47,13 +47,8 @@
+@@ -47,13 +48,8 @@
  # You can also tell Nagios to process all config files (with a .cfg
  # extension) in a particular directory by using the cfg_dir
  # directive as shown below:
@@ -120,7 +118,7 @@ diff -ur nagios.org/sample-config/nagios.cfg.in nagios/sample-config/nagios.cfg.
  
  
  # OBJECT CACHE FILE
-@@ -242,7 +237,7 @@
+@@ -242,7 +238,7 @@
  # This is the directory where archived (rotated) log files should be 
  # placed (assuming you've chosen to do log rotation).
  
@@ -129,7 +127,7 @@ diff -ur nagios.org/sample-config/nagios.cfg.in nagios/sample-config/nagios.cfg.
  
  
  
-@@ -250,7 +245,7 @@
+@@ -250,7 +246,7 @@
  # If you want messages logged to the syslog facility, as well as the
  # Nagios log file set this option to 1.  If not, set it to 0.
  
@@ -138,7 +136,7 @@ diff -ur nagios.org/sample-config/nagios.cfg.in nagios/sample-config/nagios.cfg.
  
  
  
-@@ -707,7 +702,7 @@
+@@ -707,7 +703,7 @@
  # by Nagios Enterprises from the update check is processed in accordance 
  # with our privacy policy - see http://api.nagios.org for details.
  
@@ -147,7 +145,7 @@ diff -ur nagios.org/sample-config/nagios.cfg.in nagios/sample-config/nagios.cfg.
  
  
  
-@@ -719,7 +714,7 @@
+@@ -719,7 +715,7 @@
  # this data to determine the number of users running specific version of 
  # Nagios.  Enable this option if you do not want this information to be sent.
  
@@ -156,7 +154,7 @@ diff -ur nagios.org/sample-config/nagios.cfg.in nagios/sample-config/nagios.cfg.
  
  
  
-@@ -854,8 +849,8 @@
+@@ -854,8 +850,8 @@
  # pipe ("p") mode which avoid blocking at startup, otherwise you will
  # likely want the defult append ("a") mode.
  
@@ -167,7 +165,7 @@ diff -ur nagios.org/sample-config/nagios.cfg.in nagios/sample-config/nagios.cfg.
  
  
  
-@@ -1091,7 +1086,7 @@
+@@ -1091,7 +1087,7 @@
  #	strict-iso8601	(YYYY-MM-DDTHH:MM:SS)
  #
  
@@ -176,7 +174,7 @@ diff -ur nagios.org/sample-config/nagios.cfg.in nagios/sample-config/nagios.cfg.
  
  
  
-@@ -1285,7 +1280,7 @@
+@@ -1285,7 +1281,7 @@
  # DEBUG FILE
  # This option determines where Nagios should write debugging information.
  
@@ -185,7 +183,6 @@ diff -ur nagios.org/sample-config/nagios.cfg.in nagios/sample-config/nagios.cfg.
  
  
  
-diff -ur nagios.org/sample-config/resource.cfg.in nagios/sample-config/resource.cfg.in
 --- nagios.org/sample-config/resource.cfg.in	2013-09-20 21:01:20.000000000 +0200
 +++ nagios/sample-config/resource.cfg.in	2013-10-01 21:52:53.371451113 +0200
 @@ -1,6 +1,6 @@
