@@ -13,17 +13,17 @@ Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
 Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	4.0.8
-Release:	4
+Release:	5
 License:	GPL v2+
 Group:		Networking
-Source0:	http://downloads.sourceforge.net/nagios/nagios-4.x/%{name}-%{version}/%{name}-%{version}.tar.gz
+Source0:	http://downloads.sourceforge.net/nagios/%{name}-%{version}.tar.gz
 # Source0-md5:	4bba4eef427cfb113fb513b6166a6af6
 Source1:	%{name}-apache.conf
 Source2:	%{name}.init
 Source3:	%{name}.sysconfig
 # http://git.pld-linux.org/projects/nagios-config/
-Source4:	%{name}-config-20090914.tar.bz2
-# Source4-md5:	605f1cd28c00db961dad6f529d849f16
+Source4:	%{name}-config-20150805.tar.xz
+# Source4-md5:	16683172c72cc2c09662261c82abef40
 Source5:	%{name}-lighttpd.conf
 Source6:	http://www.google.com/mapfiles/shadow50.png
 # Source6-md5:	eff99f302f21b95a900d321743fce72b
@@ -49,6 +49,8 @@ BuildRequires:	automake
 %{?with_doc:BuildRequires:	doxygen}
 BuildRequires:	rpmbuild(macros) >= 1.268
 BuildRequires:	sed >= 4.0
+BuildRequires:	tar >= 1:1.22
+BuildRequires:	xz
 %if %{with gd}
 BuildRequires:	gd-devel
 BuildRequires:	libjpeg-devel
