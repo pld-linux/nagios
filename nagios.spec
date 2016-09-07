@@ -571,6 +571,27 @@ EOF
 %{htmldir}/rss-corefeed.html
 %{htmldir}/rss-newsfeed.html
 
+%{htmldir}/angularjs
+%{htmldir}/bootstrap-3.3.0
+%{htmldir}/d3
+%{htmldir}/spin
+%{htmldir}/graph-header.html
+%{htmldir}/histogram-form.html
+%{htmldir}/histogram-graph.html
+%{htmldir}/histogram-links.html
+%{htmldir}/histogram.html
+%{htmldir}/infobox.html
+%{htmldir}/map-directive.html
+%{htmldir}/map-form.html
+%{htmldir}/map-links.html
+%{htmldir}/map-popup.html
+%{htmldir}/trends-form.html
+%{htmldir}/trends-graph.html
+%{htmldir}/trends-host-yaxis.html
+%{htmldir}/trends-links.html
+%{htmldir}/trends-service-yaxis.html
+%{htmldir}/trends.html
+
 %files theme-classicui
 %defattr(644,root,root,755)
 %exclude %{htmldir}/nagioswall.php
