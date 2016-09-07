@@ -29,8 +29,8 @@ diff -ur nagios.org/html/config.inc.php.in nagios/html/config.inc.php.in
  	$(MAKE) install-basic
  
  install-basic:
---- nagios.org/sample-config/cgi.cfg.in	2013-09-20 21:01:20.000000000 +0200
-+++ nagios/sample-config/cgi.cfg.in	2013-10-01 21:52:32.937634398 +0200
+--- nagios-4.2.1/sample-config/cgi.cfg.in~	2016-09-07 19:22:34.000000000 +0300
++++ nagios-4.2.1/sample-config/cgi.cfg.in	2016-09-07 19:22:52.152175332 +0300
 @@ -1,6 +1,6 @@
  #################################################################
  #
@@ -57,10 +57,10 @@ diff -ur nagios.org/html/config.inc.php.in nagios/html/config.inc.php.in
  
  
  
-@@ -370,3 +370,5 @@
+@@ -402,3 +402,5 @@
  
- navbar_search_for_addresses=1
- navbar_search_for_aliases=1
+ #ack_no_sticky=0
+ #ack_no_send=0
 +
 +# vim:ts=8:sw=8:ft=cfg
 --- nagios.org/sample-config/nagios.cfg.in	2013-09-20 21:01:20.000000000 +0200

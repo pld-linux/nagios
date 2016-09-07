@@ -30,9 +30,18 @@
  
  
  //build splash divs to ajax load 
---- nagios-3.4.1/html/Makefile.in~	2012-02-13 22:40:42.000000000 +0200
-+++ nagios-3.4.1/html/Makefile.in	2012-05-28 23:52:30.828823727 +0300
-@@ -79,10 +79,6 @@
+--- nagios-4.2.1/html/Makefile.in~	2016-09-06 17:59:22.000000000 +0300
++++ nagios-4.2.1/html/Makefile.in	2016-09-07 19:25:18.613096481 +0300
+@@ -54,8 +54,6 @@
+ 	$(INSTALL) -m 775 $(INSTALL_OPTS) -d $(DESTDIR)$(HTMLDIR)/images
+ 	$(INSTALL) -m 775 $(INSTALL_OPTS) -d $(DESTDIR)$(HTMLDIR)/images/logos
+ 	$(INSTALL) -m 775 $(INSTALL_OPTS) -d $(DESTDIR)$(HTMLDIR)/includes
+-	$(INSTALL) -m 775 $(INSTALL_OPTS) -d $(DESTDIR)$(HTMLDIR)/includes/rss
+-	$(INSTALL) -m 775 $(INSTALL_OPTS) -d $(DESTDIR)$(HTMLDIR)/includes/rss/extlib
+ 	$(INSTALL) -m 775 $(INSTALL_OPTS) -d $(DESTDIR)$(HTMLDIR)/ssi
+ # Directories for new CGI pages
+ 	$(INSTALL) -m 775 $(INSTALL_OPTS) -d $(DESTDIR)$(HTMLDIR)/angularjs
+@@ -120,10 +120,6 @@
  	do $(INSTALL) -m 664 $(INSTALL_OPTS) $$file $(DESTDIR)$(HTMLDIR)/images/logos; done
  	for file in includes/*.*; \
  	do $(INSTALL) -m 664 $(INSTALL_OPTS) $$file $(DESTDIR)$(HTMLDIR)/includes; done
@@ -40,6 +49,6 @@
 -	do $(INSTALL) -m 664 $(INSTALL_OPTS) $$file $(DESTDIR)$(HTMLDIR)/includes/rss; done
 -	for file in includes/rss/extlib/*.*; \
 -	do $(INSTALL) -m 664 $(INSTALL_OPTS) $$file $(DESTDIR)$(HTMLDIR)/includes/rss/extlib; done
- 
- install-unstripped:
- 	$(MAKE) install
+ # Support files for new graphical CGIs
+ 	$(INSTALL) -m 664 $(INSTALL_OPTS) angularjs/angular-1.3.9/angular.min.js  $(DESTDIR)$(HTMLDIR)/angularjs/angular-1.3.9
+ 	$(INSTALL) -m 664 $(INSTALL_OPTS) angularjs/angular-1.3.9/angular.min.js.map  $(DESTDIR)$(HTMLDIR)/angularjs/angular-1.3.9

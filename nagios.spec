@@ -12,12 +12,12 @@ Summary:	Open Source host, service and network monitoring program
 Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
 Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
-Version:	4.0.8
-Release:	5
+Version:	4.2.1
+Release:	0.1
 License:	GPL v2+
 Group:		Networking
-Source0:	http://downloads.sourceforge.net/nagios/%{name}-%{version}.tar.gz
-# Source0-md5:	4bba4eef427cfb113fb513b6166a6af6
+Source0:	https://assets.nagios.com/downloads/nagioscore/releases/%{name}-%{version}.tar.gz
+# Source0-md5:	96a71803c10afe1a7d2b05e61e35578a
 Source1:	%{name}-apache.conf
 Source2:	%{name}.init
 Source3:	%{name}.sysconfig
@@ -43,7 +43,7 @@ Patch8:		archivelog-timeformat.patch
 Patch9:		system-magpierss.patch
 Patch10:	system-jquery.patch
 Patch11:	do-not-fetch-rss.patch
-URL:		http://www.nagios.org/
+URL:		https://www.nagios.org/projects/nagios-core/
 BuildRequires:	autoconf
 BuildRequires:	automake
 %{?with_doc:BuildRequires:	doxygen}

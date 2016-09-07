@@ -1,5 +1,5 @@
---- nagios-3.2.0/cgi/statusmap.c	2009-10-22 18:19:21.913340828 +0300
-+++ nagios-3.2.0.googlemap/cgi/statusmap.c	2009-10-22 18:19:06.830007817 +0300
+--- nagios-4.2.1/cgi/statusmap.c~	2016-09-07 19:23:29.000000000 +0300
++++ nagios-4.2.1/cgi/statusmap.c	2016-09-07 19:24:13.969747452 +0300
 @@ -27,6 +27,10 @@
   *
   *****************************************************************************/
@@ -81,15 +81,18 @@
  		printf("<body CLASS='statusmap' name='mappage' id='mappage'>\n");
  
  		/* include user SSI header */
-@@ -703,7 +729,7 @@
- 		/* right hand column of top row */
+@@ -745,9 +745,9 @@
  		printf("<td align=right valign=top>\n");
  
+ #ifdef LEGACY_GRAPHICAL_CGIS
 -		printf("<form method=\"POST\" action=\"%s\">\n", STATUSMAP_CGI);
-+		printf("<form name=\"layoutform\" method=\"POST\" action=\"%s\">\n",STATUSMAP_CGI);
++		printf("<form name=\"layoutform\" method=\"POST\" action=\"%s\">\n", STATUSMAP_CGI);
+ #else
+-		printf("<form method=\"POST\" action=\"%s\">\n", LEGACY_STATUSMAP_CGI);
++		printf("<form name=\"layoutform\" method=\"POST\" action=\"%s\">\n", LEGACY_STATUSMAP_CGI);
+ #endif
  		printf("<table border=0 CLASS='optBox'>\n");
  		printf("<tr><td valign=top>\n");
- 		printf("<input type='hidden' name='host' value='%s'>\n",escape_string(host_name));
 @@ -725,6 +751,7 @@
  		printf("<option value=%d %s>Circular\n", LAYOUT_CIRCULAR, (layout_method == LAYOUT_CIRCULAR) ? "selected" : "");
  		printf("<option value=%d %s>Circular (Marked Up)\n", LAYOUT_CIRCULAR_MARKUP, (layout_method == LAYOUT_CIRCULAR_MARKUP) ? "selected" : "");

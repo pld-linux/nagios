@@ -1,5 +1,5 @@
---- nagios-1.2/configure.in.orig	Tue Feb  3 05:45:08 2004
-+++ nagios-1.2/configure.in	Fri May  7 11:28:28 2004
+--- nagios-1.2/configure.ac.orig	Tue Feb  3 05:45:08 2004
++++ nagios-1.2/configure.ac	Fri May  7 11:28:28 2004
 @@ -533,7 +533,7 @@
  if test x$TRYGD = xyep; then
  
