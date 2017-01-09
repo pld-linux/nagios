@@ -157,7 +157,6 @@ Requires:	webserver(auth)
 Requires:	webserver(cgi)
 Requires:	webserver(indexfile)
 Suggests:	%{name}-doc
-Suggests:	php-magpierss >= 0.72
 
 %description cgi
 CGI webinterface for Nagios.
