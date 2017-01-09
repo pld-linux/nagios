@@ -12,12 +12,12 @@ Summary:	Open Source host, service and network monitoring program
 Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
 Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
-Version:	4.2.1
-Release:	0.1
+Version:	4.2.4
+Release:	1
 License:	GPL v2+
 Group:		Networking
 Source0:	https://assets.nagios.com/downloads/nagioscore/releases/%{name}-%{version}.tar.gz
-# Source0-md5:	96a71803c10afe1a7d2b05e61e35578a
+# Source0-md5:	02a4d396eb3efe689e19b0405be00ad4
 Source1:	%{name}-apache.conf
 Source2:	%{name}.init
 Source3:	%{name}.sysconfig
@@ -34,13 +34,13 @@ Source9:	%{name}wall.php
 Patch0:		%{name}-resources.patch
 Patch1:		%{name}-iconv-in-libc.patch
 Patch2:		%{name}-webapps.patch
-Patch3:		%{name}-cgi-http_charset.patch
+
 Patch4:		%{name}-cmd-typo.patch
 Patch5:		config.patch
 Patch6:		%{name}-googlemap.patch
 Patch7:		%{name}-doc-usermacros.patch
 Patch8:		archivelog-timeformat.patch
-Patch9:		system-magpierss.patch
+
 Patch10:	system-jquery.patch
 Patch11:	do-not-fetch-rss.patch
 URL:		https://www.nagios.org/projects/nagios-core/
@@ -252,14 +252,14 @@ mv %{name}-%{version}/* .
 %patch0 -p0
 %patch1 -p1
 %patch2 -p1
-%patch3 -p1
+
 #fixed
 #%patch4 -p1
 %patch5 -p1
 %patch6 -p1
 %patch7 -p1
 %patch8 -p1
-%patch9 -p1
+
 %patch10 -p1
 %patch11 -p1
 
@@ -568,8 +568,6 @@ EOF
 %{htmldir}/images/marker.png
 %{htmldir}/images/shadow50.png
 %{htmldir}/nagioswall.php
-%{htmldir}/rss-corefeed.html
-%{htmldir}/rss-newsfeed.html
 
 %{htmldir}/angularjs
 %{htmldir}/bootstrap-3.3.0
