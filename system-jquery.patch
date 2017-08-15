@@ -1,36 +1,36 @@
 --- nagios-3.4.1/html/main.php~	2012-05-12 03:00:53.000000000 +0300
 +++ nagios-3.4.1/html/main.php	2012-05-28 23:55:54.310721306 +0300
-@@ -13,7 +13,7 @@ $this_year = '2014';
- <meta name="ROBOTS" content="NOINDEX, NOFOLLOW" />
+@@ -14,7 +14,7 @@ $this_year = '2017';
  <title>Nagios Core</title>
  <link rel="stylesheet" type="text/css" href="stylesheets/common.css?<?php echo $this_version; ?>" />
+ <link rel="stylesheet" type="text/css" href="stylesheets/nag_funcs.css?<?php echo $this_version; ?>" />
 -<script type="text/javascript" src="js/jquery-1.7.1.min.js"></script>
 +<script type="text/javascript" src="/js/jquery/jquery.js"></script>
+ <script type="text/javascript" src="js/nag_funcs.js"></script>
  
  <script type='text/javascript'>
- 	$(document).ready(function() {
 --- nagios-3.4.1/include/cgiutils.h~	2012-05-24 17:15:30.000000000 +0300
 +++ nagios-3.4.1/include/cgiutils.h	2012-05-28 23:56:18.921757228 +0300
-@@ -77,7 +77,7 @@
- #define SUMMARY_CSS             "summary.css"
+@@ -93,7 +93,7 @@ NAGIOS_BEGIN_DECL
+ #define NAGFUNCS_CSS       "nag_funcs.css"
  
  	/********************************* JAVASCRIPT INCLUDES **********************/
--#define JQUERY_JS		"jquery-1.7.1.min.js"
-+#define JQUERY_JS		"/js/jquery/jquery.js"
+-#define JQUERY_JS          "jquery-1.7.1.min.js"
++#define JQUERY_JS          "/js/jquery/jquery.js"
+ #define NAGFUNCS_JS        "nag_funcs.js"
  
  	/********************************* ICONS ************************************/
- 
 --- nagios-3.4.1/cgi/status.c~	2012-05-24 17:15:30.000000000 +0300
 +++ nagios-3.4.1/cgi/status.c	2012-05-28 23:57:04.933694000 +0300
-@@ -525,7 +525,7 @@
+@@ -531,7 +531,7 @@ void document_header(int use_stylesheet)
  		}
  
  	/* added jquery library 1/31/2012 */
--	printf("<script type='text/javascript' src='%s%s'></script>\n",url_js_path, JQUERY_JS);
+-	printf("<script type='text/javascript' src='%s%s'></script>\n", url_js_path, JQUERY_JS);
 +	printf("<script type='text/javascript' src='%s'></script>\n",JQUERY_JS);
+ 	printf("<script type='text/javascript' src='%s%s'></script>\n", url_js_path, NAGFUNCS_JS);
  	/* JS function to append content to elements on page */
  	printf("<script type='text/javascript'>\n");
- 	printf("$(document).ready(function() { $('#top_page_numbers').append($('#bottom_page_numbers').html() ); });");
 --- nagios-3.4.1/html/Makefile.in~	2012-05-28 23:52:30.000000000 +0300
 +++ nagios-3.4.1/html/Makefile.in	2012-05-28 23:59:43.973722231 +0300
 @@ -61,8 +61,6 @@
