@@ -13,7 +13,7 @@ Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
 Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	4.3.3
-Release:	1
+Release:	2
 License:	GPL v2+
 Group:		Networking
 Source0:	https://assets.nagios.com/downloads/nagioscore/releases/%{name}-%{version}.tar.gz
@@ -327,7 +327,7 @@ cd ..
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},%{_webapps}/%{_webapp}} \
 	$RPM_BUILD_ROOT{%{_var}/log/%{name}/archives,%{_localstatedir}/rw} \
-	$RPM_BUILD_ROOT%{_sysconfdir}/{plugins,objects} \
+	$RPM_BUILD_ROOT%{_sysconfdir}/{plugins,objects,nrpe.d} \
 	$RPM_BUILD_ROOT%{_libdir}/%{name}/{eventhandlers,plugins,brokers} \
 %if "%{_lib}" != "lib"
 	$RPM_BUILD_ROOT%{_prefix}/lib/%{name}/{eventhandlers,plugins} \
@@ -520,6 +520,7 @@ EOF
 %defattr(644,root,root,755)
 %attr(750,root,nagcmd) %dir %{_sysconfdir}
 %attr(750,root,nagios) %dir %{_sysconfdir}/plugins
+%attr(750,root,nagios) %dir %{_sysconfdir}/nrpe.d
 %dir %{_libdir}/%{name}
 %dir %{_libdir}/%{name}/plugins
 %dir %{_libdir}/%{name}/eventhandlers
