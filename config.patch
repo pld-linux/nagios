@@ -57,10 +57,10 @@ diff -ur nagios.org/html/config.inc.php.in nagios/html/config.inc.php.in
  
  
  
-@@ -394,3 +394,5 @@ navbar_search_for_aliases=1
- # Set to 1 to show only HARD states. Defaults to 0 (HARD+SOFT).
- 
- #tac_cgi_hard_only=0
+@@ -420,3 +420,5 @@ navbar_search_for_aliases=1
+ #CMT_ACKNOWLEDGE_HOST_PROBLEM=2,"Problem is being looked into"
+ #CMT_SCHEDULE_SVC_CHECK=1
+ #CMT_SCHEDULE_HOST_DOWNTIME=0
 +
 +# vim:ts=8:sw=8:ft=cfg
 --- nagios.org/sample-config/nagios.cfg.in	2013-09-20 21:01:20.000000000 +0200
