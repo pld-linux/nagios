@@ -33,7 +33,7 @@ Source7:	http://www.google.com/mapfiles/marker.png
 Source8:	googlemap.js
 Source9:	%{name}wall.php
 Patch100:	%{name}-git.patch
-# Patch100-md5: xyz
+# Patch100-md5:	76c628cc2bc0e0e68aed4d42683cc32d
 
 Patch0:		%{name}-resources.patch
 Patch1:		%{name}-iconv-in-libc.patch
