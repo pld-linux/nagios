@@ -12,13 +12,13 @@ Summary:	Open Source host, service and network monitoring program
 Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
 Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
-Version:	4.4.3
-Release:	2
+Version:	4.4.5
+Release:	1
 License:	GPL v2+
 Group:		Networking
 # https://www.nagios.org/downloads/nagios-core/
 Source0:	https://assets.nagios.com/downloads/nagioscore/releases/%{name}-%{version}.tar.gz
-# Source0-md5:	8beb253b1236ee1407f698b5d2a2d894
+# Source0-md5:	f7ff56cbfa3c57e2337aa53f84737564
 Source1:	%{name}-apache.conf
 Source2:	%{name}.init
 Source3:	%{name}.sysconfig
@@ -32,8 +32,8 @@ Source7:	http://www.google.com/mapfiles/marker.png
 # Source7-md5:	edefef4bdfc29e1c953694651f05b466
 Source8:	googlemap.js
 Source9:	%{name}wall.php
-Patch100:	%{name}-git.patch
-# Patch100-md5:	76c628cc2bc0e0e68aed4d42683cc32d
+#Patch100:	%{name}-git.patch
+# Patch100-md5:	56f785241d0ed9fe51a8170b9dd50272
 
 Patch0:		%{name}-resources.patch
 Patch1:		%{name}-iconv-in-libc.patch
@@ -253,7 +253,7 @@ mv %{name}-%{version}/* .
 %undos include/*.h
 %undos base/*
 
-%patch100 -p1
+#%patch100 -p1
 
 %patch0 -p0
 %patch1 -p1
