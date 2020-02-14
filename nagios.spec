@@ -16,7 +16,7 @@ Version:	4.4.5
 Release:	1
 License:	GPL v2+
 Group:		Networking
-# https://www.nagios.org/downloads/nagios-core/
+# https://www.nagios.org/downloads/nagios-core/thanks/?product_download=nagioscore-source
 Source0:	https://assets.nagios.com/downloads/nagioscore/releases/%{name}-%{version}.tar.gz
 # Source0-md5:	f7ff56cbfa3c57e2337aa53f84737564
 Source1:	%{name}-apache.conf
