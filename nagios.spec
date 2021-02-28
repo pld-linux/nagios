@@ -173,9 +173,7 @@ Summary:	MRTG Graphs: Nagios Statistics
 Group:		Applications/Networking
 Requires:	%{name} = %{version}-%{release}
 Provides:	mrtg-start
-%if "%{_rpmversion}" >= "5"
 BuildArch:	noarch
-%endif
 
 %description mrtggraphs
 This pacakge graphs several Nagios statistics which can be useful for
@@ -185,9 +183,7 @@ generate the data.
 %package doc
 Summary:	HTML Documentation for Nagios
 Group:		Documentation
-%if "%{_rpmversion}" >= "5"
 BuildArch:	noarch
-%endif
 # does not require base
 
 %description doc
@@ -200,9 +196,7 @@ Requires:	%{name}-cgi = %{version}-%{release}
 Requires:	webserver(php)
 Provides:	nagios-theme
 Obsoletes:	nagios-theme
-%if "%{_rpmversion}" >= "5"
 BuildArch:	noarch
-%endif
 
 %description theme-classicui
 Original theme from Nagios.
@@ -218,9 +212,7 @@ Suggests:	nagios-theme-classicui
 Suggests:	nagios-theme-exfoliation
 Suggests:	nagios-theme-nuvola
 Obsoletes:	nagios-theme-default < 3.3.1-1.4
-%if "%{_rpmversion}" >= "5"
 BuildArch:	noarch
-%endif
 
 %description theme-default
 Virtual package to handle Nagios theme migration
