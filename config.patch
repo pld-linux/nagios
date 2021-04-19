@@ -1,18 +1,7 @@
-diff -ur nagios.org/html/config.inc.php.in nagios/html/config.inc.php.in
---- nagios.org/html/config.inc.php.in	2013-09-20 21:01:20.000000000 +0200
-+++ nagios/html/config.inc.php.in	2013-10-01 21:51:45.176497587 +0200
-@@ -2,7 +2,7 @@
- //
- 
- 
--$cfg['cgi_config_file']='@sysconfdir@/cgi.cfg';  // location of the CGI config file
-+$cfg['cgi_config_file']='/etc/webapps/nagios/cgi.cfg';  // location of the CGI config file
- 
- $cfg['cgi_base_url']='@cgiurl@';
- 
---- nagios.org/Makefile.in	2013-09-20 21:01:20.000000000 +0200
-+++ nagios/Makefile.in	2013-10-01 21:51:45.176497587 +0200
-@@ -234,14 +234,14 @@ install:
+diff -urNp -x '*.orig' nagios-4.4.6.org/Makefile.in nagios-4.4.6/Makefile.in
+--- nagios-4.4.6.org/Makefile.in	2020-04-28 22:48:29.000000000 +0200
++++ nagios-4.4.6/Makefile.in	2021-04-19 12:03:30.865816616 +0200
+@@ -276,14 +276,14 @@ install:
  	cd $(SRC_BASE) && $(MAKE) $@
  	cd $(SRC_CGI) && $(MAKE) $@
  	cd $(SRC_HTM) && $(MAKE) $@
@@ -29,8 +18,21 @@ diff -ur nagios.org/html/config.inc.php.in nagios/html/config.inc.php.in
  	$(MAKE) install-basic
  
  install-basic:
---- nagios-4.2.1/sample-config/cgi.cfg.in~	2016-09-07 19:22:34.000000000 +0300
-+++ nagios-4.2.1/sample-config/cgi.cfg.in	2016-09-07 19:22:52.152175332 +0300
+diff -urNp -x '*.orig' nagios-4.4.6.org/html/config.inc.php.in nagios-4.4.6/html/config.inc.php.in
+--- nagios-4.4.6.org/html/config.inc.php.in	2020-04-28 22:48:29.000000000 +0200
++++ nagios-4.4.6/html/config.inc.php.in	2021-04-19 12:03:30.865816616 +0200
+@@ -2,7 +2,7 @@
+ //
+ 
+ 
+-$cfg['cgi_config_file']='@sysconfdir@/cgi.cfg';  // location of the CGI config file
++$cfg['cgi_config_file']='/etc/webapps/nagios/cgi.cfg';  // location of the CGI config file
+ 
+ $cfg['cgi_base_url']='@cgiurl@';
+ 
+diff -urNp -x '*.orig' nagios-4.4.6.org/sample-config/cgi.cfg.in nagios-4.4.6/sample-config/cgi.cfg.in
+--- nagios-4.4.6.org/sample-config/cgi.cfg.in	2020-04-28 22:48:29.000000000 +0200
++++ nagios-4.4.6/sample-config/cgi.cfg.in	2021-04-19 12:03:30.865816616 +0200
 @@ -1,6 +1,6 @@
  #################################################################
  #
@@ -39,7 +41,7 @@ diff -ur nagios.org/html/config.inc.php.in nagios/html/config.inc.php.in
  #
  #
  #################################################################
-@@ -42,7 +42,7 @@
+@@ -42,7 +42,7 @@ url_html_path=@htmurl@
  # Values: 0 = disables context-sensitive help
  #         1 = enables context-sensitive help
  
@@ -48,7 +50,7 @@ diff -ur nagios.org/html/config.inc.php.in nagios/html/config.inc.php.in
  
  
  
-@@ -263,7 +263,7 @@
+@@ -270,7 +270,7 @@ default_statuswrl_layout=4
  # OS and distribution, so you may have to tweak this to
  # work on your system.
  
@@ -63,8 +65,9 @@ diff -ur nagios.org/html/config.inc.php.in nagios/html/config.inc.php.in
  #CMT_SCHEDULE_HOST_DOWNTIME=0
 +
 +# vim:ts=8:sw=8:ft=cfg
---- nagios.org/sample-config/nagios.cfg.in	2013-09-20 21:01:20.000000000 +0200
-+++ nagios/sample-config/nagios.cfg.in	2013-10-01 21:53:09.708504449 +0200
+diff -urNp -x '*.orig' nagios-4.4.6.org/sample-config/nagios.cfg.in nagios-4.4.6/sample-config/nagios.cfg.in
+--- nagios-4.4.6.org/sample-config/nagios.cfg.in	2020-04-28 22:48:29.000000000 +0200
++++ nagios-4.4.6/sample-config/nagios.cfg.in	2021-04-19 12:03:30.865816616 +0200
 @@ -1,6 +1,6 @@
  ##############################################################################
  #
@@ -74,7 +77,7 @@ diff -ur nagios.org/html/config.inc.php.in nagios/html/config.inc.php.in
  # Read the documentation for more information on this configuration
  # file.  I've provided some comments here, but things may not be so
 @@ -15,7 +15,7 @@
- # for historical purposes.  This should be the first option specified 
+ # for historical purposes.  This should be the first option specified
  # in the config file!!!
  
 -log_file=@localstatedir@/nagios.log
@@ -82,7 +85,7 @@ diff -ur nagios.org/html/config.inc.php.in nagios/html/config.inc.php.in
  
  
  
-@@ -26,13 +26,14 @@
+@@ -26,13 +26,14 @@ log_file=@localstatedir@/nagios.log
  # if you wish (as shown below), or keep them all in a single config file.
  
  # You can specify individual object config files as shown below:
@@ -102,7 +105,7 @@ diff -ur nagios.org/html/config.inc.php.in nagios/html/config.inc.php.in
  
  # Definitions for monitoring a Windows machine
  #cfg_file=@sysconfdir@/objects/windows.cfg
-@@ -47,13 +48,8 @@
+@@ -47,13 +48,8 @@ cfg_file=@sysconfdir@/objects/localhost.
  # You can also tell Nagios to process all config files (with a .cfg
  # extension) in a particular directory by using the cfg_dir
  # directive as shown below:
@@ -118,8 +121,8 @@ diff -ur nagios.org/html/config.inc.php.in nagios/html/config.inc.php.in
  
  
  # OBJECT CACHE FILE
-@@ -242,7 +238,7 @@
- # This is the directory where archived (rotated) log files should be 
+@@ -243,7 +239,7 @@ log_rotation_method=d
+ # This is the directory where archived (rotated) log files should be
  # placed (assuming you've chosen to do log rotation).
  
 -log_archive_path=@localstatedir@/archives
@@ -127,7 +130,7 @@ diff -ur nagios.org/html/config.inc.php.in nagios/html/config.inc.php.in
  
  
  
-@@ -250,7 +246,7 @@
+@@ -251,7 +247,7 @@ log_archive_path=@localstatedir@/archive
  # If you want messages logged to the syslog facility, as well as the
  # Nagios log file set this option to 1.  If not, set it to 0.
  
@@ -136,17 +139,17 @@ diff -ur nagios.org/html/config.inc.php.in nagios/html/config.inc.php.in
  
  
  
-@@ -707,7 +703,7 @@
- # by Nagios Enterprises from the update check is processed in accordance 
- # with our privacy policy - see http://api.nagios.org for details.
+@@ -709,7 +705,7 @@ interval_length=60
+ # by Nagios Enterprises from the update check is processed in accordance
+ # with our privacy policy - see https://api.nagios.org for details.
  
 -check_for_updates=1
 +check_for_updates=0
  
  
  
-@@ -719,7 +715,7 @@
- # this data to determine the number of users running specific version of 
+@@ -721,7 +717,7 @@ check_for_updates=1
+ # this data to determine the number of users running specific version of
  # Nagios.  Enable this option if you do not want this information to be sent.
  
 -bare_update_check=0
@@ -154,9 +157,9 @@ diff -ur nagios.org/html/config.inc.php.in nagios/html/config.inc.php.in
  
  
  
-@@ -854,8 +850,8 @@
+@@ -856,8 +852,8 @@ process_performance_data=0
  # pipe ("p") mode which avoid blocking at startup, otherwise you will
- # likely want the defult append ("a") mode.
+ # likely want the default append ("a") mode.
  
 -#host_perfdata_file_mode=a
 -#service_perfdata_file_mode=a
@@ -165,7 +168,7 @@ diff -ur nagios.org/html/config.inc.php.in nagios/html/config.inc.php.in
  
  
  
-@@ -1091,7 +1087,7 @@
+@@ -1093,7 +1089,7 @@ high_host_flap_threshold=20.0
  #	strict-iso8601	(YYYY-MM-DDTHH:MM:SS)
  #
  
@@ -174,7 +177,7 @@ diff -ur nagios.org/html/config.inc.php.in nagios/html/config.inc.php.in
  
  
  
-@@ -1285,7 +1281,7 @@
+@@ -1292,7 +1288,7 @@ debug_verbosity=1
  # DEBUG FILE
  # This option determines where Nagios should write debugging information.
  
@@ -183,8 +186,9 @@ diff -ur nagios.org/html/config.inc.php.in nagios/html/config.inc.php.in
  
  
  
---- nagios.org/sample-config/resource.cfg.in	2013-09-20 21:01:20.000000000 +0200
-+++ nagios/sample-config/resource.cfg.in	2013-10-01 21:52:53.371451113 +0200
+diff -urNp -x '*.orig' nagios-4.4.6.org/sample-config/resource.cfg.in nagios-4.4.6/sample-config/resource.cfg.in
+--- nagios-4.4.6.org/sample-config/resource.cfg.in	2021-04-19 12:03:30.622476046 +0200
++++ nagios-4.4.6/sample-config/resource.cfg.in	2021-04-19 12:03:30.865816616 +0200
 @@ -1,6 +1,6 @@
  ###########################################################################
  #

@@ -1,20 +1,22 @@
 set sane format for archived logs, so the files would be sortable
 ideally this should came from config (date_format=iso8601)
 
---- nagios-3.4.1/base/logging.c~	2012-05-24 17:09:34.000000000 +0300
-+++ nagios-3.4.1/base/logging.c	2012-05-24 17:10:09.466859755 +0300
-@@ -424,7 +424,7 @@
- 	stat_result = stat(log_file, &log_file_stat);
+diff -urNp -x '*.orig' nagios-4.4.6.org/base/logging.c nagios-4.4.6/base/logging.c
+--- nagios-4.4.6.org/base/logging.c	2021-04-19 12:04:00.320026000 +0200
++++ nagios-4.4.6/base/logging.c	2021-04-19 12:04:00.590034030 +0200
+@@ -406,7 +406,7 @@ int rotate_log_file(time_t rotation_time
+ 	close_log_file();
  
  	/* get the archived filename to use */
 -	asprintf(&log_archive, "%s%snagios-%02d-%02d-%d-%02d.log", log_archive_path, (log_archive_path[strlen(log_archive_path) - 1] == '/') ? "" : "/", t->tm_mon + 1, t->tm_mday, t->tm_year + 1900, t->tm_hour);
 +	asprintf(&log_archive, "%s%snagios-%04d-%02d-%02d-%02d.log", log_archive_path, (log_archive_path[strlen(log_archive_path) - 1] == '/') ? "" : "/", t->tm_year + 1900, t->tm_mon + 1, t->tm_mday, t->tm_hour);
  
- 	/* rotate the log file */
- 	rename_result = my_rename(log_file, log_archive);
---- nagios-3.4.1/cgi/cgiutils.c~	2012-05-24 17:09:34.000000000 +0300
-+++ nagios-3.4.1/cgi/cgiutils.c	2012-05-24 17:11:08.629380008 +0300
-@@ -1143,7 +1143,7 @@
+ 	/* HACK: If the archive exists, don't overwrite it. This is a hack
+ 		because the real problem is that some log rotations are executed
+diff -urNp -x '*.orig' nagios-4.4.6.org/cgi/cgiutils.c nagios-4.4.6/cgi/cgiutils.c
+--- nagios-4.4.6.org/cgi/cgiutils.c	2021-04-19 12:04:00.296691972 +0200
++++ nagios-4.4.6/cgi/cgiutils.c	2021-04-19 12:04:00.590034030 +0200
+@@ -1468,7 +1468,7 @@ void get_log_archive_to_use(int archive,
  	t = localtime(&this_scheduled_log_rotation);
  
  	/* use the time that the log rotation occurred to figure out the name of the log file */

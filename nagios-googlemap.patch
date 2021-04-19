@@ -1,6 +1,7 @@
---- nagios-4.2.1/cgi/statusmap.c~	2016-09-07 19:23:29.000000000 +0300
-+++ nagios-4.2.1/cgi/statusmap.c	2016-09-07 19:24:13.969747452 +0300
-@@ -27,6 +27,10 @@
+diff -urNp -x '*.orig' nagios-4.4.6.org/cgi/statusmap.c nagios-4.4.6/cgi/statusmap.c
+--- nagios-4.4.6.org/cgi/statusmap.c	2021-04-19 12:03:46.639619108 +0200
++++ nagios-4.4.6/cgi/statusmap.c	2021-04-19 12:03:46.922960869 +0200
+@@ -25,6 +25,10 @@
   *
   *****************************************************************************/
  
@@ -11,7 +12,7 @@
  #include "../include/config.h"
  #include "../include/common.h"
  #include "../include/objects.h"
-@@ -92,6 +92,7 @@ extern int default_statusmap_layout_meth
+@@ -89,6 +93,7 @@ extern int default_statusmap_layout_meth
  #define LAYOUT_CIRCULAR                 4
  #define LAYOUT_CIRCULAR_MARKUP          5
  #define LAYOUT_CIRCULAR_BALLOON         6
@@ -19,7 +20,7 @@
  
  
  struct layer {
-@@ -99,6 +100,20 @@ struct layer {
+@@ -96,6 +101,20 @@ struct layer {
  	struct layer *next;
  };
  
@@ -40,7 +41,7 @@
  
  void document_header(int);
  void document_footer(void);
-@@ -117,6 +135,10 @@
+@@ -113,6 +132,10 @@ void load_background_image(void);
  void draw_background_image(void);
  void draw_background_extras(void);
  void draw_host_links(void);
@@ -49,9 +50,9 @@
 +void write_google_head_code(void);
 +
  void draw_hosts(void);
- void draw_host_text(char *,int,int);
- void draw_text(char *,int,int,int);
-@@ -288,12 +310,11 @@
+ void draw_host_text(char *, int, int);
+ void draw_text(char *, int, int, int);
+@@ -287,12 +310,11 @@ int main(int argc, char **argv) {
  	/* initialize macros */
  	init_macros();
  
@@ -66,7 +67,7 @@
  	/* display the network map... */
  	display_map();
  
-@@ -345,9 +366,14 @@
+@@ -344,9 +366,14 @@ void document_header(int use_stylesheet)
  
  		/* write JavaScript code for popup window */
  		write_popup_code();
@@ -81,7 +82,7 @@
  		printf("<body CLASS='statusmap' name='mappage' id='mappage'>\n");
  
  		/* include user SSI header */
-@@ -745,9 +745,9 @@
+@@ -718,9 +745,9 @@ void display_page_header(void) {
  		printf("<td align=right valign=top>\n");
  
  #ifdef LEGACY_GRAPHICAL_CGIS
@@ -93,7 +94,7 @@
  #endif
  		printf("<table border=0 CLASS='optBox'>\n");
  		printf("<tr><td valign=top>\n");
-@@ -725,6 +751,7 @@
+@@ -743,6 +770,7 @@ void display_page_header(void) {
  		printf("<option value=%d %s>Circular\n", LAYOUT_CIRCULAR, (layout_method == LAYOUT_CIRCULAR) ? "selected" : "");
  		printf("<option value=%d %s>Circular (Marked Up)\n", LAYOUT_CIRCULAR_MARKUP, (layout_method == LAYOUT_CIRCULAR_MARKUP) ? "selected" : "");
  		printf("<option value=%d %s>Circular (Balloon)\n", LAYOUT_CIRCULAR_BALLOON, (layout_method == LAYOUT_CIRCULAR_BALLOON) ? "selected" : "");
@@ -101,7 +102,7 @@
  		printf("</select>\n");
  		printf("</td>\n");
  		printf("<td CLASS='optBoxItem'>\n");
-@@ -821,6 +848,11 @@
+@@ -839,6 +867,11 @@ void display_map(void) {
  	/* display page header */
  	display_page_header();
  
@@ -113,7 +114,7 @@
  	initialize_graphics();
  	draw_background_image();
  	draw_background_extras();
-@@ -1563,10 +1602,19 @@
+@@ -1585,10 +1618,19 @@ void draw_host_links(void) {
  	return;
  	}
  
@@ -132,8 +133,8 @@
 +	
  	host *temp_host;
  	int x1, x2;
- 	int y1, y2;
-@@ -1586,6 +1634,8 @@
+ 	int y1;
+@@ -1608,6 +1650,8 @@ void draw_hosts(void) {
  	int translated_x;
  	int translated_y;
  
@@ -142,7 +143,7 @@
  
  	/* user didn't supply any coordinates for hosts, so display a warning */
  	if(coordinates_were_specified == FALSE) {
-@@ -2241,6 +2291,197 @@
+@@ -2265,6 +2309,197 @@ void cleanup_graphics(void) {
  /************************* MISC FUNCTIONS *************************/
  /******************************************************************/
  
@@ -339,4 +340,4 @@
 +}
  
  /* write JavaScript code an layer for popup window */
- void write_popup_code(void){
+ void write_popup_code(void) {
