@@ -1,0 +1,11 @@
+--- nagios-4.4.6/cgi/status.c~	2021-05-03 16:43:18.000000000 +0200
++++ nagios-4.4.6/cgi/status.c	2021-05-03 17:01:33.489957800 +0200
+@@ -2009,6 +2009,8 @@ void show_service_detail(void) {
+ 			printf("<td class='status%s'>%d/%d</td>\n", status_bg_class, temp_status->current_attempt, temp_status->max_attempts);
+ 			printf("<td class='status%s' valign='center'>", status_bg_class);
+ 			printf("%s&nbsp;", (temp_status->plugin_output == NULL) ? "" : html_encode(temp_status->plugin_output, TRUE));
++			printf("<BR>%s&nbsp;", (temp_status->long_plugin_output == NULL) ? "" : html_encode(temp_status->long_plugin_output, TRUE));
++
+ 			/*
+ 			if(enable_splunk_integration==TRUE)
+ 				display_splunk_service_url(temp_service);
