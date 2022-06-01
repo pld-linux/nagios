@@ -13,7 +13,7 @@ Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
 Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	4.4.7
-Release:	1
+Release:	2
 License:	GPL v2+
 Group:		Networking
 # https://www.nagios.org/downloads/nagios-core/thanks/?product_download=nagioscore-source
@@ -246,6 +246,8 @@ mv %{name}-%{version}/* .
 %undos base/*
 
 #%patch100 -p1
+
+patch -p1 < ./contrib/epel-patches/nagios-0010-remove-information-leak.patch || exit 1
 
 %patch0 -p0
 %patch1 -p1

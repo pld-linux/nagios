@@ -6,17 +6,17 @@ more reasonable)
 diff -urNp -x '*.orig' nagios-4.4.6.org/html/main.php nagios-4.4.6/html/main.php
 --- nagios-4.4.6.org/html/main.php	2021-04-19 12:04:15.360473328 +0200
 +++ nagios-4.4.6/html/main.php	2021-04-19 12:04:15.620481061 +0200
-@@ -25,6 +25,10 @@ $this_year = '2020';
- 		var vboxText = "<a href=https://www.nagios.com/tours target=_blank> " +
- 						"Click here to watch the entire Nagios Core 4 Tour!</a>";
- 	<?php } ?>
+@@ -19,6 +19,10 @@ $this_year = '2022';
+ 
+ <script type='text/javascript'>
+ 	var cookie;
 +<?php
 +	$updateinfo=get_update_information();
 +	if ($updateinfo['update_checks_enabled']!==false):
 +?>
  	$(document).ready(function() {
- 		var user = "<?php echo htmlspecialchars($_SERVER['REMOTE_USER']); ?>";
- 
+ 		loadRemoteFeed( // Our top banner splash.
+ 			'#splashbox0-contents', 'corebanner', 1,
 @@ -47,7 +51,9 @@ $this_year = '2020';
  			'#splashbox5-contents', 'corepromo', 3,
  			'<ul>', processPromoItem, '</ul>'
