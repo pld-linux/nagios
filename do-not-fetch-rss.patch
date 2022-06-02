@@ -11,29 +11,27 @@ diff -urNp -x '*.orig' nagios-4.4.6.org/html/main.php nagios-4.4.6/html/main.php
  <script type='text/javascript'>
  	var cookie;
 +<?php
-+	$updateinfo=get_update_information();
-+	if ($updateinfo['update_checks_enabled']!==false):
++       $updateinfo=get_update_information();
++       if ($updateinfo['update_checks_enabled']!==false):
 +?>
  	$(document).ready(function() {
  		loadRemoteFeed( // Our top banner splash.
  			'#splashbox0-contents', 'corebanner', 1,
-@@ -47,7 +51,9 @@ $this_year = '2020';
- 			'#splashbox5-contents', 'corepromo', 3,
- 			'<ul>', processPromoItem, '</ul>'
- 		);
--
-+<?php
-+		endif;
-+?>
+@@ -37,6 +41,7 @@ $this_year = '2022';
+ 
  		getCoreStatus();
  	});
++<?php endif ?>
  
-@@ -152,7 +158,7 @@ $this_year = '2020';
+ 	// Fetch an RSS feed and format HTML for the first n items.
+ 	function loadRemoteFeed(id, name, n, prefix, formatter, suffix) {
+@@ -125,7 +130,8 @@ $this_year = '2022';
  
  <div id="updateversioninfo">
  <?php
 -	$updateinfo = get_update_information();
-+	//$updateinfo = get_update_information();
++	// $updateinfo = get_update_information();
++	$updateinfo['update_checks_enabled'] = false;
  	if (!$updateinfo['update_checks_enabled']) {
  ?>
  		<div class="updatechecksdisabled">
