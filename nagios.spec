@@ -12,13 +12,13 @@ Summary:	Open Source host, service and network monitoring program
 Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
 Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
-Version:	4.4.10
+Version:	4.4.14
 Release:	1
 License:	GPL v2+
 Group:		Networking
 # https://www.nagios.org/downloads/nagios-core/thanks/?product_download=nagioscore-source
 Source0:	https://assets.nagios.com/downloads/nagioscore/releases/%{name}-%{version}.tar.gz
-# Source0-md5:	193610ea3995e561c5e9bd9dcdaad529
+# Source0-md5:	90187ec0cb2eeace142680e3918cc44d
 Source1:	%{name}-apache.conf
 Source2:	%{name}.init
 Source3:	%{name}.sysconfig
