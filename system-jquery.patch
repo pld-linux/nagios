@@ -4,7 +4,7 @@
  <title>Nagios Core</title>
  <link rel="stylesheet" type="text/css" href="stylesheets/common.css?<?php echo $this_version; ?>" />
  <link rel="stylesheet" type="text/css" href="stylesheets/nag_funcs.css?<?php echo $this_version; ?>" />
--<script type="text/javascript" src="js/jquery-1.12.4.min.js"></script>
+-<script type="text/javascript" src="js/jquery-3.7.1.min.js"></script>
 +<script type="text/javascript" src="/js/jquery/jquery.js"></script>
  <script type="text/javascript" src="js/nag_funcs.js"></script>
  
@@ -15,7 +15,7 @@
  #define NAGFUNCS_CSS       "nag_funcs.css"
  
  	/********************************* JAVASCRIPT INCLUDES **********************/
--#define JQUERY_JS          "jquery-1.12.4.min.js"
+-#define JQUERY_JS          "jquery-3.7.1.min.js"
 +#define JQUERY_JS          "/js/jquery/jquery.js"
  #define NAGFUNCS_JS        "nag_funcs.js"
  
@@ -31,13 +31,24 @@
  	printf("<script type='text/javascript' src='%s%s'></script>\n", url_js_path, NAGFUNCS_JS);
  	/* JS function to append content to elements on page */
  	printf("<script type='text/javascript'>\n");
+--- nagios-4.5.3/html/jsonquery.html~	2024-06-11 16:50:20.000000000 +0200
++++ nagios-4.5.3/html/jsonquery.html	2024-08-01 10:44:22.443304502 +0200
+@@ -4,7 +4,7 @@
+ 	<head>
+ 		<title>JSON Query Generator</title>
+ 		<link rel="stylesheet" type="text/css" href="stylesheets/jsonquery.css"/>
+-		<script type="text/javascript" src="js/jquery-3.7.1.min.js"></script>
++		<script type="text/javascript" src="js/jquery/jquery.js"></script>
+ 		<script type="text/javascript" src="js/jsonquery.js"></script>
+ 	</head>
+ 	<body>
 --- nagios-3.4.1/html/Makefile.in~	2012-05-28 23:52:30.000000000 +0300
 +++ nagios-3.4.1/html/Makefile.in	2012-05-28 23:59:43.973722231 +0300
-@@ -61,8 +61,6 @@
+@@ -106,8 +106,6 @@ install:
  	do $(INSTALL) -m 664 $(INSTALL_OPTS) $$file $(DESTDIR)$(HTMLDIR)/stylesheets; done
- 	for file in contexthelp/*.html; \
+ 	for file in $(srcdir)/contexthelp/*.html; \
  	do $(INSTALL) -m 664 $(INSTALL_OPTS) $$file $(DESTDIR)$(HTMLDIR)/contexthelp; done
--	for file in js/*.js; \
+-	for file in $(srcdir)/js/*.js; \
 -	do $(INSTALL) -m 664 $(INSTALL_OPTS) $$file $(DESTDIR)$(HTMLDIR)/js; done
  #	for file in docs/*.html; \
  #	do $(INSTALL) -m 664 $(INSTALL_OPTS) $$file $(DESTDIR)$(HTMLDIR)/docs; done

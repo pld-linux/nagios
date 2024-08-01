@@ -12,13 +12,13 @@ Summary:	Open Source host, service and network monitoring program
 Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
 Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
-Version:	4.4.14
+Version:	4.5.3
 Release:	1
 License:	GPL v2+
 Group:		Networking
 # https://www.nagios.org/downloads/nagios-core/thanks/?product_download=nagioscore-source
 Source0:	https://assets.nagios.com/downloads/nagioscore/releases/%{name}-%{version}.tar.gz
-# Source0-md5:	90187ec0cb2eeace142680e3918cc44d
+# Source0-md5:	b77fd2fb656245dd0097c8e7b1310d3e
 Source1:	%{name}-apache.conf
 Source2:	%{name}.init
 Source3:	%{name}.sysconfig
@@ -42,7 +42,8 @@ Patch3:		long-output.patch
 Patch4:		%{name}-cmd-typo.patch
 Patch5:		config.patch
 Patch6:		%{name}-googlemap.patch
-
+# rediffed and fixed contrib/epel-patches/nagios-0010-remove-information-leak.patch
+Patch7:		remove-information-leak.patch
 Patch8:		archivelog-timeformat.patch
 
 Patch10:	system-jquery.patch
@@ -152,7 +153,7 @@ Requires:	%{name} = %{version}-%{release}
 Requires:	%{name}-imagepaks
 Requires:	%{name}-theme
 Requires:	group(http)
-Requires:	jquery
+Requires:	jquery >= 3.7.1
 Requires:	webapps
 Requires:	webserver
 Requires:	webserver(access)
@@ -211,6 +212,8 @@ Requires:	nagios-theme
 Suggests:	nagios-theme-classicui
 Suggests:	nagios-theme-exfoliation
 Suggests:	nagios-theme-nuvola
+Conflicts:	nagios-theme-classicui < %{version}-%{release}
+Conflicts:	nagios-theme-exfoliation < %{version}-%{release}
 Obsoletes:	nagios-theme-default < 3.3.1-1.4
 BuildArch:	noarch
 
@@ -247,8 +250,6 @@ mv %{name}-%{version}/* .
 
 #%patch100 -p1
 
-patch -p1 < ./contrib/epel-patches/nagios-0010-remove-information-leak.patch || exit 1
-
 %patch0 -p0
 %patch1 -p1
 %patch2 -p1
@@ -257,7 +258,7 @@ patch -p1 < ./contrib/epel-patches/nagios-0010-remove-information-leak.patch || 
 #%patch4 -p1
 %patch5 -p1
 %patch6 -p1
-
+%patch7 -p1
 %patch8 -p1
 
 %patch10 -p1
@@ -380,6 +381,8 @@ done
 
 install -d $RPM_BUILD_ROOT%{_docdir}/%{name}
 %{?with_doc:%{__cp} -a Documentation/html/* $RPM_BUILD_ROOT%{_docdir}/%{name}}
+
+rm $RPM_BUILD_ROOT%{htmldir}/js/jquery-*.min.js
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -560,6 +563,7 @@ EOF
 %dir %{htmldir}
 %dir %{htmldir}/includes
 %dir %{htmldir}/images
+%dir %{htmldir}/js
 %dir %{htmldir}/stylesheets
 %{htmldir}/robots.txt
 %{htmldir}/contexthelp
@@ -569,28 +573,9 @@ EOF
 %{htmldir}/images/favicon.ico
 %{htmldir}/images/marker.png
 %{htmldir}/images/shadow50.png
+%{htmldir}/js/jsonquery.js
+%{htmldir}/js/nag_funcs.js
 %{htmldir}/nagioswall.php
-
-%{htmldir}/angularjs
-%{htmldir}/bootstrap-3.3.7
-%{htmldir}/d3
-%{htmldir}/spin
-%{htmldir}/graph-header.html
-%{htmldir}/histogram-form.html
-%{htmldir}/histogram-graph.html
-%{htmldir}/histogram-links.html
-%{htmldir}/histogram.html
-%{htmldir}/infobox.html
-%{htmldir}/map-directive.html
-%{htmldir}/map-form.html
-%{htmldir}/map-links.html
-%{htmldir}/map-popup.html
-%{htmldir}/trends-form.html
-%{htmldir}/trends-graph.html
-%{htmldir}/trends-host-yaxis.html
-%{htmldir}/trends-links.html
-%{htmldir}/trends-service-yaxis.html
-%{htmldir}/trends.html
 
 %files theme-classicui
 %defattr(644,root,root,755)

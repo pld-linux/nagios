@@ -1,18 +1,26 @@
-diff -urNp -x '*.orig' nagios-4.4.6.org/Makefile.in nagios-4.4.6/Makefile.in
---- nagios-4.4.6.org/Makefile.in	2020-04-28 22:48:29.000000000 +0200
-+++ nagios-4.4.6/Makefile.in	2021-04-19 12:03:30.865816616 +0200
-@@ -276,14 +276,14 @@ install:
- 	cd $(SRC_BASE) && $(MAKE) $@
- 	cd $(SRC_CGI) && $(MAKE) $@
- 	cd $(SRC_HTM) && $(MAKE) $@
+--- nagios-4.5.3/Makefile.in~	2024-06-11 16:50:20.000000000 +0200
++++ nagios-4.5.3/Makefile.in	2024-08-01 10:46:49.579971168 +0200
+@@ -275,7 +275,7 @@ coverage: test
+ 
+ install-html:
+ 	cd $(BLD_HTM) && $(MAKE) install
+-	$(MAKE) install-exfoliation
++	$(MAKE) install-classicui
+ 
+ install-base:
+ 	cd $(BLD_BASE) && $(MAKE) install
+@@ -287,14 +287,14 @@ install:
+ 	cd $(BLD_BASE) && $(MAKE) $@
+ 	cd $(BLD_CGI) && $(MAKE) $@
+ 	cd $(BLD_HTM) && $(MAKE) $@
 -	$(MAKE) install-exfoliation
 +	$(MAKE) install-classicui
  	$(MAKE) install-basic
  
  install-unstripped:
- 	cd $(SRC_BASE) && $(MAKE) $@
- 	cd $(SRC_CGI) && $(MAKE) $@
- 	cd $(SRC_HTM) && $(MAKE) $@
+ 	cd $(BLD_BASE) && $(MAKE) $@
+ 	cd $(BLD_CGI) && $(MAKE) $@
+ 	cd $(BLD_HTM) && $(MAKE) $@
 -	$(MAKE) install-exfoliation
 +	$(MAKE) install-classicui
  	$(MAKE) install-basic
