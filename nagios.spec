@@ -13,7 +13,7 @@ Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
 Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	4.5.3
-Release:	4
+Release:	5
 License:	GPL v2+
 Group:		Networking
 # https://www.nagios.org/downloads/nagios-core/thanks/?product_download=nagioscore-source
@@ -43,11 +43,11 @@ Patch4:		%{name}-cmd-typo.patch
 Patch5:		config.patch
 Patch6:		%{name}-googlemap.patch
 # rediffed and fixed contrib/epel-patches/nagios-0010-remove-information-leak.patch
+# + disabling checks related to update_checks_enabled
 Patch7:		remove-information-leak.patch
 Patch8:		archivelog-timeformat.patch
 
 Patch10:	system-jquery.patch
-Patch11:	do-not-fetch-rss.patch
 URL:		https://www.nagios.org/projects/nagios-core/
 BuildRequires:	autoconf
 BuildRequires:	automake
@@ -265,7 +265,6 @@ mv %{name}-%{version}/* .
 %patch8 -p1
 
 %patch10 -p1
-%patch11 -p1
 
 find -name .cvsignore -o -name .gitignore | xargs rm
 

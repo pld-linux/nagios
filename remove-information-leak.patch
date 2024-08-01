@@ -1,6 +1,6 @@
-diff -urN nagios-4.5.3.org/cgi/extinfo.c nagios-4.5.3/cgi/extinfo.c
+diff -ur nagios-4.5.3.org/cgi/extinfo.c nagios-4.5.3/cgi/extinfo.c
 --- nagios-4.5.3.org/cgi/extinfo.c	2024-06-11 16:50:20.000000000 +0200
-+++ nagios-4.5.3/cgi/extinfo.c	2024-08-01 10:36:50.536637843 +0200
++++ nagios-4.5.3/cgi/extinfo.c	2024-08-01 12:11:08.706637661 +0200
 @@ -557,27 +557,6 @@
  		printf("<LINK REL='stylesheet' TYPE='text/css' HREF='%s%s'>\n", url_stylesheets_path, NAGFUNCS_CSS);
  		}
@@ -29,9 +29,9 @@ diff -urN nagios-4.5.3.org/cgi/extinfo.c nagios-4.5.3/cgi/extinfo.c
  	printf("</head>\n");
  
  	printf("<body CLASS='extinfo'>\n");
-diff -urN nagios-4.5.3.org/cgi/status.c nagios-4.5.3/cgi/status.c
+diff -ur nagios-4.5.3.org/cgi/status.c nagios-4.5.3/cgi/status.c
 --- nagios-4.5.3.org/cgi/status.c	2024-06-11 16:50:20.000000000 +0200
-+++ nagios-4.5.3/cgi/status.c	2024-08-01 10:36:50.539971176 +0200
++++ nagios-4.5.3/cgi/status.c	2024-08-01 12:11:08.709970995 +0200
 @@ -556,31 +556,8 @@
  	/* JS function to append content to elements on page */
  	printf("<script type='text/javascript'>\n");
@@ -64,9 +64,9 @@ diff -urN nagios-4.5.3.org/cgi/status.c nagios-4.5.3/cgi/status.c
  		printf("});\n");
  		}
  	printf("function set_limit(url) { \nthis.location = url+'&limit='+$('#limit').val();\n  }\n");
-diff -urN nagios-4.5.3.org/cgi/tac.c nagios-4.5.3/cgi/tac.c
+diff -ur nagios-4.5.3.org/cgi/tac.c nagios-4.5.3/cgi/tac.c
 --- nagios-4.5.3.org/cgi/tac.c	2024-06-11 16:50:20.000000000 +0200
-+++ nagios-4.5.3/cgi/tac.c	2024-08-01 10:36:50.539971176 +0200
++++ nagios-4.5.3/cgi/tac.c	2024-08-01 12:11:08.709970995 +0200
 @@ -308,17 +308,7 @@
  
  	if (enable_page_tour == TRUE) {
@@ -86,10 +86,10 @@ diff -urN nagios-4.5.3.org/cgi/tac.c nagios-4.5.3/cgi/tac.c
  
  
  
-diff -urN nagios-4.5.3.org/html/main.php nagios-4.5.3/html/main.php
+diff -ur nagios-4.5.3.org/html/main.php nagios-4.5.3/html/main.php
 --- nagios-4.5.3.org/html/main.php	2024-06-11 16:50:20.000000000 +0200
-+++ nagios-4.5.3/html/main.php	2024-08-01 10:36:50.539971176 +0200
-@@ -19,20 +19,7 @@
++++ nagios-4.5.3/html/main.php	2024-08-01 12:21:25.903304305 +0200
+@@ -19,35 +19,7 @@
  
  <script type='text/javascript'>
  	var cookie;
@@ -107,10 +107,25 @@ diff -urN nagios-4.5.3.org/html/main.php nagios-4.5.3/html/main.php
 -			vbox = new vidbox({pos:'lr',vidurl:'https://www.youtube.com/embed/2hVBAet-XpY',
 -								text:vboxText,vidid:vBoxId});
 -		<?php } ?>
- 		loadRemoteFeed( // Our top banner splash.
- 			'#splashbox0-contents', 'corebanner', 1,
- 			'', processBannerItem, ''
-@@ -59,7 +46,6 @@
+-		loadRemoteFeed( // Our top banner splash.
+-			'#splashbox0-contents', 'corebanner', 1,
+-			'', processBannerItem, ''
+-		);
+-
+-		loadRemoteFeed( // "Latest News"
+-			'#splashbox4-contents', 'frontpage', 3,
+-			'<ul>', processNewsItem, '<li><a href="https://www.nagios.org/news" target="_blank">More news...</a></li></ul>'
+-		);
+-
+-		loadRemoteFeed( // "Don't Miss..."
+-			'#splashbox5-contents', 'corepromo', 3,
+-			'<ul>', processPromoItem, '</ul>'
+-		);
+-
+ 		getCoreStatus();
+ 	});
+ 
+@@ -59,7 +31,6 @@
  			crossDomain: true,
  			success: function(d, status, jqXHR) {
  				// We should have Internet access, set the playlist HTML.
@@ -118,7 +133,7 @@ diff -urN nagios-4.5.3.org/html/main.php nagios-4.5.3/html/main.php
  
  				var text = ''; // Start with empty text by default.
  
-@@ -94,19 +80,6 @@
+@@ -94,19 +65,6 @@
  			: '';
  	}
  
@@ -138,3 +153,18 @@ diff -urN nagios-4.5.3.org/html/main.php nagios-4.5.3/html/main.php
  	// Get the daemon status JSON.
  	function getCoreStatus() {
  		setCoreStatusHTML('passiveonly', 'Checking process status...');
+@@ -152,12 +110,11 @@
+ 
+ <div id="updateversioninfo">
+ <?php
+-	$updateinfo = get_update_information();
+-	if (!$updateinfo['update_checks_enabled']) {
++	if (1 || !$updateinfo['update_checks_enabled']) {
+ ?>
+ 		<div class="updatechecksdisabled">
+ 			<div class="warningmessage">Warning: Automatic Update Checks are Disabled!</div>
+-			<div class="submessage">Disabling update checks presents a possible security risk.  Visit <a href="https://www.nagios.org/" target="_blank">nagios.org</a> to check for updates manually or enable update checks in your Nagios config file.</a></div>
++			<div class="submessage">Disabling update checks presents a possible security risk.  Visit <a href="https://www.nagios.org/" target="_blank">nagios.org</a> to check for updates manually.</a></div>
+ 		</div>
+ <?php
+ 	} else if (
