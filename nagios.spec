@@ -13,7 +13,7 @@ Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
 Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
 Version:	4.5.3
-Release:	1
+Release:	2
 License:	GPL v2+
 Group:		Networking
 # https://www.nagios.org/downloads/nagios-core/thanks/?product_download=nagioscore-source
@@ -212,8 +212,12 @@ Requires:	nagios-theme
 Suggests:	nagios-theme-classicui
 Suggests:	nagios-theme-exfoliation
 Suggests:	nagios-theme-nuvola
+Conflicts:	nagios-theme-default < %{version}-%{release}
+Conflicts:  nagios-theme-default > %{version}-%{release}
 Conflicts:	nagios-theme-classicui < %{version}-%{release}
+Conflicts:	nagios-theme-classicui > %{version}-%{release}
 Conflicts:	nagios-theme-exfoliation < %{version}-%{release}
+Conflicts:	nagios-theme-exfoliation > %{version}-%{release}
 Obsoletes:	nagios-theme-default < 3.3.1-1.4
 BuildArch:	noarch
 
