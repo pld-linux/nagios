@@ -89,7 +89,7 @@ diff -ur nagios-4.5.3.org/cgi/tac.c nagios-4.5.3/cgi/tac.c
 diff -ur nagios-4.5.3.org/html/main.php nagios-4.5.3/html/main.php
 --- nagios-4.5.3.org/html/main.php	2024-06-11 16:50:20.000000000 +0200
 +++ nagios-4.5.3/html/main.php	2024-08-01 12:21:25.903304305 +0200
-@@ -19,35 +19,7 @@
+@@ -23,21 +23,7 @@ if ($theme != 'dark' && $theme != 'light
  
  <script type='text/javascript'>
  	var cookie;
@@ -100,60 +100,18 @@ diff -ur nagios-4.5.3.org/html/main.php nagios-4.5.3/html/main.php
 -						"Click here to watch the entire Nagios Core 4 Tour!</a>";
 -	<?php } ?>
  	$(document).ready(function() {
--		var user = "<?php echo htmlspecialchars($_SERVER['REMOTE_USER']); ?>";
+-		var user = "<?php echo htmlspecialchars($_SERVER['REMOTE_USER'] ?? ''); ?>";
 -
 -		<?php if ($cfg["enable_page_tour"]) { ?>
 -			vBoxId += ";" + user;
 -			vbox = new vidbox({pos:'lr',vidurl:'https://www.youtube.com/embed/2hVBAet-XpY',
 -								text:vboxText,vidid:vBoxId});
 -		<?php } ?>
--		loadRemoteFeed( // Our top banner splash.
--			'#splashbox0-contents', 'corebanner', 1,
--			'', processBannerItem, ''
--		);
--
--		loadRemoteFeed( // "Latest News"
--			'#splashbox4-contents', 'frontpage', 3,
--			'<ul>', processNewsItem, '<li><a href="https://www.nagios.org/news" target="_blank">More news...</a></li></ul>'
--		);
--
--		loadRemoteFeed( // "Don't Miss..."
--			'#splashbox5-contents', 'corepromo', 3,
--			'<ul>', processPromoItem, '</ul>'
--		);
 -
  		getCoreStatus();
  	});
  
-@@ -59,7 +31,6 @@
- 			crossDomain: true,
- 			success: function(d, status, jqXHR) {
- 				// We should have Internet access, set the playlist HTML.
--				initializePlaylist();
- 
- 				var text = ''; // Start with empty text by default.
- 
-@@ -94,19 +65,6 @@
- 			: '';
- 	}
- 
--
--	// Set our playlist HTML when we know we have Internet access.
--	var playlistInitialized = false;
--	function initializePlaylist() {
--		if (!playlistInitialized) {
--			playlistInitialized = true;
--			$('#splashbox3')
--				.addClass('splashbox3-full')
--				.removeClass('splashbox3-empty')
--				.html('<iframe width="100%" height="100%" src="//www.youtube.com/embed/videoseries?list=PLN-ryIrpC_mCUW1DFwZpxpAk00i60lSkE&iv_load_policy=3&rel=0" frameborder="0" allowfullscreen></iframe>');
--		}
--	}
--
- 	// Get the daemon status JSON.
- 	function getCoreStatus() {
- 		setCoreStatusHTML('passiveonly', 'Checking process status...');
-@@ -152,12 +110,11 @@
+@@ -81,12 +67,11 @@ if ($theme != 'dark' && $theme != 'light
  
  <div id="updateversioninfo">
  <?php
@@ -167,4 +125,4 @@ diff -ur nagios-4.5.3.org/html/main.php nagios-4.5.3/html/main.php
 +			<div class="submessage">Disabling update checks presents a possible security risk.  Visit <a href="https://www.nagios.org/" target="_blank">nagios.org</a> to check for updates manually.</a></div>
  		</div>
  <?php
- 	} else if (
+ 	} else if ($updateinfo['update_available'] && $this_version < $updateinfo['update_version']) {

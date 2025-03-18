@@ -82,18 +82,15 @@ diff -urNp -x '*.orig' nagios-4.4.6.org/cgi/statusmap.c nagios-4.4.6/cgi/statusm
  		printf("<body CLASS='statusmap' name='mappage' id='mappage'>\n");
  
  		/* include user SSI header */
-@@ -718,9 +745,9 @@ void display_page_header(void) {
+@@ -728,7 +728,7 @@ void display_page_header(void) {
+ 		/* right hand column of top row */
  		printf("<td align=right valign=top>\n");
  
- #ifdef LEGACY_GRAPHICAL_CGIS
 -		printf("<form method=\"POST\" action=\"%s\">\n", STATUSMAP_CGI);
-+		printf("<form name=\"layoutform\" method=\"POST\" action=\"%s\">\n", STATUSMAP_CGI);
- #else
--		printf("<form method=\"POST\" action=\"%s\">\n", LEGACY_STATUSMAP_CGI);
-+		printf("<form name=\"layoutform\" method=\"POST\" action=\"%s\">\n", LEGACY_STATUSMAP_CGI);
- #endif
++                printf("<form name=\"layoutform\" method=\"POST\" action=\"%s\">\n", STATUSMAP_CGI);
  		printf("<table border=0 CLASS='optBox'>\n");
  		printf("<tr><td valign=top>\n");
+ 		printf("<input type='hidden' name='host' value='%s'>\n", escape_string(host_name));
 @@ -743,6 +770,7 @@ void display_page_header(void) {
  		printf("<option value=%d %s>Circular\n", LAYOUT_CIRCULAR, (layout_method == LAYOUT_CIRCULAR) ? "selected" : "");
  		printf("<option value=%d %s>Circular (Marked Up)\n", LAYOUT_CIRCULAR_MARKUP, (layout_method == LAYOUT_CIRCULAR_MARKUP) ? "selected" : "");

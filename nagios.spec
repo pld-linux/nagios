@@ -12,13 +12,13 @@ Summary:	Open Source host, service and network monitoring program
 Summary(pl.UTF-8):	Program do monitorowania serwerów/usług/sieci
 Summary(pt_BR.UTF-8):	Programa para monitoração de máquinas e serviços
 Name:		nagios
-Version:	4.5.3
-Release:	5
+Version:	4.5.9
+Release:	1
 License:	GPL v2+
 Group:		Networking
 # https://www.nagios.org/downloads/nagios-core/thanks/?product_download=nagioscore-source
 Source0:	https://assets.nagios.com/downloads/nagioscore/releases/%{name}-%{version}.tar.gz
-# Source0-md5:	b77fd2fb656245dd0097c8e7b1310d3e
+# Source0-md5:	dea21ad245e301fb05d3e8408499e001
 Source1:	%{name}-apache.conf
 Source2:	%{name}.init
 Source3:	%{name}.sysconfig
@@ -253,18 +253,18 @@ mv %{name}-%{version}/* .
 
 #%patch100 -p1
 
-%patch0 -p0
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
+%patch -P0 -p0
+%patch -P1 -p1
+%patch -P2 -p1
+%patch -P3 -p1
 #fixed
-#%patch4 -p1
-%patch5 -p1
-%patch6 -p1
-%patch7 -p1
-%patch8 -p1
+#%%patch -P4 -p1
+%patch -P5 -p1
+%patch -P6 -p1
+%patch -P7 -p1
+%patch -P8 -p1
 
-%patch10 -p1
+%patch -P10 -p1
 
 find -name .cvsignore -o -name .gitignore | xargs rm
 
