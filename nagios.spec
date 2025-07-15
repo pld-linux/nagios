@@ -251,7 +251,7 @@ mv %{name}-%{version}/* .
 %undos include/*.h
 %undos base/*
 
-#%patch100 -p1
+#%%patch100 -p1
 
 %patch -P0 -p0
 %patch -P1 -p1
